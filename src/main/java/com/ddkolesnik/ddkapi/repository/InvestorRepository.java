@@ -1,6 +1,6 @@
 package com.ddkolesnik.ddkapi.repository;
 
-import com.ddkolesnik.ddkapi.model.User;
+import com.ddkolesnik.ddkapi.model.Investor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
  */
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface InvestorRepository extends JpaRepository<Investor, Long> {
 }
