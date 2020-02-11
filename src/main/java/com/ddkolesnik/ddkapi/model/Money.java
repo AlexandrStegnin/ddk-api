@@ -10,6 +10,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 
+import static com.ddkolesnik.ddkapi.util.Constants.UNKNOWN_FACILITY;
+
 /**
  * @author Alexandr Stegnin
  */
@@ -22,14 +24,14 @@ import java.time.LocalDate;
 public class Money {
 
     @Id
-    @Column(name = "id", insertable = false, updatable = false)
     Long id;
 
     @Column(name = "givedCash")
     BigDecimal givenCash;
 
-    @Column(name = "facilityId")
-    Long facilityId;
+    @OneToOne
+    @JoinColumn(name = "facilityId")
+    Facility facility;
 
     @Column(name = "dateGivedCash")
     LocalDate dateGiven;
@@ -38,4 +40,7 @@ public class Money {
         return givenCash.setScale(2, RoundingMode.HALF_UP);
     }
 
+    public String getFacility() {
+        return facility != null ? facility.getName() : UNKNOWN_FACILITY;
+    }
 }
