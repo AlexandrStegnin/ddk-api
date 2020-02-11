@@ -1,8 +1,10 @@
 package com.ddkolesnik.ddkapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * @author Alexandr Stegnin
@@ -11,7 +13,8 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "USERS")
-public class User {
+@JsonIgnoreProperties({"id"})
+public class Investor {
 
     @Id
     @GeneratedValue
@@ -20,4 +23,7 @@ public class User {
 
     private String login;
 
+    @OneToMany
+    @JoinColumn(name = "investorId")
+    private List<Money> monies;
 }
