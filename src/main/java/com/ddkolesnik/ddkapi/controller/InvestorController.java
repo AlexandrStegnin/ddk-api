@@ -10,13 +10,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.ddkolesnik.ddkapi.util.Constants.INVESTORS_PATH;
+
 /**
  * @author Alexandr Stegnin
  */
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "api/v1/investors")
+@RequestMapping(path = INVESTORS_PATH)
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class InvestorController {
 
