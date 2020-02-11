@@ -1,7 +1,9 @@
 package com.ddkolesnik.ddkapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
 import java.util.List;
@@ -14,16 +16,15 @@ import java.util.List;
 @Entity
 @Table(name = "USERS")
 @JsonIgnoreProperties({"id"})
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Investor {
 
     @Id
-    @GeneratedValue
-    @Column(name = "id", insertable = false, updatable = false)
-    private Long id;
+    Long id;
 
-    private String login;
+    String login;
 
     @OneToMany
     @JoinColumn(name = "investorId")
-    private List<Money> monies;
+    List<Money> monies;
 }
