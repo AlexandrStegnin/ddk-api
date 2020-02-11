@@ -1,7 +1,7 @@
 package com.ddkolesnik.ddkapi.controller;
 
-import com.ddkolesnik.ddkapi.model.User;
-import com.ddkolesnik.ddkapi.service.UserService;
+import com.ddkolesnik.ddkapi.model.Investor;
+import com.ddkolesnik.ddkapi.service.InvestorService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -16,15 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "api/v1/users")
+@RequestMapping(path = "api/v1/investors")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-public class UserController {
+public class InvestorController {
 
-    UserService userService;
+    InvestorService investorService;
 
     @GetMapping(path = "/{id}")
-    public User findUser(@PathVariable long id) {
-        return userService.findById(id);
+    public Investor getInvestor(@PathVariable long id) {
+        return investorService.findById(id);
     }
 
 }
