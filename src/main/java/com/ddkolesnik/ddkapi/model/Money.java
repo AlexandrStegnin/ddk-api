@@ -1,16 +1,13 @@
 package com.ddkolesnik.ddkapi.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
-
-import static com.ddkolesnik.ddkapi.util.Constants.UNKNOWN_FACILITY;
 
 /**
  * @author Alexandr Stegnin
@@ -18,13 +15,10 @@ import static com.ddkolesnik.ddkapi.util.Constants.UNKNOWN_FACILITY;
 
 @Data
 @Entity
-@Table(name = "InvestorsCash")
-@JsonIgnoreProperties({"id"})
+@Table(name = "InvestorsCash", schema = "pss_projects")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Money {
-
-    @Id
-    Long id;
+@EqualsAndHashCode(callSuper = false)
+public class Money extends AbstractEntity {
 
     @Column(name = "givedCash")
     BigDecimal givenCash;
@@ -36,11 +30,11 @@ public class Money {
     @Column(name = "dateGivedCash")
     LocalDate dateGiven;
 
-    public BigDecimal getGivenCash() {
-        return givenCash.setScale(2, RoundingMode.HALF_UP);
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "investorId")
+    Investor investor;
 
-    public String getFacility() {
-        return facility != null ? facility.getName() : UNKNOWN_FACILITY;
-    }
+    @Column(name = "dateClosingInvest")
+    LocalDate dateClosing;
+
 }
