@@ -15,7 +15,7 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "FACILITYES", schema = "pss_projects")
+@Table(name = "FACILITYES", schema = "pss_projects", catalog = "pss_projects")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = false)
 public class Facility extends AbstractEntity {

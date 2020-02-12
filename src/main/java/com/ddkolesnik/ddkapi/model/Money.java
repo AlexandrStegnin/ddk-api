@@ -15,7 +15,7 @@ import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name = "InvestorsCash", schema = "pss_projects")
+@Table(name = "InvestorsCash", schema = "pss_projects", catalog = "pss_projects")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = false)
 public class Money extends AbstractEntity {
