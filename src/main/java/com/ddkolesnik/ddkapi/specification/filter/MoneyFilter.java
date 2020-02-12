@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Objects;
+
 /**
  * @author Alexandr Stegnin
  */
@@ -18,4 +20,9 @@ public class MoneyFilter extends AbstractFilter {
 
     String investor;
 
+    String partnerCode;
+
+    public String getPartnerCode() {
+        return Objects.isNull(partnerCode) ? "" : "investor" + partnerCode;
+    }
 }
