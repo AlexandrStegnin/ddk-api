@@ -29,6 +29,7 @@ public class MoneySpecification extends BaseSpecification<Money, MoneyFilter> {
         return (root, query, cb) -> where(
                 defaultConditions())
                 .and(investorLoginEqual(filter.getInvestor()))
+                .and(loginContainsPartnerCode(filter.getPartnerCode()))
                 .and(dateGivenCashBetween(filter.getFromDate(), filter.getToDate()))
                 .and(facilityEqual(filter.getFacility()))
                 .toPredicate(root, query, cb);
@@ -80,6 +81,10 @@ public class MoneySpecification extends BaseSpecification<Money, MoneyFilter> {
             }
         }
         );
+    }
+
+    private static Specification<Money> loginContainsPartnerCode(String partnerCode) {
+        return investorLoginEqual(partnerCode);
     }
 
     private static Specification<Money> givenCashGreaterThanZero() {
