@@ -1,11 +1,13 @@
 package com.ddkolesnik.ddkapi.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.List;
 
 /**
@@ -14,17 +16,13 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "USERS")
-@JsonIgnoreProperties({"id"})
+@Table(name = "USERS", schema = "pss_projects")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Investor {
-
-    @Id
-    Long id;
+@EqualsAndHashCode(callSuper = false)
+public class Investor extends AbstractEntity {
 
     String login;
 
-    @OneToMany
-    @JoinColumn(name = "investorId")
+    @OneToMany(mappedBy = "investor")
     List<Money> monies;
 }
