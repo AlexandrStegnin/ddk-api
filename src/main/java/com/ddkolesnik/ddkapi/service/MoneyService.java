@@ -1,5 +1,6 @@
 package com.ddkolesnik.ddkapi.service;
 
+import com.ddkolesnik.ddkapi.dto.bitrix.BitrixContactDTO;
 import com.ddkolesnik.ddkapi.dto.MoneyDTO;
 import com.ddkolesnik.ddkapi.model.Money;
 import com.ddkolesnik.ddkapi.repository.MoneyRepository;
@@ -11,7 +12,10 @@ import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -20,26 +24,41 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class MoneyService {
 
-    MoneyRepository moneyRepository;
+    final MoneyRepository moneyRepository;
 
-    MoneySpecification specification;
+    final MoneySpecification specification;
 
-    ModelMapper mapper;
+    final ModelMapper mapper;
+
+    final BitrixContactService bitrixContactService;
+
+    List<BitrixContactDTO> bitrixContacts;
 
     private List<Money> findAll(MoneyFilter filter) {
         return moneyRepository.findAll(specification.getFilter(filter));
     }
 
     public List<MoneyDTO> findAllDTO(MoneyFilter filter) {
+        bitrixContacts = new ArrayList<>(bitrixContactService.findAll());
         return findAll(filter).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     private MoneyDTO convertToDTO(Money money) {
-        return mapper.map(money, MoneyDTO.class);
+        MoneyDTO dto = mapper.map(money, MoneyDTO.class);
+        Pattern pattern = Pattern.compile("\\d+");
+        Matcher matcher = pattern.matcher(dto.getInvestor());
+        if (matcher.find()) {
+            BitrixContactDTO contactDTO = bitrixContacts
+                    .stream()
+                    .filter(contact -> contact.getCode().equalsIgnoreCase(matcher.group()))
+                    .findFirst().orElse(null);
+            dto.setBitrixInfo(contactDTO);
+        }
+        return dto;
     }
 }
