@@ -12,9 +12,9 @@ public class Constant {
 
     public static final String VERSION = "/v1";
 
-    public static final String PATH_INVESTORS = API + VERSION + "/investors";
+    public static final String PATH_INVESTORS = VERSION + "/investors";
 
-    public static final String PATH_MONIES = API + VERSION + "/monies";
+    public static final String PATH_MONIES = VERSION + "/monies";
 
     // MESSAGES
     public static final String UNKNOWN_FACILITY = "Неизвестный объект";
