@@ -1,5 +1,6 @@
 package com.ddkolesnik.ddkapi.dto;
 
+import com.ddkolesnik.ddkapi.dto.bitrix.BitrixContactDTO;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -26,9 +27,11 @@ public class MoneyDTO {
 
     FacilityDTO facility;
 
-    BigDecimal givenCash;
+    BigDecimal givenCash = BigDecimal.ZERO;
 
     LocalDate dateGiven;
+
+    BitrixContactDTO bitrixInfo;
 
     public String getInvestor() {
         return Objects.isNull(investor) ? UNKNOWN_INVESTOR : investor.getLogin();
