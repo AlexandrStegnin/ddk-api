@@ -1,10 +1,9 @@
 package com.ddkolesnik.ddkapi.specification.filter;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -24,5 +23,12 @@ public class MoneyFilter extends AbstractFilter {
 
     public String getPartnerCode() {
         return Objects.isNull(partnerCode) ? "" : "investor" + partnerCode;
+    }
+
+    public MoneyFilter(LocalDate fromDate, LocalDate toDate, String facility, String investor, String partnerCode) {
+        super(fromDate, toDate);
+        this.facility = facility;
+        this.investor = investor;
+        this.partnerCode = partnerCode;
     }
 }
