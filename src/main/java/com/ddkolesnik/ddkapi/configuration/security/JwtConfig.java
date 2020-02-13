@@ -1,4 +1,4 @@
-package com.ddkolesnik.ddkapi.configuration;
+package com.ddkolesnik.ddkapi.configuration.security;
 
 import lombok.Getter;
 import lombok.ToString;

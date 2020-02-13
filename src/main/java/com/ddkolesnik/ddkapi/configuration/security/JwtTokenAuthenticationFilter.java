@@ -1,4 +1,4 @@
-package com.ddkolesnik.ddkapi.configuration;
+package com.ddkolesnik.ddkapi.configuration.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

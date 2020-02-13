@@ -1,4 +1,4 @@
-package com.ddkolesnik.ddkapi.configuration;
+package com.ddkolesnik.ddkapi.configuration.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ddkolesnik.ddkapi.model.User;
