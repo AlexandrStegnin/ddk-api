@@ -26,6 +26,8 @@ public class Constant {
 
     public static final String UNKNOWN_INVESTOR = "Неизвестный инвестор";
 
+    // IGNORING access to Spring Security
+
     public static final String[] ALL_HTTP_MATCHERS = {
             "/VAADIN/**", "/HEARTBEAT/**", "/UIDL/**", "/resources/**",
             "/manifest.json", "/icons/**", "/images/**",
