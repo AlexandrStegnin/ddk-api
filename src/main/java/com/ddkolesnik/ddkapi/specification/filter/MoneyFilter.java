@@ -1,6 +1,9 @@
 package com.ddkolesnik.ddkapi.specification.filter;
 
-import lombok.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
@@ -15,10 +18,13 @@ import java.util.Objects;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MoneyFilter extends AbstractFilter {
 
+    @Schema(implementation = String.class, name = "facility", description = "Объект вложений")
     String facility;
 
+    @Schema(implementation = String.class, name = "investor", description = "Логин инвестора")
     String investor;
 
+    @Schema(implementation = String.class, name = "partnerCode", description = "Код партнёра", required = true)
     String partnerCode;
 
     public String getPartnerCode() {
