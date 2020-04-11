@@ -1,6 +1,9 @@
 package com.ddkolesnik.ddkapi.controller;
 
+import com.ddkolesnik.ddkapi.configuration.ApiErrorResponse;
 import com.ddkolesnik.ddkapi.dto.MoneyDTO;
+import com.ddkolesnik.ddkapi.exception.ApiException;
+import com.ddkolesnik.ddkapi.service.AppKeyService;
 import com.ddkolesnik.ddkapi.service.MoneyService;
 import com.ddkolesnik.ddkapi.specification.filter.MoneyFilter;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,14 +17,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static com.ddkolesnik.ddkapi.util.Constant.PATH_MONIES;
@@ -39,27 +38,21 @@ public class MoneyController {
 
     MoneyService moneyService;
 
+    AppKeyService appKeyService;
+
     @Operation(summary = "Получить список денег инвестора по параметрам", tags = {"Money"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Успешно"),
             @ApiResponse(responseCode = "403", description = "Доступ запрещён",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = String.class))))})
-    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public List<MoneyDTO> getMonies(
-            @Parameter(description = "Код партнёра.", example = "017", schema = @Schema(implementation = String.class))
-            @RequestParam String partnerCode,
-            @Parameter(description = "Логин инвестора.", example = "investor017", schema = @Schema(implementation = String.class))
-            @RequestParam(required = false) String login,
-            @Parameter(description = "Объект вложений.", example = "Чаплина", schema = @Schema(implementation = String.class))
-            @RequestParam(required = false) String facility,
-            @Parameter(description = "Вложения С даты.", example = "2016-01-01", schema = @Schema(implementation = LocalDate.class))
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @Parameter(description = "Вложения ПО дату.", example = "2020-01-01", schema = @Schema(implementation = LocalDate.class))
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
-        MoneyFilter filter = new MoneyFilter(fromDate, toDate, facility, login, partnerCode);
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class))))})
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public List<MoneyDTO> getAllInvestorMonies(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
+                                               @PathVariable(name = "appKey") String appKey,
+                                               @Parameter(description = "Фильтр", schema = @Schema(implementation = MoneyFilter.class))
+                                               @RequestBody MoneyFilter filter) {
+        if (!appKeyService.existByKey(appKey)) {
+            throw new ApiException("Доступ запрещён", HttpStatus.FORBIDDEN);
+        }
         return moneyService.findAllDTO(filter);
     }
-
 }
