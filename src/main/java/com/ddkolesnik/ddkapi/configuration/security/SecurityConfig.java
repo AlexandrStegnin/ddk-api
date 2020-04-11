@@ -24,8 +24,6 @@ import static com.ddkolesnik.ddkapi.util.Constant.*;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-//@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-//@EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -44,6 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(BASE_URL).permitAll()
                 .antMatchers(API_INFO_URL).permitAll()
                 .antMatchers(ALL_HTTP_MATCHERS).permitAll()
+                .antMatchers(HttpMethod.POST, PATH_MONIES).permitAll()
                 .and()
                 // handle an authorized attempts
                 .exceptionHandling().authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED))
