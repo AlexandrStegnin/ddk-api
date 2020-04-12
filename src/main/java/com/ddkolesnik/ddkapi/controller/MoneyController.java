@@ -19,8 +19,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static com.ddkolesnik.ddkapi.util.Constant.PATH_MONIES;
@@ -29,6 +31,7 @@ import static com.ddkolesnik.ddkapi.util.Constant.PATH_MONIES;
  * @author Alexandr Stegnin
  */
 
+@Validated
 @RestController
 @RequestMapping(PATH_MONIES)
 @RequiredArgsConstructor
@@ -49,7 +52,7 @@ public class MoneyController {
     public List<MoneyDTO> getAllInvestorMonies(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
                                                @PathVariable(name = "appKey") String appKey,
                                                @Parameter(description = "Фильтр", schema = @Schema(implementation = MoneyFilter.class))
-                                               @RequestBody MoneyFilter filter) {
+                                               @Valid @RequestBody MoneyFilter filter) {
         if (!appKeyService.existByKey(appKey)) {
             throw new ApiException("Доступ запрещён", HttpStatus.FORBIDDEN);
         }
