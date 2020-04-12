@@ -22,4 +22,10 @@ public abstract class AbstractFilter {
     @Schema(implementation = LocalDate.class, name = "toDate", description = "Дата вложений ПО")
     LocalDate toDate;
 
+    @Schema(implementation = Integer.class, name = "limit", description = "Количество записей")
+    int limit = 50;
+
+    @Schema(implementation = Integer.class, name = "offset", description = "С какой записи запрашивать")
+    int offset = 0;
+
 }
