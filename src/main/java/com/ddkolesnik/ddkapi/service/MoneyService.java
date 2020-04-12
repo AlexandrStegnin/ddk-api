@@ -3,6 +3,7 @@ package com.ddkolesnik.ddkapi.service;
 import com.ddkolesnik.ddkapi.dto.bitrix.BitrixContactDTO;
 import com.ddkolesnik.ddkapi.dto.MoneyDTO;
 import com.ddkolesnik.ddkapi.model.Money;
+import com.ddkolesnik.ddkapi.model.Money_;
 import com.ddkolesnik.ddkapi.repository.MoneyRepository;
 import com.ddkolesnik.ddkapi.specification.MoneySpecification;
 import com.ddkolesnik.ddkapi.specification.filter.MoneyFilter;
@@ -10,6 +11,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -38,7 +42,21 @@ public class MoneyService {
     List<BitrixContactDTO> bitrixContacts;
 
     private List<Money> findAll(MoneyFilter filter) {
-        return moneyRepository.findAll(specification.getFilter(filter));
+        int page = 0;
+        int limit = 50;
+        if (filter != null) {
+            if (filter.getLimit() == 0) {
+                filter.setLimit(50);
+            }
+            limit = filter.getLimit();
+            if (filter.getOffset() > 0) {
+                page = filter.getOffset() / limit;
+            } else {
+                page = 0;
+            }
+        }
+        Pageable pageable = PageRequest.of(page, limit, Sort.Direction.ASC, Money_.DATE_GIVEN);
+        return moneyRepository.findAll(specification.getFilter(filter), pageable).getContent();
     }
 
     public List<MoneyDTO> findAllDTO(MoneyFilter filter) {
