@@ -28,6 +28,13 @@ public class Constant {
 
     public static final String UNKNOWN_INVESTOR = "Неизвестный инвестор";
 
+    // USERS PATH
+    public static final String USERS = BASE_URL + VERSION + KEY_PATH + "/users";
+
+    public static final String UPDATE_USER = "/update";
+
+    public static final String USER_LOGIN = "/{login}";
+
     // IGNORING access to Spring Security
 
     public static final String[] ALL_HTTP_MATCHERS = {
