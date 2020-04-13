@@ -32,7 +32,7 @@ public class AppUserDTOConstraintsTest {
     @DisplayName("Проверка фамилии на null, должна быть 1 ошибка")
     public void when_last_name_null_the_constraint_exceptions_not_equals_zero() {
         AppUserDTO dto = new AppUserDTO();
-        dto.setLogin("login");
+        dto.setPartnerCode("login");
         Set<ConstraintViolation<AppUserDTO>> violations = validator.validate(dto);
         assertEquals(violations.size(), 1);
     }
@@ -42,7 +42,7 @@ public class AppUserDTOConstraintsTest {
     @DisplayName("Проверка фамилии на пустую строку, должна быть 1 ошибка")
     public void when_last_name_is_empty_the_constraint_exceptions_not_equals_zero() {
         AppUserDTO dto = new AppUserDTO();
-        dto.setLogin("login");
+        dto.setPartnerCode("login");
         dto.setLastName("");
         Set<ConstraintViolation<AppUserDTO>> violations = validator.validate(dto);
         assertEquals(violations.size(), 1);
@@ -53,7 +53,7 @@ public class AppUserDTOConstraintsTest {
     @DisplayName("Проверка фамилии на строку с пробелом, должна быть 1 ошибка")
     public void when_last_name_is_blank_the_constraint_exceptions_not_equals_zero() {
         AppUserDTO dto = new AppUserDTO();
-        dto.setLogin("login");
+        dto.setPartnerCode("login");
         dto.setLastName(" ");
         Set<ConstraintViolation<AppUserDTO>> violations = validator.validate(dto);
         assertEquals(violations.size(), 1);
