@@ -11,10 +11,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.UUID;
 
 /**
+ * Сервис для управления пользователями
+ *
  * @author Alexandr Stegnin
  */
 
@@ -33,12 +34,28 @@ public class AppUserService {
 
     RoleService roleService;
 
-    public AppUser update(AppUser user) {
+    /**
+     * Обновить данные пользователя
+     *
+     * @param user - пользователь, которого необходимо обновить
+     * @return - обновлённый пользователь
+     */
+    private AppUser update(AppUser user) {
         return appUserRepository.save(user);
     }
 
+    /**
+     * Обновить данные пользователя
+     *
+     * @param appUserDTO - DTO пользователя
+     * @return - обновлённое DTO пользователя
+     */
     public AppUserDTO update(AppUserDTO appUserDTO) {
-        AppUser user = new AppUser();
+        String login = INVESTOR_PREFIX.concat(appUserDTO.getPartnerCode());
+        AppUser user = findByLogin(login);
+        if (user == null) {
+            user = new AppUser();
+        }
         BeanUtils.copyProperties(appUserDTO, user);
         user.addRole(getInvestorRole());
         user.setPassword(generatePassword());
@@ -47,19 +64,14 @@ public class AppUserService {
         return appUserDTO;
     }
 
-    @Deprecated
+    /**
+     * Найти пользователя по логину
+     *
+     * @param login - логин пользователя
+     * @return - пользователь
+     */
     private AppUser findByLogin(String login) {
-        AppUser user = appUserRepository.findByLogin(login);
-        if (user == null) {
-            throw new EntityNotFoundException("Пользователь с логином = [" + login + "] не найден");
-        }
         return appUserRepository.findByLogin(login);
-    }
-
-    @Deprecated
-    public AppUserDTO findByName(String login) {
-        AppUser user = findByLogin(login);
-        return new AppUserDTO(user);
     }
 
     @Deprecated
@@ -67,10 +79,20 @@ public class AppUserService {
         appUserRepository.delete(findByLogin(login));
     }
 
+    /**
+     * Получить из базы роль "ИНВЕСТОР"
+     *
+     * @return - роль
+     */
     private Role getInvestorRole() {
         return roleService.findByRoleName(ROLE_INVESTOR);
     }
 
+    /**
+     * Сгенерировать пароль для пользователя
+     *
+     * @return - сгенерированный пароль
+     */
     private String generatePassword() {
         String password = UUID.randomUUID().toString().substring(0, 8);
         return encoder.encode(password);

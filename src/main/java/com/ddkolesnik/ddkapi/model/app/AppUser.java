@@ -45,9 +45,4 @@ public class AppUser {
         this.roles.add(role);
     }
 
-    @PrePersist
-    public void setLogin() {
-        this.login = "investor".concat(this.login);
-    }
-
 }
