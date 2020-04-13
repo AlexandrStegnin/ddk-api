@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.ddkolesnik.ddkapi.util.Constant.INVALID_APP_TOKEN;
+
 /**
  * @author Alexandr Stegnin
  */
@@ -33,8 +35,14 @@ public class ApiExceptionHandler {
                 .stream()
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.joining( ",\n"));
-        ApiErrorResponse apiErrorResponse = new ApiErrorResponse(HttpStatus.BAD_REQUEST, errorMessage, Instant.now());
-        return new ResponseEntity<>(apiErrorResponse, HttpStatus.BAD_REQUEST);
+        HttpStatus status;
+        if (errorMessage.equalsIgnoreCase(INVALID_APP_TOKEN)) {
+            status = HttpStatus.FORBIDDEN;
+        } else {
+            status = HttpStatus.BAD_REQUEST;
+        }
+        ApiErrorResponse apiErrorResponse = new ApiErrorResponse(status, errorMessage, Instant.now());
+        return new ResponseEntity<>(apiErrorResponse, status);
     }
 
     @ExceptionHandler
