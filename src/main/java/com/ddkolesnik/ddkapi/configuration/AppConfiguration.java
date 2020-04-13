@@ -28,8 +28,6 @@ public class AppConfiguration {
         return new OpenAPI()
                 .components(new Components())
                 .info(new Info().title("Документация по API Доходного Дома Колесникъ")
-                        .description("Для доступа к информации необходимо отправить POST запрос " +
-                                "в формате JSON с логином и паролем на www.api.ddkolesnik.com/auth")
                         .contact(contact));
     }
 }

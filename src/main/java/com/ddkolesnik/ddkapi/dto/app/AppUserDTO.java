@@ -1,9 +1,8 @@
 package com.ddkolesnik.ddkapi.dto.app;
 
-import com.ddkolesnik.ddkapi.model.app.AppUser;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotBlank;
@@ -13,22 +12,19 @@ import javax.validation.constraints.NotBlank;
  */
 
 @Data
-@NoArgsConstructor
+@Schema(name = "AppUser", description = "Информация об инвесторе")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AppUserDTO {
 
     @NotBlank(message = "Код партнёра должен быть указан")
-    String login;
+    @Schema(implementation = String.class, name = "partnerCode", description = "Код инвестора")
+    String partnerCode;
 
     @NotBlank(message = "Фамилия инвестора должна быть указана")
+    @Schema(implementation = String.class, name = "lastName", description = "Фамилия инвестора")
     String lastName;
 
+    @Schema(implementation = String.class, name = "email", description = "Email инвестора")
     String email;
-
-    public AppUserDTO(AppUser entity) {
-        this.login = entity.getLogin();
-        this.lastName = entity.getLastName();
-        this.email = entity.getEmail();
-    }
 
 }
