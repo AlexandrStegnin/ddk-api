@@ -34,7 +34,7 @@ public class AppUserDTOConstraintsTest {
         AppUserDTO dto = new AppUserDTO();
         dto.setPartnerCode("login");
         Set<ConstraintViolation<AppUserDTO>> violations = validator.validate(dto);
-        assertEquals(violations.size(), 1);
+        assertEquals(violations.size(), 2);
     }
 
     @Test
@@ -45,7 +45,7 @@ public class AppUserDTOConstraintsTest {
         dto.setPartnerCode("login");
         dto.setLastName("");
         Set<ConstraintViolation<AppUserDTO>> violations = validator.validate(dto);
-        assertEquals(violations.size(), 1);
+        assertEquals(violations.size(), 2);
     }
 
     @Test
@@ -56,7 +56,29 @@ public class AppUserDTOConstraintsTest {
         dto.setPartnerCode("login");
         dto.setLastName(" ");
         Set<ConstraintViolation<AppUserDTO>> violations = validator.validate(dto);
-        assertEquals(violations.size(), 1);
+        assertEquals(violations.size(), 2);
+    }
+
+    @Test
+    @Order(4)
+    @DisplayName("Проверка кода партнёра, содержит не только цифры")
+    public void when_partner_code_is_digit_with_character_the_constraint_exceptions_not_equals_zero() {
+        AppUserDTO dto = new AppUserDTO();
+        dto.setPartnerCode("login123");
+        dto.setLastName(" ");
+        Set<ConstraintViolation<AppUserDTO>> violations = validator.validate(dto);
+        assertEquals(violations.size(), 2);
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("Проверка кода партнёра, содержит только цифры")
+    public void when_user_is_valid_then_constraint_exceptions_equals_zero() {
+        AppUserDTO dto = new AppUserDTO();
+        dto.setPartnerCode("000123");
+        dto.setLastName("last name");
+        Set<ConstraintViolation<AppUserDTO>> violations = validator.validate(dto);
+        assertEquals(violations.size(), 0);
     }
 
 }
