@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 /**
  * @author Alexandr Stegnin
@@ -16,7 +17,8 @@ import javax.validation.constraints.NotBlank;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AppUserDTO {
 
-    @NotBlank(message = "Код партнёра должен быть указан")
+    @NotBlank(message = "Код инвестора должен быть указан")
+    @Pattern(regexp = "\\d+", message = "Код инвестора должен содержать только цифры")
     @Schema(implementation = String.class, name = "partnerCode", description = "Код инвестора")
     String partnerCode;
 
