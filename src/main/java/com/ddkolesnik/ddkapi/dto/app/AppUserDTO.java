@@ -20,6 +20,7 @@ public class AppUserDTO {
     @NotNull(message = "Код партнёра должен быть указан")
     String login;
 
+    @NotNull(message = "Фамилия инвестора должна быть указана")
     String lastName;
 
     String email;
