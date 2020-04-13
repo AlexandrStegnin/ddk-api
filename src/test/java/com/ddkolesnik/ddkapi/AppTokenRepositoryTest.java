@@ -1,8 +1,8 @@
 package com.ddkolesnik.ddkapi;
 
-import com.ddkolesnik.ddkapi.model.app.AppKey;
-import com.ddkolesnik.ddkapi.repository.AppKeyRepository;
-import com.ddkolesnik.ddkapi.service.AppKeyService;
+import com.ddkolesnik.ddkapi.model.app.AppToken;
+import com.ddkolesnik.ddkapi.repository.AppTokenRepository;
+import com.ddkolesnik.ddkapi.service.AppTokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,30 +20,30 @@ import static org.mockito.Mockito.*;
  */
 
 @SpringBootTest
-public class AppKeyRepositoryTest {
+public class AppTokenRepositoryTest {
 
     @Mock
-    AppKeyRepository appKeyRepository;
+    AppTokenRepository appTokenRepository;
 
     @InjectMocks
-    AppKeyService appKeyService;
+    AppTokenService appTokenService;
 
-    private static AppKey appKey;
+    private static AppToken appToken;
 
     private static final String key = UUID.randomUUID().toString();
 
     @BeforeEach
     public void setup() {
-        appKey = new AppKey();
-        appKey.setKey(key);
+        appToken = new AppToken();
+        appToken.setToken(key);
     }
 
     @Test
     @DisplayName("Получаем значение по ключу")
     public void existsByKey() {
-        when(appKeyRepository.existsByKey(key)).thenReturn(true);
-        boolean exists = appKeyService.existByKey(appKey.getKey());
+        when(appTokenRepository.existsByToken(key)).thenReturn(true);
+        boolean exists = appTokenService.existByToken(appToken.getToken());
         assertTrue(exists);
-        verify(appKeyRepository, times(1)).existsByKey(key);
+        verify(appTokenRepository, times(1)).existsByToken(key);
     }
 }
