@@ -1,9 +1,8 @@
 package com.ddkolesnik.ddkapi.controller;
 
 import com.ddkolesnik.ddkapi.configuration.ApiErrorResponse;
+import com.ddkolesnik.ddkapi.configuration.annotation.ValidToken;
 import com.ddkolesnik.ddkapi.dto.MoneyDTO;
-import com.ddkolesnik.ddkapi.exception.ApiException;
-import com.ddkolesnik.ddkapi.service.AppKeyService;
 import com.ddkolesnik.ddkapi.service.MoneyService;
 import com.ddkolesnik.ddkapi.specification.filter.MoneyFilter;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +16,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -33,15 +31,14 @@ import static com.ddkolesnik.ddkapi.util.Constant.PATH_MONIES;
 
 @Validated
 @RestController
-@RequestMapping(PATH_MONIES)
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
+@RequestMapping(PATH_MONIES)
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Tag(name = "Money", description = "API для получения информации о деньгах инвесторов")
 public class MoneyController {
 
     MoneyService moneyService;
-
-    AppKeyService appKeyService;
 
     @Operation(summary = "Получить список денег инвестора по параметрам", tags = {"Money"})
     @ApiResponses(value = {
@@ -50,12 +47,9 @@ public class MoneyController {
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class))))})
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public List<MoneyDTO> getAllInvestorMonies(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
-                                               @PathVariable(name = "appKey") String appKey,
+                                               @PathVariable(name = "appKey") @ValidToken String appKey,
                                                @Parameter(description = "Фильтр", schema = @Schema(implementation = MoneyFilter.class))
                                                @Valid @RequestBody MoneyFilter filter) {
-        if (!appKeyService.existByKey(appKey)) {
-            throw new ApiException("Доступ запрещён", HttpStatus.FORBIDDEN);
-        }
         return moneyService.findAllDTO(filter);
     }
 }

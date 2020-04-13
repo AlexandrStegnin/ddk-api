@@ -1,9 +1,8 @@
 package com.ddkolesnik.ddkapi.controller;
 
 import com.ddkolesnik.ddkapi.configuration.ApiErrorResponse;
+import com.ddkolesnik.ddkapi.configuration.annotation.ValidToken;
 import com.ddkolesnik.ddkapi.dto.app.AppUserDTO;
-import com.ddkolesnik.ddkapi.exception.ApiException;
-import com.ddkolesnik.ddkapi.service.AppKeyService;
 import com.ddkolesnik.ddkapi.service.AppUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,7 +15,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -32,15 +30,14 @@ import static com.ddkolesnik.ddkapi.util.Constant.USERS;
 
 @Validated
 @RestController
-@RequiredArgsConstructor
 @RequestMapping(USERS)
+@RequiredArgsConstructor
+@SuppressWarnings("unused")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Tag(name = "AppUser", description = "API для обновления информации о пользователях системы")
 public class AppUserController {
 
     AppUserService appUserService;
-
-    AppKeyService appKeyService;
 
     @Operation(summary = "Добавить/изменить пользователя", tags = {"AppUser"})
     @ApiResponses(value = {
@@ -49,12 +46,9 @@ public class AppUserController {
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class))))})
     @PutMapping(path = UPDATE_USER, consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public AppUserDTO update(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
-                             @PathVariable(name = "appKey") String appKey,
+                             @PathVariable(name = "appKey") @ValidToken String appKey,
                              @Parameter(description = "Пользователь", schema = @Schema(implementation = AppUserDTO.class))
                              @Valid @RequestBody AppUserDTO appUser) {
-        if (!appKeyService.existByKey(appKey)) {
-            throw new ApiException("Доступ запрещён", HttpStatus.FORBIDDEN);
-        }
         return appUserService.update(appUser);
     }
 
