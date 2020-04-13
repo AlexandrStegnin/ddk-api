@@ -15,6 +15,8 @@ public class Constant {
 
     public static final String ROLE_PREFIX = "ROLE_";
 
+    public static final String INVALID_APP_TOKEN = "Неверный ключ приложения.";
+
     // PATHS
 
     public static final String KEY_PATH = "/{appKey}";
