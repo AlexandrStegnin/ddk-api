@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 /**
  * @author Alexandr Stegnin
@@ -17,10 +17,10 @@ import javax.validation.constraints.NotNull;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AppUserDTO {
 
-    @NotNull(message = "Код партнёра должен быть указан")
+    @NotBlank(message = "Код партнёра должен быть указан")
     String login;
 
-    @NotNull(message = "Фамилия инвестора должна быть указана")
+    @NotBlank(message = "Фамилия инвестора должна быть указана")
     String lastName;
 
     String email;
