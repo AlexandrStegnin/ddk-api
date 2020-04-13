@@ -19,7 +19,7 @@ public class Constant {
 
     // PATHS
 
-    public static final String KEY_PATH = "/{appKey}";
+    public static final String KEY_PATH = "/{token}";
 
     public static final String VERSION = "v1";
 

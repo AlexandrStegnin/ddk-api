@@ -28,11 +28,11 @@ import static com.ddkolesnik.ddkapi.util.Constant.USERS;
  * @author Alexandr Stegnin
  */
 
+@SuppressWarnings("unused")
 @Validated
 @RestController
 @RequestMapping(USERS)
 @RequiredArgsConstructor
-@SuppressWarnings("unused")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Tag(name = "AppUser", description = "API для обновления информации о пользователях системы")
 public class AppUserController {
@@ -46,7 +46,7 @@ public class AppUserController {
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class))))})
     @PutMapping(path = UPDATE_USER, consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public AppUserDTO update(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
-                             @PathVariable(name = "appKey") @ValidToken String appKey,
+                             @PathVariable(name = "token") @ValidToken String token,
                              @Parameter(description = "Пользователь", schema = @Schema(implementation = AppUserDTO.class))
                              @Valid @RequestBody AppUserDTO appUser) {
         return appUserService.update(appUser);
