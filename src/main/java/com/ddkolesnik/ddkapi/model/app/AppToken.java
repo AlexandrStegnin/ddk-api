@@ -23,16 +23,16 @@ import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name = "app_key")
+@Table(name = "app_token")
 @EqualsAndHashCode(callSuper = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AppKey extends AbstractEntity {
+public class AppToken extends AbstractEntity {
 
     @Column(name = "app_name")
     String name;
 
-    @Column(name = "app_key")
-    String key;
+    @Column(name = "token")
+    String token;
 
     @JsonIgnore
     @CreationTimestamp

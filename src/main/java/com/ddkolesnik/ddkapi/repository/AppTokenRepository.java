@@ -1,6 +1,6 @@
 package com.ddkolesnik.ddkapi.repository;
 
-import com.ddkolesnik.ddkapi.model.app.AppKey;
+import com.ddkolesnik.ddkapi.model.app.AppToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository;
  */
 
 @Repository
-public interface AppKeyRepository extends JpaRepository<AppKey, Long> {
+public interface AppTokenRepository extends JpaRepository<AppToken, Long> {
 
-    Boolean existsByKey(String key);
+    Boolean existsByToken(String token);
 
 }
