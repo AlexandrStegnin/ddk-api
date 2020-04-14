@@ -2,7 +2,9 @@ package com.ddkolesnik.ddkapi.dto.app;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotBlank;
@@ -13,6 +15,8 @@ import javax.validation.constraints.Pattern;
  */
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(name = "AppUser", description = "Информация об инвесторе")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AppUserDTO {
