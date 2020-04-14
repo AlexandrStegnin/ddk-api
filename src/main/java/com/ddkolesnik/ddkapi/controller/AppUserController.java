@@ -44,7 +44,7 @@ public class AppUserController {
             @ApiResponse(responseCode = "200", description = "Успешно"),
             @ApiResponse(responseCode = "403", description = "Доступ запрещён",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class))))})
-    @PutMapping(path = UPDATE_USER, consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @PostMapping(path = UPDATE_USER, consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public AppUserDTO update(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
                              @PathVariable(name = "token") @ValidToken String token,
                              @Parameter(description = "Пользователь", schema = @Schema(implementation = AppUserDTO.class))
