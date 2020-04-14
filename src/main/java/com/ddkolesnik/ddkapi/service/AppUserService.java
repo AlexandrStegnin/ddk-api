@@ -61,7 +61,9 @@ public class AppUserService {
         }
         BeanUtils.copyProperties(appUserDTO, user);
         user.addRole(getInvestorRole());
-        user.setPassword(generatePassword());
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            user.setPassword(generatePassword());
+        }
         user = update(user);
         BeanUtils.copyProperties(user, appUserDTO);
         return appUserDTO;
