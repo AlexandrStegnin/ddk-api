@@ -58,14 +58,19 @@ public class AppUserService {
         if (user == null) {
             user = new AppUser();
             user.setLogin(login);
+        } else if (needUpdate(appUserDTO, user)) {
+            String email = user.getEmail();
+            BeanUtils.copyProperties(appUserDTO, user);
+            if (user.getEmail() == null || user.getEmail().isEmpty()) {
+                user.setEmail(email);
+            }
+            user.addRole(getInvestorRole());
+            if (user.getPassword() == null || user.getPassword().isEmpty()) {
+                user.setPassword(generatePassword());
+            }
+            user = update(user);
+            BeanUtils.copyProperties(user, appUserDTO);
         }
-        BeanUtils.copyProperties(appUserDTO, user);
-        user.addRole(getInvestorRole());
-        if (user.getPassword() == null || user.getPassword().isEmpty()) {
-            user.setPassword(generatePassword());
-        }
-        user = update(user);
-        BeanUtils.copyProperties(user, appUserDTO);
         return appUserDTO;
     }
 
@@ -106,5 +111,10 @@ public class AppUserService {
     public AppUserDTO update(String partnerCode, String lastName, String email) {
         AppUserDTO userDTO = new AppUserDTO(partnerCode, lastName, email);
         return update(userDTO);
+    }
+
+    private boolean needUpdate(AppUserDTO dto, AppUser entity) {
+        return !dto.getLastName().equalsIgnoreCase(entity.getLastName()) ||
+                !dto.getEmail().equalsIgnoreCase(entity.getEmail());
     }
 }
