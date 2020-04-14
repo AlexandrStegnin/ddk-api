@@ -59,15 +59,7 @@ public class AppUserService {
             user = new AppUser();
             user.setLogin(login);
         } else if (needUpdate(appUserDTO, user)) {
-            String email = user.getEmail();
-            BeanUtils.copyProperties(appUserDTO, user);
-            if (user.getEmail() == null || user.getEmail().isEmpty()) {
-                user.setEmail(email);
-            }
-            user.addRole(getInvestorRole());
-            if (user.getPassword() == null || user.getPassword().isEmpty()) {
-                user.setPassword(generatePassword());
-            }
+            prepareUser(user, appUserDTO);
             user = update(user);
             BeanUtils.copyProperties(user, appUserDTO);
         }
@@ -108,13 +100,41 @@ public class AppUserService {
         return encoder.encode(password);
     }
 
+    /**
+     * Обновляем пользователя по параметрам
+     *
+     * @param partnerCode - код инвестора
+     * @param lastName - фамилия
+     * @param email - email
+     * @return - DTO пользователя
+     */
     public AppUserDTO update(String partnerCode, String lastName, String email) {
         AppUserDTO userDTO = new AppUserDTO(partnerCode, lastName, email);
         return update(userDTO);
     }
 
+    /**
+     * Проверяем необходимость обновления пользователя
+     *
+     * @param dto - DTO пользователя для обновления
+     * @param entity - пользователь из базы данных
+     * @return - надо/не надо обновлять
+     */
     private boolean needUpdate(AppUserDTO dto, AppUser entity) {
         return !dto.getLastName().equalsIgnoreCase(entity.getLastName()) ||
                 !dto.getEmail().equalsIgnoreCase(entity.getEmail());
+    }
+
+    private void prepareUser(AppUser user, AppUserDTO dto) {
+        if (dto.getEmail() != null && !dto.getEmail().isEmpty()) {
+            user.setEmail(dto.getEmail());
+        }
+        if (dto.getLastName() != null && !dto.getLastName().isEmpty()) {
+            user.setLastName(dto.getLastName());
+        }
+        user.addRole(getInvestorRole());
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            user.setPassword(generatePassword());
+        }
     }
 }
