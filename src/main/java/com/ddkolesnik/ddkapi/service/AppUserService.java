@@ -57,6 +57,7 @@ public class AppUserService {
         AppUser user = findByLogin(login);
         if (user == null) {
             user = new AppUser();
+            user.setLogin(login);
         }
         BeanUtils.copyProperties(appUserDTO, user);
         user.addRole(getInvestorRole());
