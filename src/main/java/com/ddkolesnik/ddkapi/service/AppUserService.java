@@ -101,4 +101,8 @@ public class AppUserService {
         return encoder.encode(password);
     }
 
+    public AppUserDTO update(String partnerCode, String lastName, String email) {
+        AppUserDTO userDTO = new AppUserDTO(partnerCode, lastName, email);
+        return update(userDTO);
+    }
 }
