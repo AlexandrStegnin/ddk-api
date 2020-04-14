@@ -7,6 +7,7 @@ import com.ddkolesnik.ddkapi.repository.AppUserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.UUID;
  * @author Alexandr Stegnin
  */
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -43,6 +45,7 @@ public class AppUserService {
      * @return - обновлённый пользователь
      */
     private AppUser update(AppUser user) {
+        log.info("Сохраняем пользователя {}", user);
         return appUserRepository.save(user);
     }
 
@@ -125,6 +128,12 @@ public class AppUserService {
                 !dto.getEmail().equalsIgnoreCase(entity.getEmail());
     }
 
+    /**
+     * Подготавливаем пользователя к сохранению
+     *
+     * @param user - пользователь для сохранения
+     * @param dto - DTO на основе которого подготавливается пользователь
+     */
     private void prepareUser(AppUser user, AppUserDTO dto) {
         if (dto.getEmail() != null && !dto.getEmail().isEmpty()) {
             user.setEmail(dto.getEmail());
