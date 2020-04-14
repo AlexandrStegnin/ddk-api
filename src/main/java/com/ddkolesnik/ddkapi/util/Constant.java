@@ -35,6 +35,8 @@ public class Constant {
 
     public static final String UPDATE_USER = "/update";
 
+    public static final String UPDATE_USER_JSON = "/update.json";
+
     public static final String USER_LOGIN = "/{login}";
 
     // IGNORING access to Spring Security
