@@ -15,20 +15,21 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import static com.ddkolesnik.ddkapi.util.Constant.UPDATE_USER;
-import static com.ddkolesnik.ddkapi.util.Constant.USERS;
+import static com.ddkolesnik.ddkapi.util.Constant.*;
 
 /**
  * @author Alexandr Stegnin
  */
 
 @SuppressWarnings("unused")
+@Slf4j
 @Validated
 @RestController
 @RequestMapping(USERS)
@@ -44,12 +45,48 @@ public class AppUserController {
             @ApiResponse(responseCode = "200", description = "Успешно"),
             @ApiResponse(responseCode = "403", description = "Доступ запрещён",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class))))})
-    @PostMapping(path = UPDATE_USER, consumes = MediaType.APPLICATION_JSON_VALUE, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @PostMapping(path = UPDATE_USER, consumes = "application/x-www-form-urlencoded;charset=UTF-8",
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public AppUserDTO update(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
                              @PathVariable(name = "token") @ValidToken String token,
                              @Parameter(description = "Пользователь", schema = @Schema(implementation = AppUserDTO.class))
-                             @Valid @RequestBody AppUserDTO appUser) {
+                             @Valid AppUserDTO appUser) {
+        log.info("Called POST method form-url-encoded");
         return appUserService.update(appUser);
+    }
+
+    @Operation(summary = "Добавить/изменить пользователя", tags = {"AppUser"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Успешно"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class))))})
+    @PostMapping(path = UPDATE_USER_JSON, consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public AppUserDTO updateUser(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
+                                 @PathVariable(name = "token") @ValidToken String token,
+                                 @Parameter(description = "Пользователь", schema = @Schema(implementation = AppUserDTO.class))
+                                 @Valid @RequestBody AppUserDTO appUser) {
+        log.info("Called POST method JSON encoded");
+        return appUserService.update(appUser);
+    }
+
+    @Operation(summary = "Добавить/изменить пользователя", tags = {"AppUser"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Успешно"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class))))})
+    @GetMapping(path = UPDATE_USER,
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public AppUserDTO saveUser(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
+                               @PathVariable(name = "token") @ValidToken String token,
+                               @Parameter(description = "Код инвестора", schema = @Schema(implementation = String.class))
+                               @RequestParam(name = "partnerCode") String partnerCode,
+                               @Parameter(description = "Фамилия инвестора", schema = @Schema(implementation = String.class))
+                               @RequestParam(name = "lastName") String lastName,
+                               @Parameter(description = "Email инвестора", schema = @Schema(implementation = String.class))
+                               @RequestParam(name = "email", required = false) String email) {
+        log.info("Called GET method with PathVariables");
+        return appUserService.update(partnerCode, lastName, email);
     }
 
 }
