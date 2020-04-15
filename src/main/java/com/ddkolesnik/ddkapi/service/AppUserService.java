@@ -3,6 +3,7 @@ package com.ddkolesnik.ddkapi.service;
 import com.ddkolesnik.ddkapi.dto.app.AppUserDTO;
 import com.ddkolesnik.ddkapi.model.Role;
 import com.ddkolesnik.ddkapi.model.app.AppUser;
+import com.ddkolesnik.ddkapi.model.app.AppUser_;
 import com.ddkolesnik.ddkapi.repository.AppUserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +46,7 @@ public class AppUserService {
      * @return - обновлённый пользователь
      */
     private AppUser update(AppUser user) {
-        log.info("Сохраняем пользователя {}", user);
+        log.info(String.format("Сохраняем пользователя [login = %s]", user.getLogin()));
         return appUserRepository.save(user);
     }
 
@@ -59,13 +60,22 @@ public class AppUserService {
         String login = INVESTOR_PREFIX.concat(appUserDTO.getPartnerCode());
         AppUser user = findByLogin(login);
         if (user == null) {
-            user = new AppUser();
-            user.setLogin(login);
+            appUserDTO.setPartnerCode(login);
+            return createUser(appUserDTO);
         } else if (needUpdate(appUserDTO, user)) {
             prepareUser(user, appUserDTO);
             user = update(user);
             BeanUtils.copyProperties(user, appUserDTO);
         }
+        return appUserDTO;
+    }
+
+    private AppUserDTO createUser(AppUserDTO appUserDTO) {
+        AppUser user = new AppUser();
+        user.setLogin(appUserDTO.getPartnerCode());
+        prepareUser(user, appUserDTO);
+        user = update(user);
+        BeanUtils.copyProperties(user, appUserDTO, AppUser_.ROLES);
         return appUserDTO;
     }
 
