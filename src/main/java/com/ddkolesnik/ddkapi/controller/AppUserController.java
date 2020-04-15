@@ -51,7 +51,6 @@ public class AppUserController {
                              @PathVariable(name = "token") @ValidToken String token,
                              @Parameter(description = "Пользователь", schema = @Schema(implementation = AppUserDTO.class))
                              @Valid AppUserDTO appUser) {
-        log.info("Called POST method form-url-encoded");
         return appUserService.update(appUser);
     }
 
@@ -66,7 +65,6 @@ public class AppUserController {
                                  @PathVariable(name = "token") @ValidToken String token,
                                  @Parameter(description = "Пользователь", schema = @Schema(implementation = AppUserDTO.class))
                                  @Valid @RequestBody AppUserDTO appUser) {
-        log.info("Called POST method JSON encoded");
         return appUserService.update(appUser);
     }
 
@@ -85,7 +83,6 @@ public class AppUserController {
                                @RequestParam(name = "lastName") String lastName,
                                @Parameter(description = "Email инвестора", schema = @Schema(implementation = String.class))
                                @RequestParam(name = "email", required = false) String email) {
-        log.info("Called GET method with PathVariables");
         return appUserService.update(partnerCode, lastName, email);
     }
 
