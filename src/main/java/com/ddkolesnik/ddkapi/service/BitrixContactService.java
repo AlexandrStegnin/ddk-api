@@ -14,11 +14,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -44,6 +44,7 @@ public class BitrixContactService {
 
     AppUserService userService;
 
+    @Transactional()
     public BitrixContact findById(String id) {
         return contactRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Contact with id = [" + id + "] not found"));
