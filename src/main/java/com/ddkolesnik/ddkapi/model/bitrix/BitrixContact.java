@@ -32,6 +32,6 @@ public class BitrixContact {
     @Column(name = "partner_code")
     String code;
 
-    @OneToMany(mappedBy = "contact")
+    @OneToMany(mappedBy = "contact", fetch = FetchType.EAGER)
     Set<BitrixEmail> emails;
 }
