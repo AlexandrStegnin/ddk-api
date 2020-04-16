@@ -10,7 +10,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.ClientResponse;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
@@ -19,6 +24,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.ddkolesnik.ddkapi.util.Constant.BITRIX_CONTACT_UPDATE_URL;
 
 /**
  * @author Alexandr Stegnin
@@ -57,7 +64,26 @@ public class BitrixContactService {
                 .collect(Collectors.toList());
     }
 
-    public void mergeContacts() {
+    public HttpStatus updateContacts() {
+        WebClient client = WebClient
+                .builder()
+                .baseUrl(BITRIX_CONTACT_UPDATE_URL)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+        ClientResponse response = client.get().exchange()
+                .doOnSuccess(clientResponse -> {
+                    mergeContacts();
+                    log.info("Синхронизация контактов завершена.");
+                })
+                .doOnError(resp -> log.error("Ошибка: " + resp.getMessage()))
+                .block();
+        if (Objects.nonNull(response)) {
+            return response.statusCode();
+        }
+        return HttpStatus.BAD_REQUEST;
+    }
+
+    private void mergeContacts() {
         List<BitrixContactDTO> contacts = findAll();
         List<AppUserDTO> users = userService.getAllDTO();
         List<AppUserDTO> updatedUsers = new ArrayList<>();

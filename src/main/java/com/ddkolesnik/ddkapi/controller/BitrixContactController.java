@@ -15,20 +15,15 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.ClientResponse;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Objects;
-
-import static com.ddkolesnik.ddkapi.util.Constant.*;
+import static com.ddkolesnik.ddkapi.util.Constant.BITRIX_CONTACT;
+import static com.ddkolesnik.ddkapi.util.Constant.BITRIX_CONTACTS_MERGE;
 
 /**
  * Контроллер для работы с контактами из Битрикс 24
@@ -56,22 +51,7 @@ public class BitrixContactController {
     @GetMapping(BITRIX_CONTACTS_MERGE)
     public HttpStatus updateContacts(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
                                  @PathVariable(name = "token") @ValidToken String token) {
-        WebClient client = WebClient
-                .builder()
-                .baseUrl(BITRIX_CONTACT_UPDATE_URL)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
-        ClientResponse response = client.get().exchange()
-                .doOnSuccess(clientResponse -> {
-                    bitrixContactService.mergeContacts();
-                    log.info("Синхронизация контактов завершена.");
-                })
-                .doOnError(resp -> log.error("Ошибка: " + resp.getMessage()))
-                .block();
-        if (Objects.nonNull(response)) {
-            return response.statusCode();
-        }
-        return HttpStatus.BAD_REQUEST;
+        return bitrixContactService.updateContacts();
     }
 
 }
