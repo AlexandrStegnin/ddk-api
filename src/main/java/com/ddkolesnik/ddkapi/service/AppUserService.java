@@ -14,7 +14,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Сервис для управления пользователями
@@ -156,4 +159,17 @@ public class AppUserService {
             user.setPassword(generatePassword());
         }
     }
+
+    public List<AppUserDTO> getAllDTO() {
+        Role role = getInvestorRole();
+        return appUserRepository.findByRolesIn(Collections.singleton(role))
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    private AppUserDTO convertToDTO(AppUser user) {
+        return new AppUserDTO(user.getLogin(), user.getLastName(), user.getEmail());
+    }
+
 }
