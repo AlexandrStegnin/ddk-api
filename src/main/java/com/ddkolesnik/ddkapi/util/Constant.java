@@ -39,6 +39,16 @@ public class Constant {
 
     public static final String USER_LOGIN = "/{login}";
 
+    // BITRIX CONTACT PATHS
+
+    public static final String BITRIX_CONTACT = BASE_URL + VERSION + KEY_PATH + "/bitrix";
+
+    public static final String BITRIX_CONTACT_UPDATE = "/update";
+
+    public static final String BITRIX_CONTACTS_MERGE = BITRIX_CONTACT + "/merge";
+
+    public static final String BITRIX_CONTACT_UPDATE_URL = "http://bitrixflows.jelastic.regruhosting.ru/update";
+
     // IGNORING access to Spring Security
 
     public static final String[] ALL_HTTP_MATCHERS = {
