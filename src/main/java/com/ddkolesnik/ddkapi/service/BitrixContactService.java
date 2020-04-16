@@ -44,7 +44,6 @@ public class BitrixContactService {
 
     AppUserService userService;
 
-    @Transactional()
     public BitrixContact findById(String id) {
         return contactRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Contact with id = [" + id + "] not found"));
