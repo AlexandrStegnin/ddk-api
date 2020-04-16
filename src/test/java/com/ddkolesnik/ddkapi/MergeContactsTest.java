@@ -17,7 +17,7 @@ public class MergeContactsTest {
 
     @Test
     public void merge() {
-        bitrixContactService.mergeContacts();
+        bitrixContactService.updateContacts();
     }
 
 }
