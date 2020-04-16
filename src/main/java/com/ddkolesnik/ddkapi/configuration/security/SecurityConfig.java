@@ -44,6 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(ALL_HTTP_MATCHERS).permitAll()
                 .antMatchers(HttpMethod.POST, PATH_MONIES).permitAll()
                 .antMatchers(USERS + "/**").permitAll()
+                .antMatchers(BITRIX_CONTACT + "/**").permitAll()
                 .and()
                 // handle an authorized attempts
                 .exceptionHandling().authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED))
