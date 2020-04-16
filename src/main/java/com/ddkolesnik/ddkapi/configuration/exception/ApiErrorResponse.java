@@ -1,4 +1,4 @@
-package com.ddkolesnik.ddkapi.configuration;
+package com.ddkolesnik.ddkapi.configuration.exception;
 
 import lombok.AccessLevel;
 import lombok.Getter;

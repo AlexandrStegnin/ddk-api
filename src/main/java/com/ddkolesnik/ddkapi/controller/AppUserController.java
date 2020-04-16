@@ -1,6 +1,6 @@
 package com.ddkolesnik.ddkapi.controller;
 
-import com.ddkolesnik.ddkapi.configuration.ApiErrorResponse;
+import com.ddkolesnik.ddkapi.configuration.exception.ApiErrorResponse;
 import com.ddkolesnik.ddkapi.configuration.annotation.ValidToken;
 import com.ddkolesnik.ddkapi.dto.app.AppUserDTO;
 import com.ddkolesnik.ddkapi.service.AppUserService;
@@ -51,6 +51,7 @@ public class AppUserController {
                              @PathVariable(name = "token") @ValidToken String token,
                              @Parameter(description = "Пользователь", schema = @Schema(implementation = AppUserDTO.class))
                              @Valid AppUserDTO appUser) {
+        log.info("POST with application/x-www-form-urlencoded;charset=UTF-8. USER = {}", appUser);
         return appUserService.update(appUser);
     }
 
@@ -65,6 +66,7 @@ public class AppUserController {
                                  @PathVariable(name = "token") @ValidToken String token,
                                  @Parameter(description = "Пользователь", schema = @Schema(implementation = AppUserDTO.class))
                                  @Valid @RequestBody AppUserDTO appUser) {
+        log.info("POST with application/json. USER = {}", appUser);
         return appUserService.update(appUser);
     }
 
@@ -83,6 +85,7 @@ public class AppUserController {
                                @RequestParam(name = "lastName") String lastName,
                                @Parameter(description = "Email инвестора", schema = @Schema(implementation = String.class))
                                @RequestParam(name = "email", required = false) String email) {
+        log.info("GET with application/json. Parameters = [partnerCode = " + partnerCode + ", lastName = " + lastName + ", email = " + email + "]");
         return appUserService.update(partnerCode, lastName, email);
     }
 

@@ -1,6 +1,6 @@
 package com.ddkolesnik.ddkapi.controller;
 
-import com.ddkolesnik.ddkapi.configuration.ApiErrorResponse;
+import com.ddkolesnik.ddkapi.configuration.exception.ApiErrorResponse;
 import com.ddkolesnik.ddkapi.configuration.annotation.ValidToken;
 import com.ddkolesnik.ddkapi.dto.MoneyDTO;
 import com.ddkolesnik.ddkapi.service.MoneyService;

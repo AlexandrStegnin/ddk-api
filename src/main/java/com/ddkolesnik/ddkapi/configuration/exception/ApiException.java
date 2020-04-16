@@ -1,4 +1,4 @@
-package com.ddkolesnik.ddkapi.exception;
+package com.ddkolesnik.ddkapi.configuration.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

@@ -1,6 +1,5 @@
-package com.ddkolesnik.ddkapi.configuration;
+package com.ddkolesnik.ddkapi.configuration.exception;
 
-import com.ddkolesnik.ddkapi.exception.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
