@@ -23,7 +23,14 @@ public class Constant {
 
     public static final String VERSION = "v1";
 
+    // MONEY PATHS
     public static final String PATH_MONIES = BASE_URL + VERSION + KEY_PATH + "/monies";
+
+    public static final String PATH_INVESTOR_CASH = BASE_URL + VERSION + KEY_PATH + "/cash";
+
+    public static final String PATH_INVESTOR_CASH_CREATE = "/create";
+
+    public static final String PATH_INVESTOR_CASH_UPDATE = "/update";
 
     // MESSAGES
     public static final String UNKNOWN_FACILITY = "Неизвестный объект";
