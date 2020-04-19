@@ -34,4 +34,7 @@ public class InvestorCashDTO {
     @Schema(implementation = String.class, name = "cashSource", description = "Источник вложений (БИК Банка)")
     String cashSource;
 
+    @Schema(implementation = String.class, name = "transactionUUID", description = "Идентификатор транзакции из 1С")
+    String transactionUUID;
+
 }
