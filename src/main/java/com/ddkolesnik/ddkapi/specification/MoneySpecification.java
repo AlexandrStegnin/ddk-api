@@ -3,7 +3,7 @@ package com.ddkolesnik.ddkapi.specification;
 import com.ddkolesnik.ddkapi.model.Facility_;
 import com.ddkolesnik.ddkapi.model.Investor_;
 import com.ddkolesnik.ddkapi.model.money.Money;
-import com.ddkolesnik.ddkapi.model.Money_;
+import com.ddkolesnik.ddkapi.model.money.Money_;
 import com.ddkolesnik.ddkapi.specification.filter.MoneyFilter;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
