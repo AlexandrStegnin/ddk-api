@@ -10,4 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InvestorRepository extends JpaRepository<Investor, Long> {
+
+    Investor findByLogin(String login);
+
 }
