@@ -40,4 +40,7 @@ public class Money extends AbstractEntity {
     @Column(name = "dateClosingInvest")
     LocalDate dateClosing;
 
+    @Column(name = "transaction_id")
+    String transactionUUID;
+
 }
