@@ -11,4 +11,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MoneyRepository extends JpaRepository<Money, Long>, JpaSpecificationExecutor<Money> {
+
+    Money findByTransactionUUID(String uuid);
+
 }
