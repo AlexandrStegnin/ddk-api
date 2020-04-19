@@ -2,7 +2,7 @@ package com.ddkolesnik.ddkapi.service;
 
 import com.ddkolesnik.ddkapi.dto.bitrix.BitrixContactDTO;
 import com.ddkolesnik.ddkapi.dto.MoneyDTO;
-import com.ddkolesnik.ddkapi.model.Money;
+import com.ddkolesnik.ddkapi.model.money.Money;
 import com.ddkolesnik.ddkapi.model.Money_;
 import com.ddkolesnik.ddkapi.repository.MoneyRepository;
 import com.ddkolesnik.ddkapi.specification.MoneySpecification;

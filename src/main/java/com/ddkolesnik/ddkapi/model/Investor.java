@@ -1,5 +1,6 @@
 package com.ddkolesnik.ddkapi.model;
 
+import com.ddkolesnik.ddkapi.model.money.Money;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

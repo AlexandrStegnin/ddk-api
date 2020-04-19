@@ -1,5 +1,8 @@
-package com.ddkolesnik.ddkapi.model;
+package com.ddkolesnik.ddkapi.model.money;
 
+import com.ddkolesnik.ddkapi.model.AbstractEntity;
+import com.ddkolesnik.ddkapi.model.Facility;
+import com.ddkolesnik.ddkapi.model.Investor;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
