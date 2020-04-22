@@ -51,9 +51,9 @@ public class InvestorCashController {
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class))))})
     @PostMapping(PATH_INVESTOR_CASH_CREATE)
     public Money createInvestorCash(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
-                                         @PathVariable(name = "token") @ValidToken String token,
+                                    @PathVariable(name = "token") @ValidToken String token,
                                     @Parameter(description = "Проводка из 1С", schema = @Schema(implementation = InvestorCashDTO.class))
-                                         @Valid @RequestBody InvestorCashDTO dto) {
+                                    @Valid @RequestBody InvestorCashDTO dto) {
         return investorCashService.update(dto);
     }
 

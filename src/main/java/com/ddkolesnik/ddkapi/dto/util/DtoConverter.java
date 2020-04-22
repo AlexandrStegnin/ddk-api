@@ -1,4 +1,4 @@
-package com.ddkolesnik.ddkapi.dto;
+package com.ddkolesnik.ddkapi.dto.util;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
