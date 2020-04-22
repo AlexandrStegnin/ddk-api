@@ -1,7 +1,7 @@
 package com.ddkolesnik.ddkapi.configuration.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ddkolesnik.ddkapi.model.User;
+import com.ddkolesnik.ddkapi.model.security.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.authentication.AuthenticationManager;

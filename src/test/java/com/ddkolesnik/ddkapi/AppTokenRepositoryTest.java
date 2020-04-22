@@ -1,8 +1,8 @@
 package com.ddkolesnik.ddkapi;
 
 import com.ddkolesnik.ddkapi.model.app.AppToken;
-import com.ddkolesnik.ddkapi.repository.AppTokenRepository;
-import com.ddkolesnik.ddkapi.service.AppTokenService;
+import com.ddkolesnik.ddkapi.repository.app.AppTokenRepository;
+import com.ddkolesnik.ddkapi.service.app.AppTokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

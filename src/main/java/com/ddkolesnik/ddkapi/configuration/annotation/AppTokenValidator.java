@@ -1,6 +1,6 @@
 package com.ddkolesnik.ddkapi.configuration.annotation;
 
-import com.ddkolesnik.ddkapi.service.AppTokenService;
+import com.ddkolesnik.ddkapi.service.app.AppTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.ConstraintValidator;

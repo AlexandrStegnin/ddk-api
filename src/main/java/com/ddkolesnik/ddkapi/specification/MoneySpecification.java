@@ -1,7 +1,7 @@
 package com.ddkolesnik.ddkapi.specification;
 
-import com.ddkolesnik.ddkapi.model.Facility_;
-import com.ddkolesnik.ddkapi.model.Investor_;
+import com.ddkolesnik.ddkapi.model.money.Facility_;
+import com.ddkolesnik.ddkapi.model.money.Investor_;
 import com.ddkolesnik.ddkapi.model.money.Money;
 import com.ddkolesnik.ddkapi.model.money.Money_;
 import com.ddkolesnik.ddkapi.specification.filter.MoneyFilter;

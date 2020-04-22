@@ -1,6 +1,6 @@
 package com.ddkolesnik.ddkapi.model.app;
 
-import com.ddkolesnik.ddkapi.model.Role;
+import com.ddkolesnik.ddkapi.model.security.Role;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;

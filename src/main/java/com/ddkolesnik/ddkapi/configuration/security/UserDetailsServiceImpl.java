@@ -1,7 +1,7 @@
 package com.ddkolesnik.ddkapi.configuration.security;
 
-import com.ddkolesnik.ddkapi.model.User;
-import com.ddkolesnik.ddkapi.repository.UserRepository;
+import com.ddkolesnik.ddkapi.model.security.User;
+import com.ddkolesnik.ddkapi.repository.security.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
