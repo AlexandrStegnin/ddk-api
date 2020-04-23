@@ -16,12 +16,14 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "FACILITYES", schema = "pss_projects", catalog = "pss_projects")
+@Table(name = "FACILITYES")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = false)
 public class Facility extends AbstractEntity {
 
-    @Column(name = "facility")
+    @Column(name = "FACILITY")
     String name;
 
+    @Column(name = "full_name")
+    String fullName;
 }
