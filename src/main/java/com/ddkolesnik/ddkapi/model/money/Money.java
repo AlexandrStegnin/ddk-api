@@ -1,6 +1,5 @@
 package com.ddkolesnik.ddkapi.model.money;
 
-import com.ddkolesnik.ddkapi.model.AbstractEntity;
 import com.ddkolesnik.ddkapi.model.cash.CashSource;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -20,7 +19,11 @@ import java.time.LocalDate;
 @Table(name = "InvestorsCash")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = false)
-public class Money extends AbstractEntity {
+public class Money {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
     @Column(name = "GivedCash")
     BigDecimal givenCash;
