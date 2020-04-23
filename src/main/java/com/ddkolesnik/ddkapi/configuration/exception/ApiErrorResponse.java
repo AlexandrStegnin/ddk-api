@@ -1,5 +1,6 @@
 package com.ddkolesnik.ddkapi.configuration.exception;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
@@ -12,11 +13,17 @@ import java.time.Instant;
  */
 
 @Getter
+@Schema(name = "ApiErrorResponse", description = "Информация об ошибке при выполнении запроса")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ApiErrorResponse {
 
+    @Schema(implementation = HttpStatus.class, name = "status", description = "Статус выполнения запроса")
     HttpStatus status;
+
+    @Schema(implementation = String.class, name = "message", description = "Сообщение")
     String message;
+
+    @Schema(implementation = Instant.class, name = "timestamp", description = "Время")
     Instant timestamp;
 
     public ApiErrorResponse(HttpStatus status, String message, Instant timestamp) {
