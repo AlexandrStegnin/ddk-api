@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Objects;
 
 /**
+ * Сервис для работы с проводками из 1С
+ *
  * @author Alexandr Stegnin
  */
 
@@ -37,14 +39,13 @@ public class InvestorCashService {
      * Создать или обновить проводку, пришедшую из 1С
      *
      * @param dto - DTO объект из 1С
-     * @return - созданная проводка
      */
-    public Money update(InvestorCashDTO dto) {
+    public void update(InvestorCashDTO dto) {
         Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
         if (Objects.isNull(money)) {
-            return create(dto);
+            create(dto);
         } else {
-            return update(money, dto);
+            update(money, dto);
         }
     }
 
@@ -52,11 +53,10 @@ public class InvestorCashService {
      * Создать проводку
      *
      * @param dto - DTO объект из 1С
-     * @return - созданная проводка
      */
-    private Money create(InvestorCashDTO dto) {
-        Money money = convertDto(dto);
-        return moneyRepository.save(money);
+    private void create(InvestorCashDTO dto) {
+        Money money = convert(dto);
+        moneyRepository.save(money);
     }
 
     /**
@@ -64,11 +64,10 @@ public class InvestorCashService {
      *
      * @param money - существующая проводка
      * @param dto - DTO объект из 1С
-     * @return - обновлённая проводка
      */
-    private Money update(Money money, InvestorCashDTO dto) {
+    private void update(Money money, InvestorCashDTO dto) {
         prepareMoney(money, dto);
-        return moneyRepository.save(money);
+        moneyRepository.save(money);
     }
 
     /**
@@ -92,7 +91,7 @@ public class InvestorCashService {
      * @param dto - DTO объект из 1С
      * @return - подготовленная к сохранению проводка
      */
-    private Money convertDto(InvestorCashDTO dto) {
+    private Money convert(InvestorCashDTO dto) {
         Money money = new Money();
 
         Investor investor = findInvestor(dto.getInvestorCode());
