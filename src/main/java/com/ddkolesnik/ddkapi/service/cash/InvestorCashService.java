@@ -1,6 +1,7 @@
 package com.ddkolesnik.ddkapi.service.cash;
 
 import com.ddkolesnik.ddkapi.dto.cash.InvestorCashDTO;
+import com.ddkolesnik.ddkapi.model.cash.CashSource;
 import com.ddkolesnik.ddkapi.model.money.Facility;
 import com.ddkolesnik.ddkapi.model.money.Investor;
 import com.ddkolesnik.ddkapi.model.money.Money;
@@ -34,6 +35,8 @@ public class InvestorCashService {
     InvestorService investorService;
 
     FacilityService facilityService;
+
+    CashSourceService cashSourceService;
 
     /**
      * Создать или обновить проводку, пришедшую из 1С
@@ -100,6 +103,9 @@ public class InvestorCashService {
         Facility facility = findFacility(dto.getFacility());
         money.setFacility(facility);
 
+        CashSource cashSource = findCashSource(dto.getCashSource());
+        money.setCashSource(cashSource);
+
         money.setDateGiven(dto.getDateGiven());
         money.setGivenCash(dto.getGivenCash());
         money.setTransactionUUID(dto.getTransactionUUID());
@@ -127,4 +133,7 @@ public class InvestorCashService {
         return facilityService.findByName(name);
     }
 
+    private CashSource findCashSource(String organization) {
+        return cashSourceService.findByOrganization(organization);
+    }
 }
