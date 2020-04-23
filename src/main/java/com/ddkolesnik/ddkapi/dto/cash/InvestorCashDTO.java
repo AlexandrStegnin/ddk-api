@@ -38,7 +38,7 @@ public class InvestorCashDTO {
     LocalDate dateGiven;
 
     @NotBlank(message = "Источник должен быть указан")
-    @Schema(implementation = String.class, name = "cashSource", description = "Источник вложений (БИК Банка)")
+    @Schema(implementation = String.class, name = "cashSource", description = "Источник вложений (счёт или название)")
     String cashSource;
 
     @NotBlank(message = "Идентификатор транзакции должен быть указан")
