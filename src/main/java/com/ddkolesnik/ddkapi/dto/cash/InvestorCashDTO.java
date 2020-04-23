@@ -17,7 +17,7 @@ import java.time.LocalDate;
  */
 
 @Data
-@Schema(name = "InvestorCash", implementation = InvestorCashDTO.class, description = "Информация о вложениях инвестора из 1С")
+@Schema(name = "InvestorCash", description = "Информация о вложениях инвестора из 1С")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class InvestorCashDTO {
 
