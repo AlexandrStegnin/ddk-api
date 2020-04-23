@@ -11,8 +11,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FacilityRepository extends JpaRepository<Facility, Long> {
 
-    Facility findByName(String name);
-
     Facility findByFullName(String fullName);
 
 }

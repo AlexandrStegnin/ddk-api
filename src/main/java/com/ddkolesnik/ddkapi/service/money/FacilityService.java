@@ -22,14 +22,6 @@ public class FacilityService {
 
     FacilityRepository facilityRepository;
 
-    public Facility findByName(String name) {
-        Facility facility = facilityRepository.findByName(name);
-        if (Objects.isNull(facility)) {
-            throw new ApiException("Объект с названием = [" + name + "] не найден", HttpStatus.NOT_FOUND);
-        }
-        return facility;
-    }
-
     public Facility findByFullName(String fullName) {
         Facility facility = facilityRepository.findByFullName(fullName);
         if (Objects.isNull(facility)) {
