@@ -33,7 +33,7 @@ public class ApiExceptionHandler {
         String errorMessage = new ArrayList<>(exception.getConstraintViolations())
                 .stream()
                 .map(ConstraintViolation::getMessage)
-                .collect(Collectors.joining( ",\n"));
+                .collect(Collectors.joining( "; "));
         HttpStatus status;
         if (errorMessage.equalsIgnoreCase(INVALID_APP_TOKEN)) {
             status = HttpStatus.FORBIDDEN;
