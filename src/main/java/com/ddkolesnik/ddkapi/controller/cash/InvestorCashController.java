@@ -2,8 +2,8 @@ package com.ddkolesnik.ddkapi.controller.cash;
 
 import com.ddkolesnik.ddkapi.configuration.annotation.ValidToken;
 import com.ddkolesnik.ddkapi.configuration.exception.ApiErrorResponse;
+import com.ddkolesnik.ddkapi.configuration.exception.ApiSuccessResponse;
 import com.ddkolesnik.ddkapi.dto.cash.InvestorCashDTO;
-import com.ddkolesnik.ddkapi.model.money.Money;
 import com.ddkolesnik.ddkapi.service.cash.InvestorCashService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +17,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,22 +41,26 @@ import static com.ddkolesnik.ddkapi.util.Constant.PATH_INVESTOR_CASH_CREATE;
 @RequestMapping(PATH_INVESTOR_CASH)
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-@Tag(name = "Create/Update investor cash", description = "API для взаимодействия с системой 1C")
+@Tag(name = "InvestorCash", description = "API для взаимодействия с системой 1C")
 public class InvestorCashController {
 
     InvestorCashService investorCashService;
 
-    @Operation(summary = "Создание проводки на основании данных из 1С", tags = {"Create/Update investor cash"})
+    @Operation(summary = "Создание проводки на основании данных из 1С", tags = {"InvestorCash"})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешно"),
+            @ApiResponse(responseCode = "200", description = "Успешно",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiSuccessResponse.class)))),
+            @ApiResponse(responseCode = "4**", description = "Произошла ошибка",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class)))),
             @ApiResponse(responseCode = "403", description = "Доступ запрещён",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class))))})
-    @PostMapping(PATH_INVESTOR_CASH_CREATE)
-    public Money createInvestorCash(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
-                                    @PathVariable(name = "token") @ValidToken String token,
-                                    @Parameter(description = "Проводка из 1С", schema = @Schema(implementation = InvestorCashDTO.class))
-                                    @Valid @RequestBody InvestorCashDTO dto) {
-        return investorCashService.update(dto);
+    @PostMapping(value = PATH_INVESTOR_CASH_CREATE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ApiSuccessResponse createInvestorCash(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
+                                                 @PathVariable(name = "token") @ValidToken String token,
+                                                 @Parameter(description = "Проводка из 1С", schema = @Schema(implementation = InvestorCashDTO.class))
+                                                 @Valid @RequestBody InvestorCashDTO dto) {
+        investorCashService.update(dto);
+        return new ApiSuccessResponse(HttpStatus.OK, "Данные успешно сохранены");
     }
 
 }
