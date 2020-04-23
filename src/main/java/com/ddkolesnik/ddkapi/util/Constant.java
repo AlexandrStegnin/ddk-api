@@ -28,8 +28,6 @@ public class Constant {
 
     public static final String PATH_INVESTOR_CASH = BASE_URL + VERSION + KEY_PATH + "/cash";
 
-    public static final String PATH_INVESTOR_CASH_CREATE = "/create";
-
     public static final String PATH_INVESTOR_CASH_UPDATE = "/update";
 
     // MESSAGES

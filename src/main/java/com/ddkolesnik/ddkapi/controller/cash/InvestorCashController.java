@@ -24,8 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import static com.ddkolesnik.ddkapi.util.Constant.PATH_INVESTOR_CASH;
-import static com.ddkolesnik.ddkapi.util.Constant.PATH_INVESTOR_CASH_CREATE;
+import static com.ddkolesnik.ddkapi.util.Constant.*;
 
 /**
  * Контроллер для работы с проводками из 1С
@@ -52,7 +51,7 @@ public class InvestorCashController {
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiSuccessResponse.class)))),
             @ApiResponse(responseCode = "Error", description = "Произошла ошибка",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class))))})
-    @PostMapping(value = PATH_INVESTOR_CASH_CREATE, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = PATH_INVESTOR_CASH_UPDATE, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiSuccessResponse createInvestorCash(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
                                                  @PathVariable(name = "token") @ValidToken String token,
                                                  @Parameter(description = "Проводка из 1С", schema = @Schema(implementation = InvestorCashDTO.class))
