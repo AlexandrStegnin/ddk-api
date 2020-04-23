@@ -56,7 +56,8 @@ public class Constant {
     public static final String[] API_HTTP_MATCHERS = {
             PATH_MONIES,
             USERS + "/**",
-            BITRIX_CONTACT + "/**"
+            BITRIX_CONTACT + "/**",
+            PATH_INVESTOR_CASH + "/**"
     };
 
     // IGNORING access to Spring Security
