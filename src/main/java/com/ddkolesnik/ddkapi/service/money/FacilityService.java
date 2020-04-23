@@ -30,4 +30,12 @@ public class FacilityService {
         return facility;
     }
 
+    public Facility findByFullName(String fullName) {
+        Facility facility = facilityRepository.findByFullName(fullName);
+        if (Objects.isNull(facility)) {
+            throw new ApiException("Объект с названием = [" + fullName + "] не найден", HttpStatus.NOT_FOUND);
+        }
+        return facility;
+    }
+
 }
