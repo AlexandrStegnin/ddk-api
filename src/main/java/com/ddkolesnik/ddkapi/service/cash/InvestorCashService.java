@@ -126,11 +126,11 @@ public class InvestorCashService {
     /**
      * Найти объект по имени, который приходит из 1С
      *
-     * @param name - название объекта
+     * @param fullName - название объекта
      * @return - найденный инвестор
      */
-    private Facility findFacility(String name) {
-        return facilityService.findByName(name);
+    private Facility findFacility(String fullName) {
+        return facilityService.findByFullName(fullName);
     }
 
     private CashSource findCashSource(String organization) {
