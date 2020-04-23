@@ -1,16 +1,14 @@
 package com.ddkolesnik.ddkapi.service.app;
 
 import com.ddkolesnik.ddkapi.dto.app.AppUserDTO;
-import com.ddkolesnik.ddkapi.model.security.Role;
 import com.ddkolesnik.ddkapi.model.app.AppUser;
-import com.ddkolesnik.ddkapi.model.app.AppUser_;
+import com.ddkolesnik.ddkapi.model.security.Role;
 import com.ddkolesnik.ddkapi.repository.app.AppUserRepository;
 import com.ddkolesnik.ddkapi.service.security.RoleService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,39 +45,33 @@ public class AppUserService {
      * Обновить данные пользователя
      *
      * @param user - пользователь, которого необходимо обновить
-     * @return - обновлённый пользователь
      */
-    private AppUser update(AppUser user) {
-        return appUserRepository.save(user);
+    private void update(AppUser user) {
+        appUserRepository.save(user);
     }
 
     /**
      * Обновить данные пользователя
      *
      * @param appUserDTO - DTO пользователя
-     * @return - обновлённое DTO пользователя
      */
-    public AppUserDTO update(AppUserDTO appUserDTO) {
+    public void update(AppUserDTO appUserDTO) {
         String login = INVESTOR_PREFIX.concat(appUserDTO.getPartnerCode());
         AppUser user = findByLogin(login);
         if (user == null) {
             appUserDTO.setPartnerCode(login);
-            return createUser(appUserDTO);
+            createUser(appUserDTO);
         } else if (needUpdate(appUserDTO, user)) {
             prepareUser(user, appUserDTO);
-            user = update(user);
-            BeanUtils.copyProperties(user, appUserDTO);
+            update(user);
         }
-        return appUserDTO;
     }
 
-    private AppUserDTO createUser(AppUserDTO appUserDTO) {
+    private void createUser(AppUserDTO appUserDTO) {
         AppUser user = new AppUser();
         user.setLogin(appUserDTO.getPartnerCode());
         prepareUser(user, appUserDTO);
-        user = update(user);
-        BeanUtils.copyProperties(user, appUserDTO, AppUser_.ROLES);
-        return appUserDTO;
+        update(user);
     }
 
     /**
