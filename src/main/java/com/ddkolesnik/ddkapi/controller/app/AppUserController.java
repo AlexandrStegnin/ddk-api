@@ -1,7 +1,7 @@
 package com.ddkolesnik.ddkapi.controller.app;
 
-import com.ddkolesnik.ddkapi.configuration.exception.ApiErrorResponse;
 import com.ddkolesnik.ddkapi.configuration.annotation.ValidToken;
+import com.ddkolesnik.ddkapi.configuration.exception.ApiErrorResponse;
 import com.ddkolesnik.ddkapi.dto.app.AppUserDTO;
 import com.ddkolesnik.ddkapi.service.app.AppUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,11 +18,15 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-import static com.ddkolesnik.ddkapi.util.Constant.*;
+import static com.ddkolesnik.ddkapi.util.Constant.UPDATE_USER;
+import static com.ddkolesnik.ddkapi.util.Constant.USERS;
 
 /**
  * @author Alexandr Stegnin
@@ -51,42 +55,7 @@ public class AppUserController {
                              @PathVariable(name = "token") @ValidToken String token,
                              @Parameter(description = "Пользователь", schema = @Schema(implementation = AppUserDTO.class))
                              @Valid AppUserDTO appUser) {
-        log.info("POST with application/x-www-form-urlencoded;charset=UTF-8. USER = {}", appUser);
         return appUserService.update(appUser);
-    }
-
-    @Operation(summary = "Добавить/изменить пользователя", tags = {"AppUser"})
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешно"),
-            @ApiResponse(responseCode = "403", description = "Доступ запрещён",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class))))})
-    @PostMapping(path = UPDATE_USER_JSON, consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public AppUserDTO updateUser(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
-                                 @PathVariable(name = "token") @ValidToken String token,
-                                 @Parameter(description = "Пользователь", schema = @Schema(implementation = AppUserDTO.class))
-                                 @Valid @RequestBody AppUserDTO appUser) {
-        log.info("POST with application/json. USER = {}", appUser);
-        return appUserService.update(appUser);
-    }
-
-    @Operation(summary = "Добавить/изменить пользователя", tags = {"AppUser"})
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешно"),
-            @ApiResponse(responseCode = "403", description = "Доступ запрещён",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class))))})
-    @GetMapping(path = UPDATE_USER,
-            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public AppUserDTO saveUser(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
-                               @PathVariable(name = "token") @ValidToken String token,
-                               @Parameter(description = "Код инвестора", schema = @Schema(implementation = String.class))
-                               @RequestParam(name = "partnerCode") String partnerCode,
-                               @Parameter(description = "Фамилия инвестора", schema = @Schema(implementation = String.class))
-                               @RequestParam(name = "lastName") String lastName,
-                               @Parameter(description = "Email инвестора", schema = @Schema(implementation = String.class))
-                               @RequestParam(name = "email", required = false) String email) {
-        log.info("GET with application/json. Parameters = [partnerCode = " + partnerCode + ", lastName = " + lastName + ", email = " + email + "]");
-        return appUserService.update(partnerCode, lastName, email);
     }
 
 }

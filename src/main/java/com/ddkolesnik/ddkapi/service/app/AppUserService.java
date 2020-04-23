@@ -50,7 +50,6 @@ public class AppUserService {
      * @return - обновлённый пользователь
      */
     private AppUser update(AppUser user) {
-        log.info(String.format("Сохраняем пользователя [login = %s]", user.getLogin()));
         return appUserRepository.save(user);
     }
 
@@ -115,19 +114,6 @@ public class AppUserService {
     private String generatePassword() {
         String password = UUID.randomUUID().toString().substring(0, 8);
         return encoder.encode(password);
-    }
-
-    /**
-     * Обновляем пользователя по параметрам
-     *
-     * @param partnerCode - код инвестора
-     * @param lastName - фамилия
-     * @param email - email
-     * @return - DTO пользователя
-     */
-    public AppUserDTO update(String partnerCode, String lastName, String email) {
-        AppUserDTO userDTO = new AppUserDTO(partnerCode, lastName, email);
-        return update(userDTO);
     }
 
     /**
