@@ -1,6 +1,7 @@
 package com.ddkolesnik.ddkapi.model.money;
 
 import com.ddkolesnik.ddkapi.model.AbstractEntity;
+import com.ddkolesnik.ddkapi.model.cash.CashSource;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,29 +17,32 @@ import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name = "InvestorsCash", schema = "pss_projects", catalog = "pss_projects")
+@Table(name = "InvestorsCash")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = false)
 public class Money extends AbstractEntity {
 
-    @Column(name = "givedCash")
+    @Column(name = "GivedCash")
     BigDecimal givenCash;
 
     @OneToOne
-    @JoinColumn(name = "facilityId")
+    @JoinColumn(name = "FacilityId")
     Facility facility;
 
-    @Column(name = "dateGivedCash")
+    @Column(name = "DateGivedCash")
     LocalDate dateGiven;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "investorId")
+    @JoinColumn(name = "InvestorId")
     Investor investor;
 
-    @Column(name = "dateClosingInvest")
+    @Column(name = "DateClosingInvest")
     LocalDate dateClosing;
 
-    @Column(name = "transaction_id")
+    @Column(name = "transaction_uuid")
     String transactionUUID;
 
+    @OneToOne
+    @JoinColumn(name = "CashSourceId")
+    CashSource cashSource;
 }
