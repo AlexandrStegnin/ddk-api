@@ -112,7 +112,7 @@ public class InvestorCashControllerTestIT {
         dto.setTransactionUUID("1858cf74-3c0c-4333-9457-03c528bf298d");
         dto.setGivenCash(new BigDecimal("5000"));
         dto.setDateGiven(LocalDate.now());
-        dto.setFacility("72001 Чаплина, 127а");
+        dto.setFacility("72001 чаплина, 127а");
         return dto;
     }
 

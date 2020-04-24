@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FacilityRepository extends JpaRepository<Facility, Long> {
 
-    Facility findByFullName(String fullName);
+    Facility findByFullNameEqualsIgnoreCase(String fullName);
 
 }

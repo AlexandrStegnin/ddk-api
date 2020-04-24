@@ -23,7 +23,7 @@ public class FacilityService {
     FacilityRepository facilityRepository;
 
     public Facility findByFullName(String fullName) {
-        Facility facility = facilityRepository.findByFullName(fullName);
+        Facility facility = facilityRepository.findByFullNameEqualsIgnoreCase(fullName);
         if (Objects.isNull(facility)) {
             throw new ApiException("Объект с названием = [" + fullName + "] не найден", HttpStatus.NOT_FOUND);
         }
