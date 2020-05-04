@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.ddkolesnik</groupId>
     <artifactId>ddk-api</artifactId>
-    <version>0.0.1</version>
+    <version>1.0</version>
     <name>ddk-api</name>
     <description>API for DDK project</description>
 
