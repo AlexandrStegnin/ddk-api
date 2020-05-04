@@ -80,7 +80,7 @@ public class AppUserService {
      * @param login - логин пользователя
      * @return - пользователь
      */
-    private AppUser findByLogin(String login) {
+    public AppUser findByLogin(String login) {
         return appUserRepository.findByLogin(login);
     }
 
