@@ -6,6 +6,7 @@ import com.ddkolesnik.ddkapi.model.money.Facility;
 import com.ddkolesnik.ddkapi.model.money.Investor;
 import com.ddkolesnik.ddkapi.model.money.Money;
 import com.ddkolesnik.ddkapi.repository.money.MoneyRepository;
+import com.ddkolesnik.ddkapi.service.SendMessageService;
 import com.ddkolesnik.ddkapi.service.money.FacilityService;
 import com.ddkolesnik.ddkapi.service.money.InvestorService;
 import lombok.AccessLevel;
@@ -38,6 +39,8 @@ public class InvestorCashService {
 
     CashSourceService cashSourceService;
 
+    SendMessageService messageService;
+
     /**
      * Создать или обновить проводку, пришедшую из 1С
      *
@@ -46,9 +49,19 @@ public class InvestorCashService {
     public void update(InvestorCashDTO dto) {
         Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
         if (Objects.isNull(money)) {
-            create(dto);
+            money = create(dto);
+            sendMessage(money.getInvestor());
         } else {
             update(money, dto);
+        }
+    }
+
+    private void sendMessage(final Investor investor) {
+        if (isFirstInvestment(investor.getId())) {
+            Runnable task = () -> this.messageService.sendMessage(investor.getLogin());
+            task.run();
+            Thread send = new Thread(task);
+            send.start();
         }
     }
 
@@ -56,17 +69,18 @@ public class InvestorCashService {
      * Создать проводку
      *
      * @param dto - DTO объект из 1С
+     * @return - созданная сумма
      */
-    private void create(InvestorCashDTO dto) {
+    private Money create(InvestorCashDTO dto) {
         Money money = convert(dto);
-        moneyRepository.save(money);
+        return moneyRepository.save(money);
     }
 
     /**
      * Обновить проводку
      *
      * @param money - существующая проводка
-     * @param dto - DTO объект из 1С
+     * @param dto   - DTO объект из 1С
      */
     private void update(Money money, InvestorCashDTO dto) {
         prepareMoney(money, dto);
@@ -77,7 +91,7 @@ public class InvestorCashService {
      * Поготовить к обновлению проводку
      *
      * @param money - существующая проводка
-     * @param dto - DTO объект из 1С
+     * @param dto   - DTO объект из 1С
      */
     private void prepareMoney(Money money, InvestorCashDTO dto) {
         if (!money.getFacility().getName().equalsIgnoreCase(dto.getFacility())) {
@@ -133,7 +147,24 @@ public class InvestorCashService {
         return facilityService.findByFullName(fullName);
     }
 
+    /**
+     * Найти источник денег по имени, которое приходит из 1С
+     *
+     * @param organization - название источника
+     * @return - найденный источник
+     */
     private CashSource findCashSource(String organization) {
         return cashSourceService.findByOrganization(organization);
+    }
+
+    /**
+     * Проверить первое вложение инвестора или нет
+     *
+     * @param investorId - id инвестора
+     * @return - первое вложение или нет
+     */
+    private boolean isFirstInvestment(Long investorId) {
+        Long count = moneyRepository.countByInvestorIdAndDateClosingIsNull(investorId);
+        return count == 1;
     }
 }
