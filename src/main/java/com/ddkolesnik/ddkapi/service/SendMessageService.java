@@ -54,8 +54,9 @@ public class SendMessageService {
                 .uri(MAIL_APP_TOKEN + MAIL_APP_WELCOME_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(userDTO), AppUserDTO.class)
-                .exchange()
-                .block();
+                .retrieve()
+                .bodyToMono(Void.class)
+                .subscribe();
     }
 
 }
