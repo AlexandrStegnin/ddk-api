@@ -7,6 +7,9 @@ import io.swagger.v3.oas.models.info.Info;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import java.util.concurrent.Executor;
 
 /**
  * @author Alexandr Stegnin
@@ -29,5 +32,10 @@ public class AppConfiguration {
                 .components(new Components())
                 .info(new Info().title("Документация по API Доходного Дома Колесникъ")
                         .contact(contact));
+    }
+
+    @Bean(name = "threadPoolTaskExecutor")
+    public Executor threadPoolTaskExecutor() {
+        return new ThreadPoolTaskExecutor();
     }
 }
