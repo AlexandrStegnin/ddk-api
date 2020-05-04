@@ -14,4 +14,6 @@ public interface MoneyRepository extends JpaRepository<Money, Long>, JpaSpecific
 
     Money findByTransactionUUID(String uuid);
 
+    Long countByInvestorIdAndDateClosingIsNull(Long investorId);
+
 }
