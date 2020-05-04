@@ -12,6 +12,7 @@ import com.ddkolesnik.ddkapi.service.money.InvestorService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,12 +57,15 @@ public class InvestorCashService {
         }
     }
 
-    private void sendMessage(final Investor investor) {
+    /**
+     * Отправка сообщения пользователю
+     *
+     * @param investor - инвестор
+     */
+    @Async
+    protected void sendMessage(final Investor investor) {
         if (isFirstInvestment(investor.getId())) {
-            Runnable task = () -> this.messageService.sendMessage(investor.getLogin());
-            task.run();
-            Thread send = new Thread(task);
-            send.start();
+            messageService.sendMessage(investor.getLogin());
         }
     }
 
