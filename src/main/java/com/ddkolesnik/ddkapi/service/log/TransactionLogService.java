@@ -92,9 +92,11 @@ public class TransactionLogService {
     private void blockLinkedLogs(Money cash, TransactionLog log) {
         List<TransactionLog> linkedLogs = findByCash(cash);
         linkedLogs.forEach(linkedLog -> {
-            linkedLog.setRollbackEnabled(false);
-            linkedLog.setBlockedFrom(log);
-            update(linkedLog);
+            if (null == linkedLog.getBlockedFrom()) {
+                linkedLog.setRollbackEnabled(false);
+                linkedLog.setBlockedFrom(log);
+                update(linkedLog);
+            }
         });
     }
 }
