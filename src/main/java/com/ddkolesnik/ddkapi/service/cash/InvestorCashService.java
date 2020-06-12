@@ -7,6 +7,7 @@ import com.ddkolesnik.ddkapi.model.money.Investor;
 import com.ddkolesnik.ddkapi.model.money.Money;
 import com.ddkolesnik.ddkapi.repository.money.MoneyRepository;
 import com.ddkolesnik.ddkapi.service.SendMessageService;
+import com.ddkolesnik.ddkapi.service.log.TransactionLogService;
 import com.ddkolesnik.ddkapi.service.money.FacilityService;
 import com.ddkolesnik.ddkapi.service.money.InvestorService;
 import lombok.AccessLevel;
@@ -42,6 +43,8 @@ public class InvestorCashService {
 
     SendMessageService messageService;
 
+    TransactionLogService transactionLogService;
+
     /**
      * Создать или обновить проводку, пришедшую из 1С
      *
@@ -52,6 +55,7 @@ public class InvestorCashService {
         if (Objects.isNull(money)) {
             money = create(dto);
             sendMessage(money.getInvestor());
+            transactionLogService.create(money);
         } else {
             update(money, dto);
         }
