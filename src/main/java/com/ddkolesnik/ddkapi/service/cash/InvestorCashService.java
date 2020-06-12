@@ -57,6 +57,7 @@ public class InvestorCashService {
             sendMessage(money.getInvestor());
             transactionLogService.create(money);
         } else {
+            transactionLogService.update(money);
             update(money, dto);
         }
     }
