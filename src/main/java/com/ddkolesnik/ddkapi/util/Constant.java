@@ -6,6 +6,8 @@ package com.ddkolesnik.ddkapi.util;
 
 public class Constant {
 
+    public static final String CREATOR_1C = "API 1C";
+
     // Security
     public static final String AUTHORITIES_KEY = "authorities";
 
