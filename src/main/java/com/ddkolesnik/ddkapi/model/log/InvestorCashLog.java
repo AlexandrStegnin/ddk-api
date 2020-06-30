@@ -53,7 +53,15 @@ public class InvestorCashLog {
     @Column(name = "date_closing_invest")
     private LocalDate dateClosing;
 
-    public InvestorCashLog(Money cash) {
+    @OneToOne
+    @JoinColumn(name = "tx_id")
+    private TransactionLog transactionLog;
+
+    @Enumerated
+    @Column(name = "instance_of")
+    private CashType instanceOf;
+
+    public InvestorCashLog(Money cash, TransactionLog log) {
         this.cashId = cash.getId();
         this.investor = cash.getInvestor();
         this.facility = cash.getFacility();
@@ -61,6 +69,8 @@ public class InvestorCashLog {
         this.dateGiven = cash.getDateGiven();
         this.cashSource = cash.getCashSource();
         this.dateClosing = cash.getDateClosing();
+        this.transactionLog = log;
+        this.instanceOf = CashType.CASH_1C;
     }
 
 }

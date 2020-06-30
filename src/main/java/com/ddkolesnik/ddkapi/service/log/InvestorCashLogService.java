@@ -1,6 +1,7 @@
 package com.ddkolesnik.ddkapi.service.log;
 
 import com.ddkolesnik.ddkapi.model.log.InvestorCashLog;
+import com.ddkolesnik.ddkapi.model.log.TransactionLog;
 import com.ddkolesnik.ddkapi.model.money.Money;
 import com.ddkolesnik.ddkapi.repository.log.InvestorCashLogRepository;
 import org.springframework.stereotype.Service;
@@ -46,9 +47,10 @@ public class InvestorCashLogService {
      * Создать сумму в истории и в логе на основании суммы инвестора
      *
      * @param cash сумма инвестора
+     * @param log
      */
-    public void create(Money cash) {
-        InvestorCashLog cashLog = new InvestorCashLog(cash);
+    public void create(Money cash, TransactionLog log) {
+        InvestorCashLog cashLog = new InvestorCashLog(cash, log);
         investorCashLogRepository.save(cashLog);
     }
 
@@ -57,9 +59,9 @@ public class InvestorCashLogService {
      *
      * @param cashes список денег
      */
-    public void update(List<Money> cashes) {
+    public void update(List<Money> cashes, TransactionLog log) {
         cashes.forEach(cash -> {
-            InvestorCashLog cashLog = new InvestorCashLog(cash);
+            InvestorCashLog cashLog = new InvestorCashLog(cash, log);
             investorCashLogRepository.save(cashLog);
         });
     }
