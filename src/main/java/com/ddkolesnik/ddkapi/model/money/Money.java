@@ -3,7 +3,7 @@ package com.ddkolesnik.ddkapi.model.money;
 import com.ddkolesnik.ddkapi.model.cash.CashSource;
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
@@ -18,7 +18,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "InvestorsCash")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@EqualsAndHashCode(callSuper = false)
+@ToString(exclude = "investor")
 public class Money {
 
     @Id
