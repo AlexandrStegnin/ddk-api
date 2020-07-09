@@ -79,4 +79,5 @@ public class Constant {
 
     public static final String[] ALL_SWAGGER_MATCHERS = {"/v3/api-docs*", "/configuration/**", "/swagger*/**", "/webjars/**", "/", "/info", "/api-info.html"};
 
+    public static final String INVESTOR_PREFIX = "investor";
 }
