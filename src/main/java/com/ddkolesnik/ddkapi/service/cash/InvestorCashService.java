@@ -17,8 +17,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
-
 /**
  * Сервис для работы с проводками из 1С
  *
@@ -52,7 +50,7 @@ public class InvestorCashService {
      */
     public void update(InvestorCashDTO dto) {
         Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
-        if (Objects.isNull(money)) {
+        if (null == money) {
             money = create(dto);
             sendMessage(money.getInvestor());
             transactionLogService.create(money);
