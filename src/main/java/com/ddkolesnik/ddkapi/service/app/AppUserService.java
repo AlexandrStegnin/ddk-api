@@ -6,7 +6,6 @@ import com.ddkolesnik.ddkapi.model.security.Role;
 import com.ddkolesnik.ddkapi.repository.app.AppUserRepository;
 import com.ddkolesnik.ddkapi.service.security.RoleService;
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,7 +26,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @Transactional
-@RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class AppUserService {
 
@@ -40,6 +38,15 @@ public class AppUserService {
     AppUserRepository appUserRepository;
 
     RoleService roleService;
+
+    AccountService accountService;
+
+    public AppUserService(BCryptPasswordEncoder encoder, AppUserRepository appUserRepository, RoleService roleService, AccountService accountService) {
+        this.encoder = encoder;
+        this.appUserRepository = appUserRepository;
+        this.roleService = roleService;
+        this.accountService = accountService;
+    }
 
     /**
      * Обновить данные пользователя
@@ -72,6 +79,7 @@ public class AppUserService {
         user.setLogin(appUserDTO.getPartnerCode());
         prepareUser(user, appUserDTO);
         update(user);
+        accountService.createAccount(user);
     }
 
     /**
