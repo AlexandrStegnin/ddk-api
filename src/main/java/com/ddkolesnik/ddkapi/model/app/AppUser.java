@@ -29,20 +29,21 @@ public class AppUser {
     @Column(name = "password")
     String password;
 
-    @Column(name = "last_name")
-    String lastName;
-
-    @Column(name = "email")
-    String email;
-
     @ManyToMany
     @JoinTable(name = "USERS_ROLES",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     Set<Role> roles = new HashSet<>();
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    UserProfile profile;
+
     public void addRole(Role role) {
         this.roles.add(role);
     }
 
+    public AppUser() {
+        this.profile = new UserProfile();
+        this.profile.setUser(this);
+    }
 }

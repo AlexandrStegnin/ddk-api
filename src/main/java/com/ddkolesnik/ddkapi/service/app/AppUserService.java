@@ -116,8 +116,8 @@ public class AppUserService {
      * @return - надо/не надо обновлять
      */
     private boolean needUpdate(AppUserDTO dto, AppUser entity) {
-        return !dto.getLastName().equalsIgnoreCase(entity.getLastName()) ||
-                !dto.getEmail().equalsIgnoreCase(entity.getEmail());
+        return !dto.getLastName().equalsIgnoreCase(entity.getProfile().getLastName()) ||
+                !dto.getEmail().equalsIgnoreCase(entity.getProfile().getEmail());
     }
 
     /**
@@ -128,10 +128,10 @@ public class AppUserService {
      */
     private void prepareUser(AppUser user, AppUserDTO dto) {
         if (dto.getEmail() != null && !dto.getEmail().isEmpty()) {
-            user.setEmail(dto.getEmail());
+            user.getProfile().setEmail(dto.getEmail());
         }
         if (dto.getLastName() != null && !dto.getLastName().isEmpty()) {
-            user.setLastName(dto.getLastName());
+            user.getProfile().setLastName(dto.getLastName());
         }
         user.addRole(getInvestorRole());
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
@@ -148,7 +148,7 @@ public class AppUserService {
     }
 
     private AppUserDTO convertToDTO(AppUser user) {
-        return new AppUserDTO(user.getLogin(), user.getLastName(), user.getEmail());
+        return new AppUserDTO(user.getLogin(), user.getProfile().getLastName(), user.getProfile().getEmail());
     }
 
 }

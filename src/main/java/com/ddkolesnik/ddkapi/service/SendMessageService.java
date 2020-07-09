@@ -49,7 +49,7 @@ public class SendMessageService {
         WebClient webClient = WebClient.create(MAIL_APP_BASE_URL);
         AppUser user = appUserService.findByLogin(login);
         AppUserDTO userDTO = new AppUserDTO();
-        userDTO.setEmail(user.getEmail());
+        userDTO.setEmail(user.getProfile().getEmail());
         webClient.post()
                 .uri(MAIL_APP_TOKEN + MAIL_APP_WELCOME_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
