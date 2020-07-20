@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.Objects;
 
 /**
  * @author Alexandr Stegnin
@@ -29,8 +28,8 @@ public class InvestorService {
     }
 
     public Investor findByLogin(String login) {
-        Investor investor = investorRepository.findByLogin(login);
-        if (Objects.isNull(investor)) {
+        Investor investor = investorRepository.findByLoginIgnoreCase(login);
+        if (investor == null) {
             throw new ApiException("Инвестор с логином [" + login + "] не найден", HttpStatus.NOT_FOUND);
         }
         return investor;
