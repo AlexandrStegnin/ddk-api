@@ -42,10 +42,6 @@ public class Constant {
 
     public static final String UPDATE_USER = "/update";
 
-    public static final String UPDATE_USER_JSON = "/update.json";
-
-    public static final String USER_LOGIN = "/{login}";
-
     // BITRIX CONTACT PATHS
 
     public static final String BITRIX_CONTACT = BASE_URL + VERSION + KEY_PATH + "/bitrix";
