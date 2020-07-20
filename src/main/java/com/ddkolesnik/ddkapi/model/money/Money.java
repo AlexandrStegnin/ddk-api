@@ -1,6 +1,7 @@
 package com.ddkolesnik.ddkapi.model.money;
 
 import com.ddkolesnik.ddkapi.model.cash.CashSource;
+import com.ddkolesnik.ddkapi.util.ShareType;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.ToString;
@@ -48,4 +49,13 @@ public class Money {
     @OneToOne
     @JoinColumn(name = "CashSourceId")
     CashSource cashSource;
+
+    @OneToOne
+    @JoinColumn(name = "UnderFacilityId")
+    UnderFacility underFacility;
+
+    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "ShareType")
+    ShareType shareType;
+
 }
