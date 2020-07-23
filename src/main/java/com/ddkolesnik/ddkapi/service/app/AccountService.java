@@ -4,7 +4,6 @@ import com.ddkolesnik.ddkapi.model.app.Account;
 import com.ddkolesnik.ddkapi.model.app.AppUser;
 import com.ddkolesnik.ddkapi.repository.app.AccountRepository;
 import com.ddkolesnik.ddkapi.util.Constant;
-import com.ddkolesnik.ddkapi.util.Region;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
@@ -45,7 +44,7 @@ public class AccountService {
     }
 
     private String getRegionNumber() {
-        return Region.TMN.getNumber();
+        return "";
     }
 
 }

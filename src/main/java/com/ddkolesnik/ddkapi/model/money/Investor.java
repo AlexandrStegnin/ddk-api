@@ -17,7 +17,7 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "USERS", schema = "pss_projects", catalog = "pss_projects")
+@Table(name = "app_user", schema = "pss_projects", catalog = "pss_projects")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = false)
 public class Investor extends AbstractEntity {

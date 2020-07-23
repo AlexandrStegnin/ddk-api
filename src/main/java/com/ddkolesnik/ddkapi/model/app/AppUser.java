@@ -15,7 +15,7 @@ import java.util.Set;
 
 @Data
 @Entity
-@Table(name = "USERS")
+@Table(name = "app_user")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AppUser {
 
@@ -30,7 +30,7 @@ public class AppUser {
     String password;
 
     @ManyToMany
-    @JoinTable(name = "USERS_ROLES",
+    @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     Set<Role> roles = new HashSet<>();

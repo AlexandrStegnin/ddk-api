@@ -16,7 +16,7 @@ import java.util.Set;
 
 @Data
 @Entity
-@Table(name = "USERS", schema = "pss_projects", catalog = "pss_projects")
+@Table(name = "app_user", schema = "pss_projects", catalog = "pss_projects")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User implements UserDetails {
 
@@ -29,7 +29,7 @@ public class User implements UserDetails {
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(
-            name = "USERS_ROLES",
+            name = "user_role",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
             foreignKey = @ForeignKey(name = "user_role_to_user"),

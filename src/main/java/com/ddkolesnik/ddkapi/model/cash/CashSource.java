@@ -14,7 +14,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "CashSources")
+@Table(name = "cash_source")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CashSource {
 
@@ -22,7 +22,7 @@ public class CashSource {
     @GeneratedValue
     Long id;
 
-    @Column(name = "CashSource")
+    @Column(name = "name")
     String name;
 
     @Column(name = "organization_id")

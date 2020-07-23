@@ -11,10 +11,10 @@ import javax.persistence.Table;
  */
 
 @Entity
-@Table(name = "UnderFacilities")
+@Table(name = "under_facility")
 public class UnderFacility extends AbstractEntity {
 
-    @Column(name = "UnderFacility")
+    @Column(name = "name")
     private String name;
 
 }
