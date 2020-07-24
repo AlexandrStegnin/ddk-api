@@ -21,6 +21,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 /**
  * Сервис для работы с проводками из 1С
  *
@@ -32,6 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class InvestorCashService {
+
+    private static final LocalDate FILTERED_DATE = LocalDate.of(2020, 6, 30);
 
     MoneyRepository moneyRepository;
 
@@ -53,14 +58,16 @@ public class InvestorCashService {
      * @param dto - DTO объект из 1С
      */
     public void update(InvestorCashDTO dto) {
-        Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
-        if (null == money) {
-            money = create(dto);
-            sendMessage(money.getInvestor());
-            transactionLogService.create(money);
-        } else {
-            transactionLogService.update(money);
-            update(money, dto);
+        if (checkCash(dto)) {
+            Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
+            if (null == money) {
+                money = create(dto);
+                sendMessage(money.getInvestor());
+                transactionLogService.create(money);
+            } else {
+                transactionLogService.update(money);
+                update(money, dto);
+            }
         }
     }
 
@@ -195,5 +202,16 @@ public class InvestorCashService {
     private boolean isFirstInvestment(Long investorId) {
         Long count = moneyRepository.countByInvestorIdAndDateClosingIsNull(investorId);
         return count == 1;
+    }
+
+    /**
+     * Проверить подходит ли сумма для внесения на сервер.
+     * Временный фильтр. Если дата передачи денег после 30.06.2020 и переданная сумма положительная
+     *
+     * @param dto DTO денег
+     * @return результат проверки
+     */
+    private boolean checkCash(InvestorCashDTO dto) {
+        return dto.getDateGiven().isAfter(FILTERED_DATE) && dto.getGivenCash().compareTo(BigDecimal.ZERO) > 0;
     }
 }
