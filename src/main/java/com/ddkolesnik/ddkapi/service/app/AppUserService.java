@@ -76,6 +76,9 @@ public class AppUserService {
             appUserDTO.setPartnerCode(login);
             createUser(appUserDTO, partner);
         } else if (needUpdate(appUserDTO, user)) {
+            if (partner != null) {
+                user.setPartnerId(partner.getId());
+            }
             prepareUser(user, appUserDTO);
             update(user);
         }
@@ -173,9 +176,6 @@ public class AppUserService {
         user.addRole(getInvestorRole());
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
             user.setPassword(generatePassword());
-        }
-        if (dto.getPartnerId() != null) {
-            user.setPartnerId(Long.valueOf(dto.getPartnerId()));
         }
         if (dto.getKin() != null) {
             Kin kin = Kin.fromTitle(dto.getKin());
