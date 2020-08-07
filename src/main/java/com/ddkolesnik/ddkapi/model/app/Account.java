@@ -31,4 +31,7 @@ public class Account {
     @Column(name = "owner_id")
     private Long ownerId;
 
+    @Column(name = "owner_type")
+    private String ownerType;
+
 }
