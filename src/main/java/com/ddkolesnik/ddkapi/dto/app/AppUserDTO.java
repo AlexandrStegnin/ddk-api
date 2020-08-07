@@ -1,5 +1,7 @@
 package com.ddkolesnik.ddkapi.dto.app;
 
+import com.ddkolesnik.ddkapi.model.app.AppUser;
+import com.ddkolesnik.ddkapi.util.Kin;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -32,5 +34,19 @@ public class AppUserDTO {
 
     @Schema(implementation = String.class, name = "email", description = "Email инвестора")
     String email;
+
+    @Schema(implementation = String.class, name = "partnerId", description = "Код инвестора партнёра")
+    String partnerId;
+
+    @Schema(implementation = String.class, name = "kin", description = "Родственник/не родственник/супруг(а)")
+    String kin;
+
+    public AppUserDTO(AppUser appUser) {
+        this.partnerCode = appUser.getLogin();
+        this.lastName = appUser.getProfile().getLastName();
+        this.email = appUser.getProfile().getEmail();
+        this.partnerId = String.valueOf(appUser.getPartnerId());
+        this.kin = Kin.fromId(appUser.getKin()).getTitle();
+    }
 
 }
