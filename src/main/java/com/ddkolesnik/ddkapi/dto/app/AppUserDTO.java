@@ -46,7 +46,15 @@ public class AppUserDTO {
         this.lastName = appUser.getProfile().getLastName();
         this.email = appUser.getProfile().getEmail();
         this.partnerId = String.valueOf(appUser.getPartnerId());
-        this.kin = Kin.fromId(appUser.getKin()).getTitle();
+        this.kin = extractKinTitle(appUser);
+    }
+
+    private String extractKinTitle(AppUser appUser) {
+        Kin kin = Kin.fromId(appUser.getKin());
+        if (kin != null) {
+            return kin.getTitle();
+        }
+        return null;
     }
 
 }
