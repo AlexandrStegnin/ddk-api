@@ -5,6 +5,7 @@ import com.ddkolesnik.ddkapi.model.app.AppUser;
 import com.ddkolesnik.ddkapi.model.security.Role;
 import com.ddkolesnik.ddkapi.repository.app.AppUserRepository;
 import com.ddkolesnik.ddkapi.service.security.RoleService;
+import com.ddkolesnik.ddkapi.util.Kin;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -65,18 +66,27 @@ public class AppUserService {
     public void update(AppUserDTO appUserDTO) {
         String login = INVESTOR_PREFIX.concat(appUserDTO.getPartnerCode());
         AppUser user = findByLogin(login);
+        String partnerLogin;
+        AppUser partner = null;
+        if (appUserDTO.getPartnerId() != null) {
+            partnerLogin = INVESTOR_PREFIX.concat(appUserDTO.getPartnerId());
+            partner = findByLogin(partnerLogin);
+        }
         if (user == null) {
             appUserDTO.setPartnerCode(login);
-            createUser(appUserDTO);
+            createUser(appUserDTO, partner);
         } else if (needUpdate(appUserDTO, user)) {
             prepareUser(user, appUserDTO);
             update(user);
         }
     }
 
-    private void createUser(AppUserDTO appUserDTO) {
+    private void createUser(AppUserDTO appUserDTO, AppUser partner) {
         AppUser user = new AppUser();
         user.setLogin(appUserDTO.getPartnerCode());
+        if (partner != null) {
+            user.setPartnerId(partner.getId());
+        }
         prepareUser(user, appUserDTO);
         update(user);
         accountService.createAccount(user);
@@ -124,6 +134,25 @@ public class AppUserService {
      * @return - надо/не надо обновлять
      */
     private boolean needUpdate(AppUserDTO dto, AppUser entity) {
+        if (dto.getPartnerId() != null && entity.getPartnerId() == null) {
+            return true;
+        } else if (dto.getPartnerId() == null && entity.getPartnerId() != null) {
+            return true;
+        } else if (!Long.valueOf(dto.getPartnerId()).equals(entity.getPartnerId())) {
+            return true;
+        }
+        if (dto.getKin() != null && entity.getKin() == null) {
+            return true;
+        } else if (dto.getKin() == null && entity.getKin() != null) {
+            return true;
+        } else if (dto.getKin() != null && entity.getKin() != null) {
+            Kin kin = Kin.fromId(entity.getKin());
+            if (kin != null) {
+                if (!dto.getKin().equalsIgnoreCase(kin.getTitle())) {
+                    return true;
+                }
+            }
+        }
         return !dto.getLastName().equalsIgnoreCase(entity.getProfile().getLastName()) ||
                 !dto.getEmail().equalsIgnoreCase(entity.getProfile().getEmail());
     }
@@ -145,6 +174,15 @@ public class AppUserService {
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
             user.setPassword(generatePassword());
         }
+        if (dto.getPartnerId() != null) {
+            user.setPartnerId(Long.valueOf(dto.getPartnerId()));
+        }
+        if (dto.getKin() != null) {
+            Kin kin = Kin.fromTitle(dto.getKin());
+            if (kin != null) {
+                user.setKin(kin.getId());
+            }
+        }
     }
 
     public List<AppUserDTO> getAllDTO() {
@@ -156,7 +194,7 @@ public class AppUserService {
     }
 
     private AppUserDTO convertToDTO(AppUser user) {
-        return new AppUserDTO(user.getLogin(), user.getProfile().getLastName(), user.getProfile().getEmail());
+        return new AppUserDTO(user);
     }
 
 }
