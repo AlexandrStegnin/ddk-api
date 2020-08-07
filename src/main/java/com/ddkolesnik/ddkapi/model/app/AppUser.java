@@ -1,8 +1,10 @@
 package com.ddkolesnik.ddkapi.model.app;
 
 import com.ddkolesnik.ddkapi.model.security.Role;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
@@ -16,6 +18,7 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "app_user")
+@ToString(exclude = "profile")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AppUser {
 
@@ -26,6 +29,7 @@ public class AppUser {
     @Column(name = "login")
     String login;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password")
     String password;
 
@@ -37,6 +41,12 @@ public class AppUser {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     UserProfile profile;
+
+    @Column(name = "kin")
+    Integer kin;
+
+    @Column(name = "partnerId")
+    Long partnerId;
 
     public void addRole(Role role) {
         this.roles.add(role);
