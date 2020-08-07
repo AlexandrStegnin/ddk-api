@@ -28,6 +28,7 @@ public class AccountService {
         Account account = new Account();
         account.setAccountNumber(generateAccountNumber(user));
         account.setOwnerId(user.getId());
+        account.setOwnerType(Constant.OWNER_TYPE_INVESTOR);
         accountRepository.save(account);
     }
 
