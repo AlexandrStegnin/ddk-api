@@ -79,4 +79,5 @@ public class Constant {
 
     public static final String UNDER_FACILITY_SUFFIX = "_Целиком";
 
+    public static final String OWNER_TYPE_INVESTOR = "INVESTOR";
 }
