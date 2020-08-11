@@ -59,6 +59,7 @@ public class AppUserController {
                              @Parameter(description = "Пользователь", schema = @Schema(implementation = AppUserDTO.class))
                              @Valid AppUserDTO appUser) {
         appUserService.update(appUser);
+        log.info("Пользователь успешно обновлён [{}]", appUser);
         return new ApiSuccessResponse(HttpStatus.OK, "Пользователь успешно сохранён");
     }
 
