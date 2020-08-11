@@ -141,9 +141,8 @@ public class AppUserService {
             return true;
         } else if (dto.getPartnerId() == null && entity.getPartnerId() != null) {
             return true;
-        } else if (dto.getPartnerId() == null && entity.getPartnerId() == null) {
-            return false;
-        } else if (!Long.valueOf(dto.getPartnerId()).equals(entity.getPartnerId())) {
+        } else if (dto.getPartnerId() != null && entity.getPartnerId() != null &&
+                !Long.valueOf(dto.getPartnerId()).equals(entity.getPartnerId())) {
             return true;
         }
         if (dto.getKin() != null && entity.getKin() == null) {
