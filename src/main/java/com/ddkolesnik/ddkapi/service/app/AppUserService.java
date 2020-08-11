@@ -152,13 +152,11 @@ public class AppUserService {
         } else if (dto.getKin() != null && entity.getKin() != null) {
             Kin kin = Kin.fromId(entity.getKin());
             if (kin != null) {
-                if (!dto.getKin().equalsIgnoreCase(kin.getTitle())) {
-                    return true;
-                }
+                return !dto.getKin().equalsIgnoreCase(kin.getTitle());
             }
-        }
-        return !dto.getLastName().equalsIgnoreCase(entity.getProfile().getLastName()) ||
+        } else return !dto.getLastName().equalsIgnoreCase(entity.getProfile().getLastName()) ||
                 !dto.getEmail().equalsIgnoreCase(entity.getProfile().getEmail());
+        return false;
     }
 
     /**
