@@ -57,6 +57,7 @@ public class InvestorCashController {
                                                  @Parameter(description = "Проводка из 1С", schema = @Schema(implementation = InvestorCashDTO.class))
                                                  @Valid @RequestBody InvestorCashDTO dto) {
         investorCashService.update(dto);
+        log.info("Проводка успешно обновлена [{}]", dto);
         return new ApiSuccessResponse(HttpStatus.OK, "Данные успешно сохранены");
     }
 
