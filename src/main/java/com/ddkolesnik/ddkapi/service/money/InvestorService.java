@@ -28,7 +28,7 @@ public class InvestorService {
     }
 
     public Investor findByLogin(String login) {
-        Investor investor = investorRepository.findByLoginIgnoreCase(login);
+        Investor investor = investorRepository.findByLogin(login);
         if (investor == null) {
             throw new ApiException("Инвестор с логином [" + login + "] не найден", HttpStatus.NOT_FOUND);
         }
