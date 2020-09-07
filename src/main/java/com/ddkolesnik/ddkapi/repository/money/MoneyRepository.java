@@ -16,4 +16,5 @@ public interface MoneyRepository extends JpaRepository<Money, Long>, JpaSpecific
 
     Long countByInvestorIdAndDateClosingIsNull(Long investorId);
 
+    void deleteByTransactionUUID(String transactionUUID);
 }
