@@ -45,4 +45,7 @@ public class InvestorCashDTO {
     @Schema(implementation = String.class, name = "transactionUUID", description = "Идентификатор транзакции из 1С")
     String transactionUUID;
 
+    @Schema(implementation = Boolean.class, name = "delete", defaultValue = "false", description = "Флаг о необходимости удаления транзакции")
+    boolean delete = false;
+
 }
