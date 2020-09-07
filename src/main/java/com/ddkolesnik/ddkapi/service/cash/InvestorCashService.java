@@ -59,14 +59,18 @@ public class InvestorCashService {
      */
     public void update(InvestorCashDTO dto) {
         if (checkCash(dto)) {
-            Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
-            if (null == money) {
-                money = create(dto);
-                sendMessage(money.getInvestor());
-                transactionLogService.create(money);
+            if (dto.isDelete()) {
+                moneyRepository.deleteByTransactionUUID(dto.getTransactionUUID());
             } else {
-                transactionLogService.update(money);
-                update(money, dto);
+                Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
+                if (null == money) {
+                    money = create(dto);
+                    sendMessage(money.getInvestor());
+                    transactionLogService.create(money);
+                } else {
+                    transactionLogService.update(money);
+                    update(money, dto);
+                }
             }
         }
     }
