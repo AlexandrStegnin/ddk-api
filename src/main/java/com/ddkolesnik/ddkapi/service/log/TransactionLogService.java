@@ -101,4 +101,18 @@ public class TransactionLogService {
             }
         });
     }
+
+    /**
+     * Разблокировать транзакции по id лога
+     *
+     * @param logId id лога
+     */
+    public void unblockTransactions(Long logId) {
+        List<TransactionLog> blockedLogs = transactionLogRepository.findByBlockedFromId(logId);
+        blockedLogs.forEach(blockedLog -> {
+            blockedLog.setRollbackEnabled(true);
+            blockedLog.setBlockedFrom(null);
+            transactionLogRepository.save(blockedLog);
+        });
+    }
 }
