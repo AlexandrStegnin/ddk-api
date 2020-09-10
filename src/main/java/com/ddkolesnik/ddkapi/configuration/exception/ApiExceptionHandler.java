@@ -1,7 +1,9 @@
 package com.ddkolesnik.ddkapi.configuration.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -20,6 +22,7 @@ import static com.ddkolesnik.ddkapi.util.Constant.INVALID_APP_TOKEN;
  * @author Alexandr Stegnin
  */
 
+@Slf4j
 @ControllerAdvice
 public class ApiExceptionHandler {
 
@@ -55,6 +58,11 @@ public class ApiExceptionHandler {
                 collect(Collectors.joining(",\n"));
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(HttpStatus.BAD_REQUEST, message, Instant.now());
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public void handle(RequestRejectedException e) {
+        log.warn("Запрос отклонён: {}", e.getLocalizedMessage());
     }
 
 }
