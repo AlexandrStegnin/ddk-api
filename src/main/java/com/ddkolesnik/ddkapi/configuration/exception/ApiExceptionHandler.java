@@ -1,6 +1,8 @@
 package com.ddkolesnik.ddkapi.configuration.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.SQLGrammarException;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.firewall.RequestRejectedException;
@@ -27,7 +29,7 @@ import static com.ddkolesnik.ddkapi.util.Constant.INVALID_APP_TOKEN;
 @ControllerAdvice
 public class ApiExceptionHandler {
 
-    @ExceptionHandler({ ApiException.class })
+    @ExceptionHandler({ApiException.class})
     protected ResponseEntity<ApiErrorResponse> handleApiException(ApiException ex) {
         return new ResponseEntity<>(new ApiErrorResponse(ex.getStatus(), ex.getMessage(), Instant.now()), ex.getStatus());
     }
@@ -37,7 +39,7 @@ public class ApiExceptionHandler {
         String errorMessage = new ArrayList<>(exception.getConstraintViolations())
                 .stream()
                 .map(ConstraintViolation::getMessage)
-                .collect(Collectors.joining( "; "));
+                .collect(Collectors.joining("; "));
         HttpStatus status;
         if (errorMessage.equalsIgnoreCase(INVALID_APP_TOKEN)) {
             status = HttpStatus.FORBIDDEN;
@@ -55,8 +57,8 @@ public class ApiExceptionHandler {
                 .collect(Collectors.toMap(FieldError::getField, Objects.requireNonNull(FieldError::getDefaultMessage)))
                 .entrySet()
                 .stream()
-                .map(entrySet -> entrySet.getKey() + ": "+ entrySet.getValue()).
-                collect(Collectors.joining(",\n"));
+                .map(entrySet -> entrySet.getKey() + ": " + entrySet.getValue()).
+                        collect(Collectors.joining(",\n"));
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(HttpStatus.BAD_REQUEST, message, Instant.now());
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.BAD_REQUEST);
     }
@@ -71,8 +73,8 @@ public class ApiExceptionHandler {
         log.warn("Произошла ошибка: {}", e.getLocalizedMessage());
     }
 
-    @ExceptionHandler
-    public void handle(SQLSyntaxErrorException e) {
+    @ExceptionHandler({SQLSyntaxErrorException.class, InvalidDataAccessResourceUsageException.class, SQLGrammarException.class})
+    public void handle(InvalidDataAccessResourceUsageException e) {
         log.warn("Ошибка базы данных: {}", e.getLocalizedMessage());
     }
 }
