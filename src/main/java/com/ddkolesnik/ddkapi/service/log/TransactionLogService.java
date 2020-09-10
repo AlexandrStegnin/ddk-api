@@ -115,4 +115,13 @@ public class TransactionLogService {
             transactionLogRepository.save(blockedLog);
         });
     }
+
+    /**
+     * Удаление записей логов
+     *
+     * @param logs логи для удаления
+     */
+    public void delete(List<TransactionLog> logs) {
+        transactionLogRepository.deleteAll(logs);
+    }
 }
