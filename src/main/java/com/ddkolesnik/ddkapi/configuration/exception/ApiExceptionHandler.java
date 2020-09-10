@@ -65,4 +65,8 @@ public class ApiExceptionHandler {
         log.warn("Запрос отклонён: {}", e.getLocalizedMessage());
     }
 
+    @ExceptionHandler
+    public void handle(IllegalArgumentException e) {
+        log.warn("Произошла ошибка: {}", e.getLocalizedMessage());
+    }
 }
