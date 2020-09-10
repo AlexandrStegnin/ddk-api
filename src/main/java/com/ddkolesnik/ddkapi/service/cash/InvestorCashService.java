@@ -2,6 +2,7 @@ package com.ddkolesnik.ddkapi.service.cash;
 
 import com.ddkolesnik.ddkapi.dto.cash.InvestorCashDTO;
 import com.ddkolesnik.ddkapi.model.cash.CashSource;
+import com.ddkolesnik.ddkapi.model.log.TransactionLog;
 import com.ddkolesnik.ddkapi.model.money.Facility;
 import com.ddkolesnik.ddkapi.model.money.Investor;
 import com.ddkolesnik.ddkapi.model.money.Money;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Сервис для работы с проводками из 1С
@@ -59,10 +61,14 @@ public class InvestorCashService {
      */
     public void update(InvestorCashDTO dto) {
         if (checkCash(dto)) {
+            Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
             if (dto.isDelete()) {
-                moneyRepository.deleteByTransactionUUID(dto.getTransactionUUID());
+                if (money != null) {
+                    List<TransactionLog> logs = transactionLogService.findByCash(money);
+                    transactionLogService.delete(logs);
+                    moneyRepository.deleteByTransactionUUID(money.getTransactionUUID());
+                }
             } else {
-                Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
                 if (null == money) {
                     money = create(dto);
                     sendMessage(money.getInvestor());
