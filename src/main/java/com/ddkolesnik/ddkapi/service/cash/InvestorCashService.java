@@ -69,10 +69,17 @@ public class InvestorCashService {
                     moneyRepository.deleteByTransactionUUID(money.getTransactionUUID());
                 }
             } else {
-                if (null == money) {
-                    money = create(dto);
-                    sendMessage(money.getInvestor());
-                    transactionLogService.create(money);
+                if (money == null) {
+                    money = moneyRepository.findMoney(dto.getDateGiven(), dto.getGivenCash(), dto.getFacility(),
+                            dto.getCashSource(), Constant.INVESTOR_PREFIX.concat(dto.getInvestorCode()));
+                    if (money == null) {
+                        money = create(dto);
+                        sendMessage(money.getInvestor());
+                        transactionLogService.create(money);
+                    } else {
+                        transactionLogService.update(money);
+                        update(money, dto);
+                    }
                 } else {
                     transactionLogService.update(money);
                     update(money, dto);
@@ -128,6 +135,7 @@ public class InvestorCashService {
         }
         money.setGivenCash(dto.getGivenCash());
         money.setDateGiven(dto.getDateGiven());
+        money.setTransactionUUID(dto.getTransactionUUID());
     }
 
     /**
