@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.sql.SQLSyntaxErrorException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -68,5 +69,10 @@ public class ApiExceptionHandler {
     @ExceptionHandler
     public void handle(IllegalArgumentException e) {
         log.warn("Произошла ошибка: {}", e.getLocalizedMessage());
+    }
+
+    @ExceptionHandler
+    public void handle(SQLSyntaxErrorException e) {
+        log.warn("Ошибка базы данных: {}", e.getLocalizedMessage());
     }
 }
