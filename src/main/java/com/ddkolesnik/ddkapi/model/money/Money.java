@@ -17,7 +17,7 @@ import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name = "InvestorsCash")
+@Table(name = "money")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ToString(exclude = "investor")
 public class Money {
@@ -26,36 +26,36 @@ public class Money {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "GivedCash")
+    @Column(name = "given_cash")
     BigDecimal givenCash;
 
     @OneToOne
-    @JoinColumn(name = "FacilityId")
+    @JoinColumn(name = "facility_id")
     Facility facility;
 
-    @Column(name = "DateGivedCash")
+    @Column(name = "date_given")
     LocalDate dateGiven;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "InvestorId")
+    @JoinColumn(name = "investor_id")
     Investor investor;
 
-    @Column(name = "DateClosingInvest")
+    @Column(name = "date_closing")
     LocalDate dateClosing;
 
     @Column(name = "transaction_uuid")
     String transactionUUID;
 
     @OneToOne
-    @JoinColumn(name = "CashSourceId")
+    @JoinColumn(name = "cash_source_id")
     CashSource cashSource;
 
     @OneToOne
-    @JoinColumn(name = "UnderFacilityId")
+    @JoinColumn(name = "under_facility_id")
     UnderFacility underFacility;
 
     @Enumerated(EnumType.ORDINAL)
-    @Column(name = "ShareType")
+    @Column(name = "share_type")
     ShareType shareType;
 
 }
