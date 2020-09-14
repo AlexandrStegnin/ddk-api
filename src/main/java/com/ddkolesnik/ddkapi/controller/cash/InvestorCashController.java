@@ -40,7 +40,7 @@ import static com.ddkolesnik.ddkapi.util.Constant.*;
 @RequestMapping(PATH_INVESTOR_CASH)
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-@Tag(name = "InvestorCash", description = "API для взаимодействия с системой 1C")
+@Tag(name = "InvestorCash", description = "API для создания проводок, приходящих из 1C")
 public class InvestorCashController {
 
     InvestorCashService investorCashService;
