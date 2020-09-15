@@ -4,6 +4,7 @@ import com.ddkolesnik.ddkapi.configuration.exception.ApiException;
 import com.ddkolesnik.ddkapi.dto.money.FacilityDTO;
 import com.ddkolesnik.ddkapi.model.money.Facility;
 import com.ddkolesnik.ddkapi.repository.money.FacilityRepository;
+import com.ddkolesnik.ddkapi.service.app.AccountService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,6 +23,8 @@ import java.util.Objects;
 public class FacilityService {
 
     FacilityRepository facilityRepository;
+
+    AccountService accountService;
 
     public Facility findByFullName(String fullName) {
         Facility facility = facilityRepository.findByFullNameEqualsIgnoreCase(fullName);
@@ -52,7 +55,7 @@ public class FacilityService {
      * Обновить объект на основе DTO из 1С
      *
      * @param facility объект для обновления
-     * @param dto DTO объект из 1С
+     * @param dto      DTO объект из 1С
      */
     private void updateFacility(Facility facility, FacilityDTO dto) {
         facility.setProjectUUID(dto.getProjectUUID());
@@ -67,11 +70,15 @@ public class FacilityService {
      * @param dto DTO из 1С
      */
     private void createFacility(FacilityDTO dto) {
+        if (accountService.checkAccountNumber(dto) != null) {
+            throw new ApiException("Номер договора уже используется.", HttpStatus.BAD_REQUEST);
+        }
         Facility facility = new Facility();
         facility.setName(dto.getName());
         facility.setFullName(dto.getName());
         facility.setProjectUUID(dto.getProjectUUID());
         facilityRepository.save(facility);
+        accountService.createAccount(facility);
     }
 
     /**
