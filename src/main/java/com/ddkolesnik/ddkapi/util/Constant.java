@@ -42,6 +42,11 @@ public class Constant {
 
     public static final String UPDATE_USER = "/update";
 
+    // FACILITIES PATH
+    public static final String FACILITIES = BASE_URL + VERSION + KEY_PATH + "/facilities";
+
+    public static final String UPDATE_FACILITY = "/update";
+
     // BITRIX CONTACT PATHS
 
     public static final String BITRIX_CONTACT = BASE_URL + VERSION + KEY_PATH + "/bitrix";
