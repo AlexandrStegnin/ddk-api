@@ -24,6 +24,11 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
+    /**
+     * Создать счёт для пользователя (инвестора)
+     *
+     * @param user пользователь
+     */
     public void createAccount(AppUser user) {
         Account account = new Account();
         account.setAccountNumber(generateAccountNumber(user));
@@ -32,12 +37,15 @@ public class AccountService {
         accountRepository.save(account);
     }
 
+    /**
+     * Сгенерировать номер счёта для пользователя
+     *
+     * @param user пользователь
+     * @return сгенерированный номер
+     */
     private String generateAccountNumber(AppUser user) {
         /*
-        первые 5 цифр 00000 (порядковый номер клиента),
-        вторые 3 цифры (номер региона),
-        далее 4 цифры (порядковый номер объекта),
-        далее 2 цифры (порядковый номер подобъекта) - всего 14 символов поллучается
+        первые 5 цифр 00000 (порядковый номер клиента)
          */
         String clientCode = user.getLogin().substring(Constant.INVESTOR_PREFIX.length());
         String regionNumber = getRegionNumber();
