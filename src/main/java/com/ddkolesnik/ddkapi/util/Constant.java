@@ -6,6 +6,8 @@ package com.ddkolesnik.ddkapi.util;
 
 public class Constant {
 
+    private static final String WILD_CARD = "/**";
+
     public static final String CREATOR_1C = "API 1C";
 
     // Security
@@ -58,9 +60,10 @@ public class Constant {
     // API PATHS
     public static final String[] API_HTTP_MATCHERS = {
             PATH_MONIES,
-            USERS + "/**",
-            BITRIX_CONTACT + "/**",
-            PATH_INVESTOR_CASH + "/**"
+            USERS + WILD_CARD,
+            BITRIX_CONTACT + WILD_CARD,
+            PATH_INVESTOR_CASH + WILD_CARD,
+            FACILITIES + WILD_CARD
     };
 
     // IGNORING access to Spring Security
