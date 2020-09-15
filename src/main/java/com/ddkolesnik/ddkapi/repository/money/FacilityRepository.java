@@ -13,4 +13,6 @@ public interface FacilityRepository extends JpaRepository<Facility, Long> {
 
     Facility findByFullNameEqualsIgnoreCase(String fullName);
 
+    Facility findByProjectUUID(String projectUUID);
+
 }
