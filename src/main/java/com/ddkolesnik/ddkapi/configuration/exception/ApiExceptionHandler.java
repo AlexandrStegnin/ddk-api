@@ -85,4 +85,9 @@ public class ApiExceptionHandler {
         log.warn("Неподдерживаемый метод: {}", e.getLocalizedMessage());
     }
 
+    @ExceptionHandler
+    public void handle(org.hibernate.exception.ConstraintViolationException exception) {
+        log.error("Ошибка базы данных: {}", exception.getSQLException().getLocalizedMessage());
+    }
+
 }
