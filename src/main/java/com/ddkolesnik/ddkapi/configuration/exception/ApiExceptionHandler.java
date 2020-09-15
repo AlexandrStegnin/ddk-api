@@ -7,11 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.validation.FieldError;
-import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -28,7 +27,7 @@ import static com.ddkolesnik.ddkapi.util.Constant.INVALID_APP_TOKEN;
  */
 
 @Slf4j
-@ControllerAdvice
+@RestControllerAdvice
 public class ApiExceptionHandler {
 
     @ExceptionHandler({ApiException.class})
@@ -80,7 +79,10 @@ public class ApiExceptionHandler {
         log.warn("Ошибка базы данных: {}", e.getLocalizedMessage());
     }
 
-    @ExceptionHandler({HttpRequestMethodNotSupportedException.class, HttpMediaTypeNotAcceptableException.class})
+    @ExceptionHandler({
+            org.springframework.web.HttpRequestMethodNotSupportedException.class,
+            org.springframework.web.HttpMediaTypeNotAcceptableException.class
+    })
     public void handle(HttpRequestMethodNotSupportedException e) {
         log.warn("Неподдерживаемый метод: {}", e.getLocalizedMessage());
     }
