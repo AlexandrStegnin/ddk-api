@@ -1,13 +1,19 @@
 package com.ddkolesnik.ddkapi.service.app;
 
+import com.ddkolesnik.ddkapi.dto.money.FacilityDTO;
 import com.ddkolesnik.ddkapi.model.app.Account;
 import com.ddkolesnik.ddkapi.model.app.AppUser;
+import com.ddkolesnik.ddkapi.model.money.Facility;
 import com.ddkolesnik.ddkapi.repository.app.AccountRepository;
 import com.ddkolesnik.ddkapi.util.Constant;
+import com.ddkolesnik.ddkapi.util.OwnerType;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Alexandr Stegnin
@@ -33,7 +39,7 @@ public class AccountService {
         Account account = new Account();
         account.setAccountNumber(generateAccountNumber(user));
         account.setOwnerId(user.getId());
-        account.setOwnerType(Constant.OWNER_TYPE_INVESTOR);
+        account.setOwnerType(OwnerType.INVESTOR.name());
         accountRepository.save(account);
     }
 
@@ -54,6 +60,65 @@ public class AccountService {
 
     private String getRegionNumber() {
         return "";
+    }
+
+    /**
+     * Создать счёт для объекта
+     *
+     * @param facility объект
+     */
+    public void createAccount(Facility facility) {
+        String accountNumber = generateAccountNumber(facility);
+        if (accountNumber.isEmpty()) {
+            return;
+        }
+        Account account = new Account();
+        account.setAccountNumber(accountNumber);
+        account.setOwnerId(facility.getId());
+        account.setOwnerType(OwnerType.FACILITY.name());
+        accountRepository.save(account);
+    }
+
+    /**
+     * Проверить номер счёта по реквизитам
+     *
+     * @param dto объект
+     * @return ответ
+     */
+    public String checkAccountNumber(FacilityDTO dto) {
+        if (dto.getName() != null && !dto.getName().isEmpty()) {
+            Facility facility = new Facility();
+            facility.setName(dto.getName());
+            facility.setFullName(dto.getName());
+            String accountNumber = generateAccountNumber(facility);
+            if (accountNumber.isEmpty()) {
+                return null;
+            }
+            if (accountRepository.existsByAccountNumber(accountNumber)) {
+                return String.format("Номер счёта [%s] уже используется. Проверьте правильность введённых данных", accountNumber);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Сгенерировать номер счёта для объекта
+     *
+     * @param facility объект
+     * @return сгенерированный номер счёта
+     */
+    private String generateAccountNumber(Facility facility) {
+        /*
+            5 или более цифр до пробела (если есть)
+        */
+        String fullName = facility.getFullName();
+        Pattern pattern = Pattern.compile("^\\d{5,}\\s*");
+        Matcher matcher = pattern.matcher(fullName);
+        String accountNumber = "";
+        while (matcher.find()) {
+            accountNumber = fullName.substring(matcher.start(), matcher.end()).trim();
+        }
+        return accountNumber;
     }
 
 }
