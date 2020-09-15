@@ -40,14 +40,10 @@ public class FacilityService {
         if (dto.getProjectUUID() == null || dto.getProjectUUID().isEmpty()) {
             throw new ApiException("Не задан идентификатор объекта", HttpStatus.BAD_REQUEST);
         }
-        Facility facility = findByProjectUUID(dto.getProjectUUID());
-        if (facility == null) {
-            facility = facilityRepository.findByFullNameEqualsIgnoreCase(dto.getFullName());
-            if (facility != null) {
-                updateFacility(facility, dto);
-            }
-        }
-        if (facility == null) {
+        Facility facility = findFacility(dto);
+        if (facility != null) {
+            updateFacility(facility, dto);
+        } else {
             createFacility(dto);
         }
     }
@@ -86,6 +82,24 @@ public class FacilityService {
      */
     public Facility findByProjectUUID(String projectUUID) {
         return facilityRepository.findByProjectUUID(projectUUID);
+    }
+
+    /**
+     * Найти объект в базе данных
+     *
+     * @param dto DTO из 1С
+     * @return найденный объект
+     */
+    private Facility findFacility(FacilityDTO dto) {
+        Facility facility = findByProjectUUID(dto.getProjectUUID());
+        if (facility != null) {
+            return facility;
+        }
+        facility = facilityRepository.findByFullNameEqualsIgnoreCase(dto.getName());
+        if (facility != null) {
+            return facility;
+        }
+        return facilityRepository.findByNameEqualsIgnoreCase(dto.getName());
     }
 
 }
