@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -77,4 +79,10 @@ public class ApiExceptionHandler {
     public void handle(InvalidDataAccessResourceUsageException e) {
         log.warn("Ошибка базы данных: {}", e.getLocalizedMessage());
     }
+
+    @ExceptionHandler({HttpRequestMethodNotSupportedException.class, HttpMediaTypeNotAcceptableException.class})
+    public void handle(HttpRequestMethodNotSupportedException e) {
+        log.warn("Неподдерживаемый метод: {}", e.getLocalizedMessage());
+    }
+
 }
