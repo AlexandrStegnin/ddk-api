@@ -1,14 +1,10 @@
 package com.ddkolesnik.ddkapi.model.money;
 
-import com.ddkolesnik.ddkapi.model.AbstractEntity;
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * @author Alexandr Stegnin
@@ -18,12 +14,26 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "facility")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@EqualsAndHashCode(callSuper = false)
-public class Facility extends AbstractEntity {
+public class Facility {
+
+    @Id
+    @TableGenerator(name = "facilitySeqStore", table = "SEQ_STORE",
+            pkColumnName = "SEQ_NAME", pkColumnValue = "FACILITY.ID.PK",
+            valueColumnName = "SEQ_VALUE", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "facilitySeqStore")
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "name")
     String name;
 
     @Column(name = "full_name")
     String fullName;
+
+    @Column(name = "city")
+    String city;
+
+    @Column(name = "project_uuid")
+    String projectUUID;
+    
 }
