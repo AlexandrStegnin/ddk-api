@@ -46,6 +46,9 @@ public class SendMessageService {
     AppUserService appUserService;
 
     public void sendMessage(String login) {
+        if (MAIL_APP_TOKEN == null || MAIL_APP_TOKEN.isEmpty()) {
+            return;
+        }
         WebClient webClient = WebClient.create(MAIL_APP_BASE_URL);
         AppUser user = appUserService.findByLogin(login);
         AppUserDTO userDTO = new AppUserDTO();
