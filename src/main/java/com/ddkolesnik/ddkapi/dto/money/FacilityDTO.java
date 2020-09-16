@@ -20,12 +20,6 @@ public class FacilityDTO {
     @Schema(implementation = String.class, name = "name", description = "Краткое название объекта", required = true)
     String name;
 
-    @Schema(implementation = String.class, name = "city", description = "Город объекта")
-    String city;
-
-    @Schema(implementation = String.class, name = "fullName", description = "Полное название объекта")
-    String fullName;
-
     @Schema(implementation = String.class, name = "projectUUID", description = "Идентификатор объекта из 1С")
     String projectUUID;
 
