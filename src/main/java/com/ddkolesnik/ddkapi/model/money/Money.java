@@ -58,4 +58,7 @@ public class Money {
     @Column(name = "share_type")
     ShareType shareType;
 
+    @Column(name = "state")
+    private String state = "MATCHING";
+
 }
