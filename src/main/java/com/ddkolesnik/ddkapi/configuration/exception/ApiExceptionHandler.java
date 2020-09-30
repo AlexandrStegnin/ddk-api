@@ -92,4 +92,9 @@ public class ApiExceptionHandler {
         log.error("Ошибка базы данных: {}", exception.getSQLException().getLocalizedMessage());
     }
 
+    @ExceptionHandler
+    public void handle(org.hibernate.HibernateException exception) {
+        log.error("Ошибка базы данных: {}", exception.getLocalizedMessage());
+    }
+
 }
