@@ -33,11 +33,19 @@ public class AccountTransactionService {
     /**
      * Найти по id суммы
      *
-     * @param moneyId
-     * @return
+     * @param moneyId id суммы
+     * @return список транзакций
      */
     public List<AccountTransaction> findByMoney(Long moneyId) {
         return accountTransactionRepository.findByMoneyId(moneyId);
+    }
+
+    /**
+     * Удалить список транзакций
+     * @param transactions список транзакций
+     */
+    public void delete(List<AccountTransaction> transactions) {
+        accountTransactionRepository.deleteAll(transactions);
     }
 
     /**
@@ -89,7 +97,7 @@ public class AccountTransactionService {
         creditTx.setPayer(owner);
         creditTx.setRecipient(owner);
         creditTx.setMoney(money);
-        creditTx.setCashType(CashType.INVESTOR_CASH);
+        creditTx.setCashType(CashType.CASH_1C);
         creditTx.setCash(money.getGivenCash().negate());
         return accountTransactionRepository.save(creditTx);
     }

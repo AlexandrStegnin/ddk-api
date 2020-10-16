@@ -3,10 +3,7 @@ package com.ddkolesnik.ddkapi.service.cash;
 import com.ddkolesnik.ddkapi.dto.cash.InvestorCashDTO;
 import com.ddkolesnik.ddkapi.model.cash.CashSource;
 import com.ddkolesnik.ddkapi.model.log.TransactionLog;
-import com.ddkolesnik.ddkapi.model.money.Facility;
-import com.ddkolesnik.ddkapi.model.money.Investor;
-import com.ddkolesnik.ddkapi.model.money.Money;
-import com.ddkolesnik.ddkapi.model.money.UnderFacility;
+import com.ddkolesnik.ddkapi.model.money.*;
 import com.ddkolesnik.ddkapi.repository.money.MoneyRepository;
 import com.ddkolesnik.ddkapi.service.SendMessageService;
 import com.ddkolesnik.ddkapi.service.log.TransactionLogService;
@@ -68,6 +65,8 @@ public class InvestorCashService {
             if (dto.isDelete()) {
                 if (money != null) {
                     List<TransactionLog> logs = transactionLogService.findByCash(money);
+                    List<AccountTransaction> transactions = accountTransactionService.findByMoney(money.getId());
+                    accountTransactionService.delete(transactions);
                     transactionLogService.delete(logs);
                     moneyRepository.deleteByTransactionUUID(money.getTransactionUUID());
                 }
