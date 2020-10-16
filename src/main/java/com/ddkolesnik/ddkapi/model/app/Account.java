@@ -1,5 +1,6 @@
 package com.ddkolesnik.ddkapi.model.app;
 
+import com.ddkolesnik.ddkapi.util.OwnerType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -31,7 +32,10 @@ public class Account {
     @Column(name = "owner_id")
     private Long ownerId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "owner_type")
-    private String ownerType;
+    private OwnerType ownerType;
 
+    @Column(name = "owner_name")
+    private String ownerName;
 }
