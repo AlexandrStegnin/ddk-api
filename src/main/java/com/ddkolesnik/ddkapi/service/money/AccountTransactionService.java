@@ -30,6 +30,12 @@ public class AccountTransactionService {
         this.accountTransactionRepository = accountTransactionRepository;
     }
 
+    /**
+     * Найти по id суммы
+     *
+     * @param moneyId
+     * @return
+     */
     public List<AccountTransaction> findByMoney(Long moneyId) {
         return accountTransactionRepository.findByMoneyId(moneyId);
     }
