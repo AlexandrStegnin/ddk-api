@@ -10,6 +10,7 @@ import com.ddkolesnik.ddkapi.model.money.UnderFacility;
 import com.ddkolesnik.ddkapi.repository.money.MoneyRepository;
 import com.ddkolesnik.ddkapi.service.SendMessageService;
 import com.ddkolesnik.ddkapi.service.log.TransactionLogService;
+import com.ddkolesnik.ddkapi.service.money.AccountTransactionService;
 import com.ddkolesnik.ddkapi.service.money.FacilityService;
 import com.ddkolesnik.ddkapi.service.money.InvestorService;
 import com.ddkolesnik.ddkapi.service.money.UnderFacilityService;
@@ -53,6 +54,8 @@ public class InvestorCashService {
     TransactionLogService transactionLogService;
 
     UnderFacilityService underFacilityService;
+
+    AccountTransactionService accountTransactionService;
 
     /**
      * Создать или обновить проводку, пришедшую из 1С
@@ -108,7 +111,9 @@ public class InvestorCashService {
      */
     private Money create(InvestorCashDTO dto) {
         Money money = convert(dto);
-        return moneyRepository.save(money);
+        moneyRepository.save(money);
+        transferMoney(money);
+        return money;
     }
 
     /**
@@ -119,6 +124,7 @@ public class InvestorCashService {
      */
     private void update(Money money, InvestorCashDTO dto) {
         prepareMoney(money, dto);
+        updateTransaction(money);
         moneyRepository.save(money);
     }
 
@@ -232,4 +238,23 @@ public class InvestorCashService {
     private boolean checkCash(InvestorCashDTO dto) {
         return dto.getDateGiven().isAfter(FILTERED_DATE) && dto.getGivenCash().compareTo(BigDecimal.ZERO) > 0;
     }
+
+    /**
+     * Переместить деньги по счетам
+     *
+     * @param money сумма для транзакции
+     */
+    private void transferMoney(Money money) {
+        accountTransactionService.transfer(money);
+    }
+
+    /**
+     * Обновить сумму транзакции
+     *
+     * @param money сумма для обновления
+     */
+    private void updateTransaction(Money money) {
+        accountTransactionService.updateTransaction(money);
+    }
+
 }
