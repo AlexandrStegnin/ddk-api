@@ -39,7 +39,8 @@ public class AccountService {
         Account account = new Account();
         account.setAccountNumber(generateAccountNumber(user));
         account.setOwnerId(user.getId());
-        account.setOwnerType(OwnerType.INVESTOR.name());
+        account.setOwnerType(OwnerType.INVESTOR);
+        account.setOwnerName(user.getLogin());
         accountRepository.save(account);
     }
 
@@ -75,7 +76,8 @@ public class AccountService {
         Account account = new Account();
         account.setAccountNumber(accountNumber);
         account.setOwnerId(facility.getId());
-        account.setOwnerType(OwnerType.FACILITY.name());
+        account.setOwnerType(OwnerType.FACILITY);
+        account.setOwnerName(facility.getFullName());
         accountRepository.save(account);
     }
 
@@ -119,6 +121,10 @@ public class AccountService {
             accountNumber = fullName.substring(matcher.start(), matcher.end()).trim();
         }
         return accountNumber;
+    }
+
+    public Account findByOwnerId(Long ownerId, OwnerType ownerType) {
+        return accountRepository.findByOwnerIdAndOwnerType(ownerId, ownerType);
     }
 
 }
