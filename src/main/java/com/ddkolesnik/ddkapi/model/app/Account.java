@@ -19,10 +19,7 @@ import javax.persistence.*;
 public class Account {
 
     @Id
-    @TableGenerator(name = "accountSeqStore", table = "SEQ_STORE",
-            pkColumnName = "SEQ_NAME", pkColumnValue = "ACCOUNT.ID.PK",
-            valueColumnName = "SEQ_VALUE", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "accountSeqStore")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private Long id;
 
