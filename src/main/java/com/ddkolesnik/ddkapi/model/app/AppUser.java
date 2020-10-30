@@ -45,7 +45,7 @@ public class AppUser {
     @Column(name = "kin")
     Integer kin;
 
-    @Column(name = "partnerId")
+    @Column(name = "partner_id")
     Long partnerId;
 
     public void addRole(Role role) {
