@@ -5,6 +5,7 @@ import com.ddkolesnik.ddkapi.model.log.CashType;
 import com.ddkolesnik.ddkapi.model.money.AccountTransaction;
 import com.ddkolesnik.ddkapi.model.money.Money;
 import com.ddkolesnik.ddkapi.repository.money.AccountTransactionRepository;
+import com.ddkolesnik.ddkapi.repository.money.MoneyRepository;
 import com.ddkolesnik.ddkapi.service.app.AccountService;
 import com.ddkolesnik.ddkapi.util.OperationType;
 import com.ddkolesnik.ddkapi.util.OwnerType;
@@ -25,19 +26,17 @@ public class AccountTransactionService {
 
     private final AccountTransactionRepository accountTransactionRepository;
 
-    public AccountTransactionService(AccountService accountService, AccountTransactionRepository accountTransactionRepository) {
+    private final MoneyRepository moneyRepository;
+
+    public AccountTransactionService(AccountService accountService, AccountTransactionRepository accountTransactionRepository,
+                                     MoneyRepository moneyRepository) {
         this.accountService = accountService;
         this.accountTransactionRepository = accountTransactionRepository;
+        this.moneyRepository = moneyRepository;
     }
 
-    /**
-     * Найти по id суммы
-     *
-     * @param moneyId id суммы
-     * @return список транзакций
-     */
-    public List<AccountTransaction> findByMoney(Long moneyId) {
-        return accountTransactionRepository.findByMoneyId(moneyId);
+    public AccountTransaction findById(Long id) {
+        return accountTransactionRepository.getOne(id);
     }
 
     /**
@@ -46,6 +45,14 @@ public class AccountTransactionService {
      */
     public void delete(List<AccountTransaction> transactions) {
         accountTransactionRepository.deleteAll(transactions);
+    }
+
+    /**
+     * Удалить транзакцию
+     * @param transaction транзакция
+     */
+    public void delete(AccountTransaction transaction) {
+        accountTransactionRepository.delete(transaction);
     }
 
     /**
@@ -79,9 +86,9 @@ public class AccountTransactionService {
         debitTx.setOperationType(OperationType.DEBIT);
         debitTx.setPayer(creditTx.getOwner());
         debitTx.setRecipient(recipient);
-        debitTx.setMoney(creditTx.getMoney());
+        debitTx.getMonies().add(money);
         debitTx.setCashType(CashType.CASH_1C);
-        debitTx.setCash(creditTx.getMoney().getGivenCash());
+        debitTx.setCash(money.getGivenCash());
         accountTransactionRepository.save(debitTx);
     }
 
@@ -96,9 +103,11 @@ public class AccountTransactionService {
         creditTx.setOperationType(OperationType.CREDIT);
         creditTx.setPayer(owner);
         creditTx.setRecipient(owner);
-        creditTx.setMoney(money);
+        creditTx.getMonies().add(money);
         creditTx.setCashType(CashType.CASH_1C);
         creditTx.setCash(money.getGivenCash().negate());
+        money.setTransaction(creditTx);
+        moneyRepository.save(money);
         return accountTransactionRepository.save(creditTx);
     }
 
@@ -108,8 +117,8 @@ public class AccountTransactionService {
      * @param money сумма для обновления
      */
     public void updateTransaction(Money money) {
-        List<AccountTransaction> transactions = findByMoney(money.getId());
-        transactions.forEach(transaction -> {
+        AccountTransaction transaction = money.getTransaction();
+        if (transaction != null) {
             switch (transaction.getOperationType()) {
                 case DEBIT:
                     transaction.setCash(money.getGivenCash());
@@ -117,8 +126,7 @@ public class AccountTransactionService {
                 case CREDIT:
                     transaction.setCash(money.getGivenCash().negate());
             }
-        });
-
+        }
     }
 
 }

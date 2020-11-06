@@ -61,4 +61,7 @@ public class Money {
     @Column(name = "state")
     private String state = "MATCHING";
 
+    @ManyToOne
+    @JoinColumn(name = "acc_tx_id")
+    private AccountTransaction transaction;
 }

@@ -65,8 +65,9 @@ public class InvestorCashService {
             if (dto.isDelete()) {
                 if (money != null) {
                     List<TransactionLog> logs = transactionLogService.findByCash(money);
-                    List<AccountTransaction> transactions = accountTransactionService.findByMoney(money.getId());
-                    accountTransactionService.delete(transactions);
+                    if (money.getTransaction() != null) {
+                        accountTransactionService.delete(money.getTransaction());
+                    }
                     transactionLogService.delete(logs);
                     moneyRepository.deleteByTransactionUUID(money.getTransactionUUID());
                 }
