@@ -67,11 +67,29 @@ public class AccountTransactionService {
             return;
         }
         try {
+            createInvestorDebitTransaction(owner, money);
             AccountTransaction creditTx = createCreditTransaction(owner, money);
             createDebitTransaction(creditTx, money);
         } catch (Exception e) {
             log.error(e.getLocalizedMessage());
         }
+    }
+
+    /**
+     * Создать приходную транзакцию инвестору на счёт
+     *
+     * @param owner владелец счёта
+     * @param money сумма
+     */
+    private void createInvestorDebitTransaction(Account owner, Money money) {
+        AccountTransaction debitTx = new AccountTransaction(owner);
+        debitTx.setOperationType(OperationType.DEBIT);
+        debitTx.setPayer(owner);
+        debitTx.setRecipient(owner);
+        debitTx.getMonies().add(money);
+        debitTx.setCashType(CashType.CASH_1C);
+        debitTx.setCash(money.getGivenCash());
+        accountTransactionRepository.save(debitTx);
     }
 
     /**
