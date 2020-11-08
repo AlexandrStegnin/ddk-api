@@ -4,6 +4,7 @@ import com.ddkolesnik.ddkapi.model.cash.CashSource;
 import com.ddkolesnik.ddkapi.util.ShareType;
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 @Table(name = "money")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ToString(exclude = "investor")
+@EqualsAndHashCode(exclude = "transaction")
 public class Money {
 
     @Id
