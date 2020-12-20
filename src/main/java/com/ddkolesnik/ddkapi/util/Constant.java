@@ -67,7 +67,8 @@ public class Constant {
             USERS + WILD_CARD,
             BITRIX_CONTACT + WILD_CARD,
             PATH_INVESTOR_CASH + WILD_CARD,
-            FACILITIES + WILD_CARD
+            FACILITIES + WILD_CARD,
+            PATH_USER_AGREEMENT + WILD_CARD
     };
 
     // IGNORING access to Spring Security
