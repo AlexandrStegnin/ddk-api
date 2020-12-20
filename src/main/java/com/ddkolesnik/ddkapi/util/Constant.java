@@ -57,6 +57,10 @@ public class Constant {
 
     public static final String BITRIX_CONTACT_UPDATE_URL = "http://bitrixflows.jelastic.regruhosting.ru/update";
 
+    public static final String PATH_USER_AGREEMENT = BASE_URL + VERSION + KEY_PATH + "/agreement";
+
+    public static final String PATH_USER_AGREEMENT_UPDATE = "/update";
+
     // API PATHS
     public static final String[] API_HTTP_MATCHERS = {
             PATH_MONIES,
