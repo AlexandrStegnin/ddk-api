@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * DTO для хранения информации о том, с кем заключён договор (ЮЛ/ФЛ)
@@ -30,7 +31,7 @@ public class UserAgreementDTO {
     @Schema(implementation = String.class, name = "concludedFrom", description = "От кого заключён договор")
     String concludedFrom;
 
-    @NotBlank(message = "Налоговая ставка должна быть заполнена")
+    @NotNull(message = "Налоговая ставка должна быть заполнена")
     @Schema(implementation = Double.class, name = "taxRate", description = "Налоговая ставка")
     Double taxRate;
 
