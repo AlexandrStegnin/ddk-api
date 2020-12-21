@@ -138,6 +138,8 @@ public class InvestorCashService {
         if (!money.getFacility().getName().equalsIgnoreCase(dto.getFacility())) {
             Facility facility = findFacility(dto.getFacility());
             money.setFacility(facility);
+            UnderFacility underFacility = findUnderFacility(facility);
+            money.setUnderFacility(underFacility);
         }
         money.setGivenCash(dto.getGivenCash());
         money.setDateGiven(dto.getDateGiven());
