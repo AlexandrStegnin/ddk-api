@@ -11,6 +11,7 @@ public enum TransactionType {
     DIVIDE(3, "Разделение"),
     REINVESTMENT(4, "Реинвестирование"),
     CLOSING(5, "Закрытие"),
+    CLOSING_RESALE(6, "Закрытие. Перепродажа доли"),
     UNDEFINED(0, "Не определено");
 
     private final int id;
