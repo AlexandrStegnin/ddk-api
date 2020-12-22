@@ -52,7 +52,7 @@ public class UserAgreementService {
      * @param dto DTO записи из Битрикс 24
      * @return созданная запись
      */
-    public UserAgreement create(UserAgreementDTO dto) {
+    private UserAgreement create(UserAgreementDTO dto) {
         Facility facility = facilityService.findByFullName(dto.getFacility());
         AppUser investor = appUserService.findByLogin(dto.getConcludedWith());
         UserAgreement userAgreement = new UserAgreement();
@@ -60,6 +60,24 @@ public class UserAgreementService {
         userAgreement.setConcludedWith(investor.getId());
         userAgreement.setTaxRate(dto.getTaxRate());
         userAgreement.setConcludedFrom(dto.getConcludedFrom());
+        return userAgreementRepository.save(userAgreement);
+    }
+
+    /**
+     * Обновить информацию о том, с кем заключён договор на основе DTO
+     *
+     * @param dto DTO из Битрикс 24
+     * @return обновлённая информация
+     */
+    public UserAgreement update(UserAgreementDTO dto) {
+        Facility facility = facilityService.findByFullName(dto.getFacility());
+        AppUser investor = appUserService.findByLogin(dto.getConcludedWith());
+        UserAgreement userAgreement = userAgreementRepository.findByFacilityIdAndConcludedWith(facility.getId(), investor.getId());
+        if (userAgreement == null) {
+            return create(dto);
+        }
+        userAgreement.setConcludedFrom(dto.getConcludedFrom());
+        userAgreement.setTaxRate(dto.getTaxRate());
         return userAgreementRepository.save(userAgreement);
     }
 

@@ -53,7 +53,7 @@ public class UserAgreementController {
                                                  @PathVariable(name = "token") @ValidToken String token,
                                                  @Parameter(description = "Данные из Битрикс 24", schema = @Schema(implementation = UserAgreementDTO.class))
                                                  @Valid @RequestBody UserAgreementDTO dto) {
-        userAgreementService.create(dto);
+        userAgreementService.update(dto);
         log.info("Запись успешно обновлена [{}]", dto);
         return new ApiSuccessResponse(HttpStatus.OK, "Данные успешно сохранены");
     }
