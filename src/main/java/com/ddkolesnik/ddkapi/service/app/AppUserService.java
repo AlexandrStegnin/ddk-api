@@ -1,5 +1,6 @@
 package com.ddkolesnik.ddkapi.service.app;
 
+import com.ddkolesnik.ddkapi.configuration.exception.ApiException;
 import com.ddkolesnik.ddkapi.dto.app.AppUserDTO;
 import com.ddkolesnik.ddkapi.model.app.AppUser;
 import com.ddkolesnik.ddkapi.model.security.Role;
@@ -9,6 +10,7 @@ import com.ddkolesnik.ddkapi.util.Kin;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,6 +104,10 @@ public class AppUserService {
      * @return - пользователь
      */
     public AppUser findByLogin(String login) {
+        AppUser user = appUserRepository.findByLogin(login);
+        if (user == null) {
+            throw new ApiException("Пользователь с логином = [" + login + "] не найден", HttpStatus.NOT_FOUND);
+        }
         return appUserRepository.findByLogin(login);
     }
 
