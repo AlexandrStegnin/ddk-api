@@ -22,10 +22,7 @@ import java.time.LocalDate;
 public class InvestorCashLog {
 
     @Id
-    @TableGenerator(name = "invCashLogSeqStore", table = "SEQ_STORE",
-            pkColumnName = "SEQ_NAME", pkColumnValue = "INV.CASH.LOG.ID.PK",
-            valueColumnName = "SEQ_VALUE", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "invCashLogSeqStore")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private Long id;
 
