@@ -2,15 +2,13 @@ package com.ddkolesnik.ddkapi.model.money;
 
 import com.ddkolesnik.ddkapi.model.cash.CashSource;
 import com.ddkolesnik.ddkapi.util.ShareType;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 /**
  * @author Alexandr Stegnin
@@ -18,6 +16,7 @@ import java.time.LocalDate;
 
 @Data
 @Entity
+@NoArgsConstructor
 @Table(name = "money")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ToString(exclude = "investor")
@@ -66,4 +65,20 @@ public class Money {
     @ManyToOne
     @JoinColumn(name = "acc_tx_id")
     private AccountTransaction transaction;
+
+    public Money(Money old) {
+        this.id = null;
+        this.givenCash = old.getGivenCash().multiply(new BigDecimal(String.valueOf(0.01))).negate();
+        this.facility = old.getFacility();
+        this.dateGiven = old.getDateGiven();
+        this.investor = old.getInvestor();
+        this.dateClosing = old.getDateClosing();
+        this.transactionUUID = UUID.randomUUID().toString();
+        this.cashSource = old.getCashSource();
+        this.underFacility = old.getUnderFacility();
+        this.shareType = old.getShareType();
+        this.state = old.getState();
+        this.transaction = old.getTransaction();
+    }
+
 }
