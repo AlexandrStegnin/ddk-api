@@ -32,7 +32,7 @@ public enum AccountingCode {
                 return accountingCode;
             }
         }
-        return AccountingCode.CASHING_BODY;
+        return null;
     }
 
 }
