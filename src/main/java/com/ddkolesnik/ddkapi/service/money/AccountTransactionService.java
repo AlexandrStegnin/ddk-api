@@ -12,8 +12,6 @@ import com.ddkolesnik.ddkapi.util.OwnerType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 /**
  * @author Alexandr Stegnin
  */
@@ -33,18 +31,6 @@ public class AccountTransactionService {
         this.accountService = accountService;
         this.accountTransactionRepository = accountTransactionRepository;
         this.moneyRepository = moneyRepository;
-    }
-
-    public AccountTransaction findById(Long id) {
-        return accountTransactionRepository.getOne(id);
-    }
-
-    /**
-     * Удалить список транзакций
-     * @param transactions список транзакций
-     */
-    public void delete(List<AccountTransaction> transactions) {
-        accountTransactionRepository.deleteAll(transactions);
     }
 
     /**
