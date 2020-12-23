@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Alexandr Stegnin
@@ -35,6 +36,19 @@ public class TransactionLogService {
     public void create(Money cash) {
         TransactionLog log = new TransactionLog();
         log.setInvestorsCashes(Collections.singleton(cash));
+        log.setType(TransactionType.CREATE);
+        log.setRollbackEnabled(true);
+        create(log);
+    }
+
+    /**
+     * Создать запись в логе по операции создания денег инвестора
+     *
+     * @param monies список денег инвесторов
+     */
+    public void create(Set<Money> monies) {
+        TransactionLog log = new TransactionLog();
+        log.setInvestorsCashes(monies);
         log.setType(TransactionType.CREATE);
         log.setRollbackEnabled(true);
         create(log);
