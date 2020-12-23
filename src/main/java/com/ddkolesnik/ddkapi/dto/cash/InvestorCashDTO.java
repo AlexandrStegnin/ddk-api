@@ -48,4 +48,7 @@ public class InvestorCashDTO {
     @Schema(implementation = Boolean.class, name = "delete", defaultValue = "false", description = "Флаг о необходимости удаления транзакции")
     boolean delete = false;
 
+    @Schema(implementation = String.class, name = "accountingCode", description = "Код бухгалтерского учёта (статьи)", example = "НФ-000001")
+    String accountingCode;
+
 }
