@@ -3,7 +3,10 @@ package com.ddkolesnik.ddkapi.service.cash;
 import com.ddkolesnik.ddkapi.dto.cash.InvestorCashDTO;
 import com.ddkolesnik.ddkapi.model.cash.CashSource;
 import com.ddkolesnik.ddkapi.model.log.TransactionLog;
-import com.ddkolesnik.ddkapi.model.money.*;
+import com.ddkolesnik.ddkapi.model.money.Facility;
+import com.ddkolesnik.ddkapi.model.money.Investor;
+import com.ddkolesnik.ddkapi.model.money.Money;
+import com.ddkolesnik.ddkapi.model.money.UnderFacility;
 import com.ddkolesnik.ddkapi.repository.money.MoneyRepository;
 import com.ddkolesnik.ddkapi.service.SendMessageService;
 import com.ddkolesnik.ddkapi.service.log.TransactionLogService;
@@ -63,14 +66,7 @@ public class InvestorCashService {
         if (checkCash(dto)) {
             Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
             if (dto.isDelete()) {
-                if (money != null) {
-                    List<TransactionLog> logs = transactionLogService.findByCash(money);
-                    if (money.getTransaction() != null) {
-                        accountTransactionService.delete(money.getTransaction());
-                    }
-                    transactionLogService.delete(logs);
-                    moneyRepository.deleteByTransactionUUID(money.getTransactionUUID());
-                }
+                delete(money);
             } else {
                 if (money == null) {
                     money = moneyRepository.findMoney(dto.getDateGiven(), dto.getGivenCash(), dto.getFacility(),
@@ -126,6 +122,22 @@ public class InvestorCashService {
         prepareMoney(money, dto);
         updateTransaction(money);
         moneyRepository.save(money);
+    }
+
+    /**
+     * Удалить сумму
+     *
+     * @param money сумма для удаления
+     */
+    private void delete(Money money) {
+        if (money != null) {
+            List<TransactionLog> logs = transactionLogService.findByCash(money);
+            if (money.getTransaction() != null) {
+                accountTransactionService.delete(money.getTransaction());
+            }
+            transactionLogService.delete(logs);
+            moneyRepository.deleteByTransactionUUID(money.getTransactionUUID());
+        }
     }
 
     /**
