@@ -4,6 +4,7 @@ import com.ddkolesnik.ddkapi.dto.cash.UserAgreementDTO;
 import com.ddkolesnik.ddkapi.model.app.AppUser;
 import com.ddkolesnik.ddkapi.model.cash.UserAgreement;
 import com.ddkolesnik.ddkapi.model.money.Facility;
+import com.ddkolesnik.ddkapi.model.money.Investor;
 import com.ddkolesnik.ddkapi.repository.cash.UserAgreementRepository;
 import com.ddkolesnik.ddkapi.service.app.AppUserService;
 import com.ddkolesnik.ddkapi.service.money.FacilityService;
@@ -81,4 +82,14 @@ public class UserAgreementService {
         return userAgreementRepository.save(userAgreement);
     }
 
+    /**
+     * Найти инфо о том, с кем заключён договор
+     *
+     * @param investor инвестор
+     * @param facility объект
+     * @return найденная информация
+     */
+    public UserAgreement findByInvestorAndFacility(Investor investor, Facility facility) {
+        return userAgreementRepository.findByFacilityIdAndConcludedWith(facility.getId(), investor.getId());
+    }
 }
