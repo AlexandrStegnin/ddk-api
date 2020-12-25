@@ -27,6 +27,9 @@ public enum AccountingCode {
     }
 
     public static AccountingCode fromCode(String code) {
+        if (code == null) {
+            return null;
+        }
         for (AccountingCode accountingCode : values()) {
             if (accountingCode.getCode().equalsIgnoreCase(code)) {
                 return accountingCode;
