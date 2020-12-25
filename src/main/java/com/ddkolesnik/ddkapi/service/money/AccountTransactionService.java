@@ -1,16 +1,23 @@
 package com.ddkolesnik.ddkapi.service.money;
 
+import com.ddkolesnik.ddkapi.configuration.exception.ApiException;
 import com.ddkolesnik.ddkapi.model.app.Account;
+import com.ddkolesnik.ddkapi.model.cash.UserAgreement;
 import com.ddkolesnik.ddkapi.model.log.CashType;
 import com.ddkolesnik.ddkapi.model.money.AccountTransaction;
 import com.ddkolesnik.ddkapi.model.money.Money;
 import com.ddkolesnik.ddkapi.repository.money.AccountTransactionRepository;
 import com.ddkolesnik.ddkapi.repository.money.MoneyRepository;
 import com.ddkolesnik.ddkapi.service.app.AccountService;
+import com.ddkolesnik.ddkapi.service.cash.UserAgreementService;
+import com.ddkolesnik.ddkapi.util.ConcludedFrom;
 import com.ddkolesnik.ddkapi.util.OperationType;
 import com.ddkolesnik.ddkapi.util.OwnerType;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 /**
  * @author Alexandr Stegnin
@@ -26,15 +33,19 @@ public class AccountTransactionService {
 
     private final MoneyRepository moneyRepository;
 
+    private final UserAgreementService userAgreementService;
+
     public AccountTransactionService(AccountService accountService, AccountTransactionRepository accountTransactionRepository,
-                                     MoneyRepository moneyRepository) {
+                                     MoneyRepository moneyRepository, UserAgreementService userAgreementService) {
         this.accountService = accountService;
         this.accountTransactionRepository = accountTransactionRepository;
         this.moneyRepository = moneyRepository;
+        this.userAgreementService = userAgreementService;
     }
 
     /**
      * Удалить транзакцию
+     *
      * @param transaction транзакция
      */
     public void delete(AccountTransaction transaction) {
@@ -54,11 +65,41 @@ public class AccountTransactionService {
         }
         try {
             createInvestorDebitTransaction(owner, money);
-            AccountTransaction creditTx = createCreditTransaction(owner, money);
+            AccountTransaction creditTx = createCreditTransaction(owner, money, false);
             createDebitTransaction(creditTx, money);
         } catch (Exception e) {
             log.error(e.getLocalizedMessage());
         }
+    }
+
+    /**
+     * Вывести деньги со счёта по данным из 1С
+     *
+     * @param money сумма для вывода
+     */
+    public Money cashing(Money money) {
+        Account owner = accountService.findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
+        if (owner == null) {
+            log.error("Не найден счёт пользователя");
+            return null;
+        }
+        try {
+            AccountTransaction creditTx = createCreditTransaction(owner, money, true);
+            UserAgreement userAgreement = userAgreementService.findByInvestorAndFacility(money.getInvestor(), money.getFacility());
+            if (userAgreement == null) {
+                throw new ApiException("Не найдена информация \"С кем заключён договор\"", HttpStatus.NOT_FOUND);
+            }
+            ConcludedFrom concludedFrom = ConcludedFrom.fromTitle(userAgreement.getConcludedFrom());
+            if (concludedFrom == ConcludedFrom.NATURAL_PERSON) {
+                Money commission = new Money(money, 0.01);
+                createCommissionCreditTransaction(money, commission);
+                return commission;
+            }
+        } catch (Exception e) {
+            log.error("Произошла ошибка: " + e.getLocalizedMessage());
+            return null;
+        }
+        return null;
     }
 
     /**
@@ -82,7 +123,7 @@ public class AccountTransactionService {
      * Создать приходную транзакцию
      *
      * @param creditTx расходная транзакция
-     * @param money сумма
+     * @param money    сумма
      */
     private void createDebitTransaction(AccountTransaction creditTx, Money money) {
         Account recipient = accountService.findByOwnerId(money.getUnderFacility().getId(), OwnerType.UNDER_FACILITY);
@@ -99,10 +140,15 @@ public class AccountTransactionService {
     /**
      * Создать расходную транзакцию по счёту
      *
-     * @param owner владелец
-     * @param money сумма
+     * @param owner   владелец
+     * @param money   сумма
+     * @param cashing признак вывода суммы
      */
-    private AccountTransaction createCreditTransaction(Account owner, Money money) {
+    private AccountTransaction createCreditTransaction(Account owner, Money money, boolean cashing) {
+        BigDecimal givenCash = money.getGivenCash().negate();
+        if (cashing) {
+            money.setGivenCash(givenCash);
+        }
         Account recipient = accountService.findByOwnerId(money.getFacility().getId(), OwnerType.FACILITY);
         AccountTransaction creditTx = new AccountTransaction(owner);
         creditTx.setOperationType(OperationType.CREDIT);
@@ -110,10 +156,31 @@ public class AccountTransactionService {
         creditTx.setRecipient(recipient);
         creditTx.getMonies().add(money);
         creditTx.setCashType(CashType.CASH_1C);
-        creditTx.setCash(money.getGivenCash().negate());
+        creditTx.setCash(givenCash);
         money.setTransaction(creditTx);
         moneyRepository.save(money);
         return accountTransactionRepository.save(creditTx);
+    }
+
+    /**
+     * Создать расходную транзакцию по счёту на сумму комиссии
+     *
+     * @param money      сумма
+     * @param commission сумма комиссии
+     */
+    public void createCommissionCreditTransaction(Money money, Money commission) {
+        Account owner = accountService.findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
+        AccountTransaction creditTx = new AccountTransaction(owner);
+        creditTx.setOperationType(OperationType.CREDIT);
+        creditTx.setPayer(owner);
+        creditTx.setRecipient(owner);
+        creditTx.getMonies().add(money);
+        creditTx.getMonies().add(commission);
+        creditTx.setCashType(CashType.CASH_1C_COMMISSION);
+        creditTx.setCash(commission.getGivenCash());
+        commission.setTransaction(creditTx);
+        moneyRepository.save(commission);
+        accountTransactionRepository.save(creditTx);
     }
 
     /**
