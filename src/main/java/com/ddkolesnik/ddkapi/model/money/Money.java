@@ -66,9 +66,9 @@ public class Money {
     @JoinColumn(name = "acc_tx_id")
     private AccountTransaction transaction;
 
-    public Money(Money old, Double taxRate) {
+    public Money(Money old) {
         this.id = null;
-        this.givenCash = old.getGivenCash().multiply(BigDecimal.valueOf((taxRate / 100))).negate();
+        this.givenCash = old.getGivenCash().multiply(BigDecimal.valueOf((0.01))).negate();
         this.facility = old.getFacility();
         this.dateGiven = old.getDateGiven();
         this.investor = old.getInvestor();
