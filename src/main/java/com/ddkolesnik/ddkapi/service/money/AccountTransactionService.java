@@ -103,10 +103,11 @@ public class AccountTransactionService {
      * @param money сумма
      */
     private AccountTransaction createCreditTransaction(Account owner, Money money) {
+        Account recipient = accountService.findByOwnerId(money.getFacility().getId(), OwnerType.FACILITY);
         AccountTransaction creditTx = new AccountTransaction(owner);
         creditTx.setOperationType(OperationType.CREDIT);
         creditTx.setPayer(owner);
-        creditTx.setRecipient(owner);
+        creditTx.setRecipient(recipient);
         creditTx.getMonies().add(money);
         creditTx.setCashType(CashType.CASH_1C);
         creditTx.setCash(money.getGivenCash().negate());
