@@ -19,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Table(name = "money")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@ToString(exclude = "investor")
+@ToString(exclude = {"investor", "transaction"})
 @EqualsAndHashCode(exclude = "transaction")
 public class Money {
 
@@ -66,9 +66,9 @@ public class Money {
     @JoinColumn(name = "acc_tx_id")
     private AccountTransaction transaction;
 
-    public Money(Money old) {
+    public Money(Money old, Double taxRate) {
         this.id = null;
-        this.givenCash = old.getGivenCash().multiply(new BigDecimal(String.valueOf(0.01))).negate();
+        this.givenCash = old.getGivenCash().multiply(BigDecimal.valueOf((taxRate / 100))).negate();
         this.facility = old.getFacility();
         this.dateGiven = old.getDateGiven();
         this.investor = old.getInvestor();
