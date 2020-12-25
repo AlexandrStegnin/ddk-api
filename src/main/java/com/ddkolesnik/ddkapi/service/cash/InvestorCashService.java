@@ -14,6 +14,7 @@ import com.ddkolesnik.ddkapi.service.money.AccountTransactionService;
 import com.ddkolesnik.ddkapi.service.money.FacilityService;
 import com.ddkolesnik.ddkapi.service.money.InvestorService;
 import com.ddkolesnik.ddkapi.service.money.UnderFacilityService;
+import com.ddkolesnik.ddkapi.util.AccountingCode;
 import com.ddkolesnik.ddkapi.util.Constant;
 import com.ddkolesnik.ddkapi.util.ShareType;
 import lombok.AccessLevel;
@@ -25,7 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Сервис для работы с проводками из 1С
@@ -68,23 +71,55 @@ public class InvestorCashService {
             if (dto.isDelete()) {
                 delete(money);
             } else {
-                if (money == null) {
-                    money = moneyRepository.findMoney(dto.getDateGiven(), dto.getGivenCash(), dto.getFacility(),
-                            dto.getCashSource(), Constant.INVESTOR_PREFIX.concat(dto.getInvestorCode()));
+                AccountingCode accountingCode = AccountingCode.fromCode(dto.getAccountingCode());
+                if (accountingCode != null) {
+                    cashing(money, dto);
+                } else {
                     if (money == null) {
-                        money = create(dto);
-                        sendMessage(money.getInvestor());
-                        transactionLogService.create(money);
+                        money = moneyRepository.findMoney(dto.getDateGiven(), dto.getGivenCash(), dto.getFacility(),
+                                dto.getCashSource(), Constant.INVESTOR_PREFIX.concat(dto.getInvestorCode()));
+                        if (money == null) {
+                            money = create(dto);
+                            sendMessage(money.getInvestor());
+                            transactionLogService.create(money);
+                        } else {
+                            transactionLogService.update(money);
+                            update(money, dto);
+                        }
                     } else {
                         transactionLogService.update(money);
                         update(money, dto);
                     }
-                } else {
-                    transactionLogService.update(money);
-                    update(money, dto);
                 }
             }
         }
+    }
+
+    /**
+     * Вывести деньги по данным из 1С
+     *
+     * @param money сумма
+     * @param dto DTO из 1С
+     */
+    private void cashing(Money money, InvestorCashDTO dto) {
+        if (money == null) {
+            money = convert(dto);
+            Money commission = accountTransactionService.cashing(money);
+            if (commission != null) {
+                Set<Money> monies = new HashSet<>();
+                monies.add(money);
+                monies.add(commission);
+                transactionLogService.create(monies);
+            } else {
+                transactionLogService.create(money);
+            }
+        } else {
+            updateCashingTransaction(money, dto);
+        }
+    }
+
+    private void updateCashingTransaction(Money money, InvestorCashDTO dto) {
+
     }
 
     /**
