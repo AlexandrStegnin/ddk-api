@@ -187,8 +187,9 @@ public class AccountTransactionService {
      * Обновить сумму транзакции
      *
      * @param money сумма для обновления
+     * @param cashing
      */
-    public void updateTransaction(Money money) {
+    public void updateTransaction(Money money, boolean cashing) {
         AccountTransaction transaction = money.getTransaction();
         if (transaction != null) {
             switch (transaction.getOperationType()) {
@@ -196,7 +197,11 @@ public class AccountTransactionService {
                     transaction.setCash(money.getGivenCash());
                     break;
                 case CREDIT:
-                    transaction.setCash(money.getGivenCash().negate());
+                    if (cashing) {
+                        transaction.setCash(money.getGivenCash());
+                    } else {
+                        transaction.setCash(money.getGivenCash().negate());
+                    }
             }
         }
     }

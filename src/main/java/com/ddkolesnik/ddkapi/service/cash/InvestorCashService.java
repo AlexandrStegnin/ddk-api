@@ -42,6 +42,8 @@ import java.util.Set;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class InvestorCashService {
 
+    private final Double COMMISSION_RATE = 0.01;
+
     private static final LocalDate FILTERED_DATE = LocalDate.of(2020, 6, 30);
 
     MoneyRepository moneyRepository;
@@ -84,11 +86,11 @@ public class InvestorCashService {
                             transactionLogService.create(money);
                         } else {
                             transactionLogService.update(money);
-                            update(money, dto);
+                            update(money, dto, false);
                         }
                     } else {
                         transactionLogService.update(money);
-                        update(money, dto);
+                        update(money, dto, false);
                     }
                 }
             }
@@ -109,8 +111,26 @@ public class InvestorCashService {
         }
     }
 
+    /**
+     * Обновить транзакцию по выводу средств
+     *
+     * @param money сумма
+     * @param dto DTO из 1С
+     */
     private void updateCashingTransaction(Money money, InvestorCashDTO dto) {
-
+        dto.setGivenCash(dto.getGivenCash().negate());
+        BigDecimal commissionSum = money.getGivenCash().multiply(BigDecimal.valueOf(COMMISSION_RATE));
+        transactionLogService.update(money);
+        update(money, dto, true);
+        Money commission = moneyRepository.findMoney(dto.getDateGiven(),
+                commissionSum, dto.getFacility(),
+                dto.getCashSource(), Constant.INVESTOR_PREFIX.concat(dto.getInvestorCode()));
+        if (commission != null) {
+            dto.setGivenCash(dto.getGivenCash().multiply(BigDecimal.valueOf(COMMISSION_RATE)));
+            dto.setTransactionUUID(commission.getTransactionUUID());
+            transactionLogService.update(commission);
+            update(commission, dto, true);
+        }
     }
 
     /**
@@ -162,9 +182,9 @@ public class InvestorCashService {
      * @param money - существующая проводка
      * @param dto   - DTO объект из 1С
      */
-    private void update(Money money, InvestorCashDTO dto) {
+    private void update(Money money, InvestorCashDTO dto, boolean cashing) {
         prepareMoney(money, dto);
-        updateTransaction(money);
+        updateTransaction(money, cashing);
         moneyRepository.save(money);
     }
 
@@ -311,8 +331,8 @@ public class InvestorCashService {
      *
      * @param money сумма для обновления
      */
-    private void updateTransaction(Money money) {
-        accountTransactionService.updateTransaction(money);
+    private void updateTransaction(Money money, boolean cashing) {
+        accountTransactionService.updateTransaction(money, cashing);
     }
 
 }
