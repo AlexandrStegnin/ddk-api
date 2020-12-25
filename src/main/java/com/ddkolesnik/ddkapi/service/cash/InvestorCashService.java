@@ -103,16 +103,7 @@ public class InvestorCashService {
      */
     private void cashing(Money money, InvestorCashDTO dto) {
         if (money == null) {
-            money = convert(dto);
-            Money commission = accountTransactionService.cashing(money);
-            if (commission != null) {
-                Set<Money> monies = new HashSet<>();
-                monies.add(money);
-                monies.add(commission);
-                transactionLogService.create(monies);
-            } else {
-                transactionLogService.create(money);
-            }
+            createCashingTransaction(dto);
         } else {
             updateCashingTransaction(money, dto);
         }
@@ -120,6 +111,24 @@ public class InvestorCashService {
 
     private void updateCashingTransaction(Money money, InvestorCashDTO dto) {
 
+    }
+
+    /**
+     * Создать транзакцию по выводу средств
+     *
+     * @param dto DTO из 1C для вывода
+     */
+    private void createCashingTransaction(InvestorCashDTO dto) {
+        Money money = convert(dto);
+        Money commission = accountTransactionService.cashing(money);
+        if (commission != null) {
+            Set<Money> monies = new HashSet<>();
+            monies.add(money);
+            monies.add(commission);
+            transactionLogService.create(monies);
+        } else {
+            transactionLogService.create(money);
+        }
     }
 
     /**
