@@ -84,7 +84,7 @@ public class AccountTransactionService {
             return null;
         }
         try {
-            AccountTransaction creditTx = createCreditTransaction(owner, money, true);
+            createCreditTransaction(owner, money, true);
             UserAgreement userAgreement = userAgreementService.findByInvestorAndFacility(money.getInvestor(), money.getFacility());
             if (userAgreement == null) {
                 throw new ApiException("Не найдена информация \"С кем заключён договор\"", HttpStatus.NOT_FOUND);
