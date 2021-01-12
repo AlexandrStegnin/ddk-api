@@ -66,6 +66,7 @@ public class Money {
     @JoinColumn(name = "acc_tx_id")
     private AccountTransaction transaction;
 
+    //TODO переделать на вид закрытия из БД
     @Column(name = "type_closing_id")
     private Long typeClosingId;
 
