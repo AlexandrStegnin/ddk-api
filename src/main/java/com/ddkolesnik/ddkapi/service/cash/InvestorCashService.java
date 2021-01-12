@@ -140,6 +140,8 @@ public class InvestorCashService {
      */
     private void createCashingTransaction(InvestorCashDTO dto) {
         Money money = convert(dto);
+        money.setDateClosing(dto.getDateGiven());
+        money.setTypeClosingId(8L);
         Money commission = accountTransactionService.cashing(money);
         if (commission != null) {
             Set<Money> monies = new HashSet<>();

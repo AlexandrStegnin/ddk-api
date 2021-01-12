@@ -175,6 +175,8 @@ public class AccountTransactionService {
         creditTx.setCashType(CashType.CASH_1C_COMMISSION);
         creditTx.setCash(commission.getGivenCash());
         commission.setTransaction(creditTx);
+        commission.setTypeClosingId(10L);
+        commission.setDateClosing(money.getDateClosing());
         moneyRepository.save(commission);
         accountTransactionRepository.save(creditTx);
     }
