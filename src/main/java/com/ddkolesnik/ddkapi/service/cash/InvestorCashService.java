@@ -314,7 +314,7 @@ public class InvestorCashService {
      * @return результат проверки
      */
     private boolean checkCash(InvestorCashDTO dto) {
-        return dto.getDateGiven().isAfter(FILTERED_DATE) && dto.getGivenCash().compareTo(BigDecimal.ZERO) > 0;
+        return dto.getDateGiven().isAfter(FILTERED_DATE);
     }
 
     /**
