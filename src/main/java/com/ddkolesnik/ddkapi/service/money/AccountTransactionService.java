@@ -185,7 +185,7 @@ public class AccountTransactionService {
      * Обновить сумму транзакции
      *
      * @param money сумма для обновления
-     * @param cashing
+     * @param cashing признак вывода денег
      */
     public void updateTransaction(Money money, boolean cashing) {
         AccountTransaction transaction = money.getTransaction();
