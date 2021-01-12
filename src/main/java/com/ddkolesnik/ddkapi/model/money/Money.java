@@ -66,6 +66,9 @@ public class Money {
     @JoinColumn(name = "acc_tx_id")
     private AccountTransaction transaction;
 
+    @Column(name = "type_closing_id")
+    private Long typeClosingId;
+
     public Money(Money old, Double taxRate) {
         this.id = null;
         this.givenCash = old.getGivenCash().multiply(BigDecimal.valueOf((taxRate)));
