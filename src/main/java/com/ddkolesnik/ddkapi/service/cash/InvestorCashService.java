@@ -118,7 +118,6 @@ public class InvestorCashService {
      * @param dto DTO из 1С
      */
     private void updateCashingTransaction(Money money, InvestorCashDTO dto) {
-        dto.setGivenCash(dto.getGivenCash().negate());
         BigDecimal commissionSum = money.getGivenCash().multiply(BigDecimal.valueOf(COMMISSION_RATE));
         transactionLogService.update(money);
         update(money, dto, true);
