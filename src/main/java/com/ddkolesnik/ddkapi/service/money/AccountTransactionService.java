@@ -65,7 +65,7 @@ public class AccountTransactionService {
         }
         try {
             createInvestorDebitTransaction(owner, money);
-            AccountTransaction creditTx = createCreditTransaction(owner, money, false);
+            AccountTransaction creditTx = createCreditTransaction(owner, money);
             createDebitTransaction(creditTx, money);
         } catch (Exception e) {
             log.error(e.getLocalizedMessage());
@@ -84,7 +84,7 @@ public class AccountTransactionService {
             return null;
         }
         try {
-            createCreditTransaction(owner, money, true);
+            createCreditTransaction(owner, money);
             UserAgreement userAgreement = userAgreementService.findByInvestorAndFacility(money.getInvestor(), money.getFacility());
             if (userAgreement == null) {
                 throw new ApiException("Не найдена информация \"С кем заключён договор\"", HttpStatus.NOT_FOUND);
@@ -142,13 +142,9 @@ public class AccountTransactionService {
      *
      * @param owner   владелец
      * @param money   сумма
-     * @param cashing признак вывода суммы
      */
-    private AccountTransaction createCreditTransaction(Account owner, Money money, boolean cashing) {
+    private AccountTransaction createCreditTransaction(Account owner, Money money) {
         BigDecimal givenCash = money.getGivenCash().negate();
-        if (cashing) {
-            money.setGivenCash(givenCash);
-        }
         Account recipient = accountService.findByOwnerId(money.getFacility().getId(), OwnerType.FACILITY);
         AccountTransaction creditTx = new AccountTransaction(owner);
         creditTx.setOperationType(OperationType.CREDIT);
