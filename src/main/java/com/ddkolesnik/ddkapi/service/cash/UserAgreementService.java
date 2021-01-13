@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 
+import static com.ddkolesnik.ddkapi.util.Constant.INVESTOR_PREFIX;
+
 /**
  * @author Alexandr Stegnin
  */
@@ -55,12 +57,12 @@ public class UserAgreementService {
      */
     private UserAgreement create(UserAgreementDTO dto) {
         Facility facility = facilityService.findByFullName(dto.getFacility());
-        AppUser investor = appUserService.findByLogin(dto.getConcludedWith());
+        AppUser investor = appUserService.findByLogin(dto.getConcludedFrom());
         UserAgreement userAgreement = new UserAgreement();
         userAgreement.setFacilityId(facility.getId());
-        userAgreement.setConcludedWith(investor.getId());
+        userAgreement.setConcludedWith(dto.getConcludedFrom());
         userAgreement.setTaxRate(dto.getTaxRate());
-        userAgreement.setConcludedFrom(dto.getConcludedFrom());
+        userAgreement.setConcludedFrom(investor.getId());
         return userAgreementRepository.save(userAgreement);
     }
 
@@ -72,12 +74,13 @@ public class UserAgreementService {
      */
     public UserAgreement update(UserAgreementDTO dto) {
         Facility facility = facilityService.findByFullName(dto.getFacility());
-        AppUser investor = appUserService.findByLogin(dto.getConcludedWith());
+        dto.setConcludedFrom(INVESTOR_PREFIX.concat(dto.getConcludedFrom()));
+        AppUser investor = appUserService.findByLogin(dto.getConcludedFrom());
         UserAgreement userAgreement = userAgreementRepository.findByFacilityIdAndConcludedWith(facility.getId(), investor.getId());
         if (userAgreement == null) {
             return create(dto);
         }
-        userAgreement.setConcludedFrom(dto.getConcludedFrom());
+        userAgreement.setConcludedFrom(investor.getId());
         userAgreement.setTaxRate(dto.getTaxRate());
         return userAgreementRepository.save(userAgreement);
     }
