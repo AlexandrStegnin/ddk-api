@@ -108,7 +108,7 @@ public class AppUserService {
         if (user == null) {
             throw new ApiException("Пользователь с логином = [" + login + "] не найден", HttpStatus.NOT_FOUND);
         }
-        return appUserRepository.findByLogin(login);
+        return user;
     }
 
     @Deprecated
