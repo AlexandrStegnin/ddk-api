@@ -49,7 +49,7 @@ public class UserAgreementController {
             @ApiResponse(responseCode = "Error", description = "Произошла ошибка",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class))))})
     @GetMapping(value = PATH_USER_AGREEMENT_UPDATE, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
-            produces = {MediaType.APPLICATION_ATOM_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiSuccessResponse updateUserAgreement(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
                                                  @PathVariable(name = "token") @ValidToken String token,
                                                  @Parameter(description = "Данные из Битрикс 24", schema = @Schema(implementation = UserAgreementDTO.class))
