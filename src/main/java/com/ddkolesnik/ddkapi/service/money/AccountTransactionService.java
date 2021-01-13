@@ -10,7 +10,7 @@ import com.ddkolesnik.ddkapi.repository.money.AccountTransactionRepository;
 import com.ddkolesnik.ddkapi.repository.money.MoneyRepository;
 import com.ddkolesnik.ddkapi.service.app.AccountService;
 import com.ddkolesnik.ddkapi.service.cash.UserAgreementService;
-import com.ddkolesnik.ddkapi.util.ConcludedFrom;
+import com.ddkolesnik.ddkapi.util.ConcludedWith;
 import com.ddkolesnik.ddkapi.util.OperationType;
 import com.ddkolesnik.ddkapi.util.OwnerType;
 import lombok.extern.slf4j.Slf4j;
@@ -89,8 +89,8 @@ public class AccountTransactionService {
             if (userAgreement == null) {
                 throw new ApiException("Не найдена информация \"С кем заключён договор\"", HttpStatus.NOT_FOUND);
             }
-            ConcludedFrom concludedFrom = ConcludedFrom.fromTitle(userAgreement.getConcludedFrom());
-            if (concludedFrom == ConcludedFrom.NATURAL_PERSON) {
+            ConcludedWith concludedWith = ConcludedWith.fromTitle(userAgreement.getConcludedWith());
+            if (concludedWith == ConcludedWith.NATURAL_PERSON) {
                 Money commission = new Money(money, 0.01);
                 createCommissionCreditTransaction(money, commission);
                 return commission;
