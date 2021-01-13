@@ -60,7 +60,7 @@ public class UserAgreementService {
         AppUser investor = appUserService.findByLogin(dto.getConcludedFrom());
         UserAgreement userAgreement = new UserAgreement();
         userAgreement.setFacilityId(facility.getId());
-        userAgreement.setConcludedWith(dto.getConcludedFrom());
+        userAgreement.setConcludedWith(dto.getConcludedWith());
         userAgreement.setTaxRate(dto.getTaxRate());
         userAgreement.setConcludedFrom(investor.getId());
         return userAgreementRepository.save(userAgreement);
@@ -76,7 +76,7 @@ public class UserAgreementService {
         Facility facility = facilityService.findByFullName(dto.getFacility());
         dto.setConcludedFrom(INVESTOR_PREFIX.concat(dto.getConcludedFrom()));
         AppUser investor = appUserService.findByLogin(dto.getConcludedFrom());
-        UserAgreement userAgreement = userAgreementRepository.findByFacilityIdAndConcludedWith(facility.getId(), investor.getId());
+        UserAgreement userAgreement = userAgreementRepository.findByFacilityIdAndConcludedFrom(facility.getId(), investor.getId());
         if (userAgreement == null) {
             return create(dto);
         }
@@ -93,6 +93,6 @@ public class UserAgreementService {
      * @return найденная информация
      */
     public UserAgreement findByInvestorAndFacility(Investor investor, Facility facility) {
-        return userAgreementRepository.findByFacilityIdAndConcludedWith(facility.getId(), investor.getId());
+        return userAgreementRepository.findByFacilityIdAndConcludedFrom(facility.getId(), investor.getId());
     }
 }
