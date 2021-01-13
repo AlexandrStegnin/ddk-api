@@ -29,16 +29,16 @@ public class UserAgreement {
     Long facilityId;
 
     /**
-     * С кем заключён договор (id инвестора)
+     * С кем заключён договор (ЮЛ/ФЛ)
      */
     @Column(name = "concluded_with")
-    Long concludedWith;
+    String concludedWith;
 
     /**
-     * От кого заключён договор (Юр лицо/Физ лицо)
+     * От кого заключён договор (id инвестора)
      */
     @Column(name = "concluded_from")
-    String concludedFrom;
+    Long concludedFrom;
 
     /**
      * Налоговая ставка (%)
