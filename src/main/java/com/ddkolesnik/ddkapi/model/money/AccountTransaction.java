@@ -4,6 +4,7 @@ import com.ddkolesnik.ddkapi.model.app.Account;
 import com.ddkolesnik.ddkapi.model.log.CashType;
 import com.ddkolesnik.ddkapi.util.OperationType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
@@ -20,6 +21,7 @@ import java.util.Set;
 @Data
 @Entity
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = {"parent", "child"})
 @ToString(exclude = {"parent", "child"})
 @Table(name = "account_transaction")
 public class AccountTransaction {
