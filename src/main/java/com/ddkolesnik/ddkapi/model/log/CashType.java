@@ -14,7 +14,8 @@ public enum CashType {
     RENT_CASH(5, "Деньги с аренды"),
     CASH_1C(6, "Проводка из 1С"),
     INVESTMENT_BODY(7, "Тело инвестиций"),
-    CASH_1C_COMMISSION(8, "Проводка из 1С. Комиссия");
+    CASH_1C_COMMISSION(8, "Проводка из 1С. Комиссия"),
+    CASH_1C_CASHING(9, "Проводка из 1С. Вывод");
 
     private final int id;
 
