@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 /**
  * @author Alexandr Stegnin
  */
@@ -63,7 +65,7 @@ public class AccountTransactionService {
         }
         try {
             createInvestorDebitTransaction(owner, money);
-            AccountTransaction creditTx = createCreditTransaction(owner, money);
+            AccountTransaction creditTx = createCreditTransaction(owner, money, false);
             createDebitTransaction(creditTx, money);
         } catch (Exception e) {
             log.error(e.getLocalizedMessage());
@@ -82,7 +84,7 @@ public class AccountTransactionService {
             return null;
         }
         try {
-            createCreditTransaction(owner, money);
+            AccountTransaction parentTx = createCreditTransaction(owner, money, true);
             UserAgreement userAgreement = userAgreementService.findByInvestorAndFacility(money.getInvestor(), money.getFacility());
             if (userAgreement == null) {
                 throw new ApiException("Не найдена информация \"С кем заключён договор\"", HttpStatus.NOT_FOUND);
@@ -90,7 +92,7 @@ public class AccountTransactionService {
             ConcludedWith concludedWith = ConcludedWith.fromTitle(userAgreement.getConcludedWith());
             if (concludedWith == ConcludedWith.NATURAL_PERSON) {
                 Money commission = new Money(money, 0.01);
-                createCommissionCreditTransaction(money, commission);
+                createCommissionCreditTransaction(money, commission, parentTx);
                 return commission;
             }
         } catch (Exception e) {
@@ -141,7 +143,11 @@ public class AccountTransactionService {
      * @param owner   владелец
      * @param money   сумма
      */
-    private AccountTransaction createCreditTransaction(Account owner, Money money) {
+    private AccountTransaction createCreditTransaction(Account owner, Money money, boolean cashing) {
+        BigDecimal givenCash = money.getGivenCash();
+        if (!cashing) {
+            givenCash = givenCash.negate();
+        }
         Account recipient = accountService.findByOwnerId(money.getFacility().getId(), OwnerType.FACILITY);
         AccountTransaction creditTx = new AccountTransaction(owner);
         creditTx.setOperationType(OperationType.CREDIT);
@@ -149,7 +155,7 @@ public class AccountTransactionService {
         creditTx.setRecipient(recipient);
         creditTx.getMonies().add(money);
         creditTx.setCashType(CashType.CASH_1C);
-        creditTx.setCash(money.getGivenCash());
+        creditTx.setCash(givenCash);
         money.setTransaction(creditTx);
         moneyRepository.save(money);
         return accountTransactionRepository.save(creditTx);
@@ -161,7 +167,7 @@ public class AccountTransactionService {
      * @param money      сумма
      * @param commission сумма комиссии
      */
-    public void createCommissionCreditTransaction(Money money, Money commission) {
+    public void createCommissionCreditTransaction(Money money, Money commission, AccountTransaction parentTx) {
         Account owner = accountService.findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         AccountTransaction creditTx = new AccountTransaction(owner);
         creditTx.setOperationType(OperationType.CREDIT);
@@ -171,6 +177,7 @@ public class AccountTransactionService {
         creditTx.getMonies().add(commission);
         creditTx.setCashType(CashType.CASH_1C_COMMISSION);
         creditTx.setCash(commission.getGivenCash());
+        creditTx.setParent(parentTx);
         commission.setTransaction(creditTx);
         commission.setTypeClosingId(10L);
         commission.setDateClosing(money.getDateClosing());
