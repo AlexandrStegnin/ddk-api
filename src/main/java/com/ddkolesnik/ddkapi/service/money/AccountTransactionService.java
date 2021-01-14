@@ -145,8 +145,10 @@ public class AccountTransactionService {
      */
     private AccountTransaction createCreditTransaction(Account owner, Money money, boolean cashing) {
         BigDecimal givenCash = money.getGivenCash();
+        CashType cashType = CashType.CASH_1C_CASHING;
         if (!cashing) {
             givenCash = givenCash.negate();
+            cashType = CashType.CASH_1C;
         }
         Account recipient = accountService.findByOwnerId(money.getFacility().getId(), OwnerType.FACILITY);
         AccountTransaction creditTx = new AccountTransaction(owner);
@@ -154,7 +156,7 @@ public class AccountTransactionService {
         creditTx.setPayer(owner);
         creditTx.setRecipient(recipient);
         creditTx.getMonies().add(money);
-        creditTx.setCashType(CashType.CASH_1C);
+        creditTx.setCashType(cashType);
         creditTx.setCash(givenCash);
         money.setTransaction(creditTx);
         moneyRepository.save(money);
