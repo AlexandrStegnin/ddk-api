@@ -208,4 +208,8 @@ public class AccountTransactionService {
         }
     }
 
+    public AccountTransaction findByParent(AccountTransaction parentTx) {
+        return accountTransactionRepository.findByParentId(parentTx.getId());
+    }
+
 }
