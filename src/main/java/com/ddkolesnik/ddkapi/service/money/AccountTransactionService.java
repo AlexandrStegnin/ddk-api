@@ -17,8 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-
 /**
  * @author Alexandr Stegnin
  */
@@ -144,7 +142,6 @@ public class AccountTransactionService {
      * @param money   сумма
      */
     private AccountTransaction createCreditTransaction(Account owner, Money money) {
-        BigDecimal givenCash = money.getGivenCash().negate();
         Account recipient = accountService.findByOwnerId(money.getFacility().getId(), OwnerType.FACILITY);
         AccountTransaction creditTx = new AccountTransaction(owner);
         creditTx.setOperationType(OperationType.CREDIT);
@@ -152,7 +149,7 @@ public class AccountTransactionService {
         creditTx.setRecipient(recipient);
         creditTx.getMonies().add(money);
         creditTx.setCashType(CashType.CASH_1C);
-        creditTx.setCash(givenCash);
+        creditTx.setCash(money.getGivenCash());
         money.setTransaction(creditTx);
         moneyRepository.save(money);
         return accountTransactionRepository.save(creditTx);
