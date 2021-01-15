@@ -18,6 +18,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
+import java.util.Date;
+
+import static com.ddkolesnik.ddkapi.util.Constant.DDK_USER_ID;
 
 /**
  * @author Alexandr Stegnin
@@ -146,14 +150,18 @@ public class AccountTransactionService {
     private AccountTransaction createCreditTransaction(Account owner, Money money, boolean cashing) {
         BigDecimal givenCash = money.getGivenCash();
         CashType cashType = CashType.CASH_1C_CASHING;
+        Account recipient = owner;
+        Account payer = accountService.findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
         if (!cashing) {
             givenCash = givenCash.negate();
             cashType = CashType.CASH_1C;
+            recipient = accountService.findByOwnerId(money.getFacility().getId(), OwnerType.FACILITY);
+            payer = owner;
         }
-        Account recipient = accountService.findByOwnerId(money.getFacility().getId(), OwnerType.FACILITY);
         AccountTransaction creditTx = new AccountTransaction(owner);
+        creditTx.setTxDate(Date.from(money.getDateGiven().atStartOfDay(ZoneId.systemDefault()).toInstant()));
         creditTx.setOperationType(OperationType.CREDIT);
-        creditTx.setPayer(owner);
+        creditTx.setPayer(payer);
         creditTx.setRecipient(recipient);
         creditTx.getMonies().add(money);
         creditTx.setCashType(cashType);
@@ -171,9 +179,10 @@ public class AccountTransactionService {
      */
     public void createCommissionCreditTransaction(Money money, Money commission, AccountTransaction parentTx) {
         Account owner = accountService.findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
+        Account payer = accountService.findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
         AccountTransaction creditTx = new AccountTransaction(owner);
         creditTx.setOperationType(OperationType.CREDIT);
-        creditTx.setPayer(owner);
+        creditTx.setPayer(payer);
         creditTx.setRecipient(owner);
         creditTx.getMonies().add(money);
         creditTx.getMonies().add(commission);
