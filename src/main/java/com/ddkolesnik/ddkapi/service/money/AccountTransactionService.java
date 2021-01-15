@@ -181,6 +181,7 @@ public class AccountTransactionService {
         Account owner = accountService.findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         Account payer = accountService.findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
         AccountTransaction creditTx = new AccountTransaction(owner);
+        creditTx.setTxDate(Date.from(money.getDateGiven().atStartOfDay(ZoneId.systemDefault()).toInstant()));
         creditTx.setOperationType(OperationType.CREDIT);
         creditTx.setPayer(payer);
         creditTx.setRecipient(owner);
