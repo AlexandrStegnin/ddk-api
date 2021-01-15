@@ -91,4 +91,7 @@ public class Constant {
     public static final String INVESTOR_PREFIX = "investor";
 
     public static final String UNDER_FACILITY_SUFFIX = "_Целиком";
+
+    public static final Long DDK_USER_ID = 322L;
+
 }
