@@ -6,7 +6,9 @@ package com.ddkolesnik.ddkapi.util;
 
 public enum AccountingCode {
 
-    CASHING("НФ-000027", "Вывод Клиентов");
+    CASHING("НФ-000027", "Вывод Клиентов"),
+    CASHING_BODY("НФ-000184", "Вывод Клиентов Тело"),
+    CASHING_COMMISSION("НФ-000167", "Вывод Клиентов Проценты");
 
     private final String code;
 
