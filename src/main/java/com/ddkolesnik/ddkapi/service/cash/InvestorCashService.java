@@ -40,7 +40,7 @@ import java.util.Set;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class InvestorCashService {
 
-    private final Double COMMISSION_RATE = 0.01;
+    private final Double COMMISSION_RATE = 0.01010101;
 
     private static final LocalDate FILTERED_DATE = LocalDate.of(2020, 6, 30);
 
