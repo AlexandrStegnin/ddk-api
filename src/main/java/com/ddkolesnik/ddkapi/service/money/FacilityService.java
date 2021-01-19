@@ -8,15 +8,15 @@ import com.ddkolesnik.ddkapi.service.app.AccountService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 /**
  * @author Alexandr Stegnin
  */
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -28,8 +28,10 @@ public class FacilityService {
 
     public Facility findByFullName(String fullName) {
         Facility facility = facilityRepository.findByFullNameEqualsIgnoreCase(fullName);
-        if (Objects.isNull(facility)) {
-            throw new ApiException("Объект с названием = [" + fullName + "] не найден", HttpStatus.NOT_FOUND);
+        if (facility == null) {
+            String message = String.format("Объект с названием [%s] не найден", fullName);
+            log.error(message);
+            throw new ApiException(message, HttpStatus.NOT_FOUND);
         }
         return facility;
     }
