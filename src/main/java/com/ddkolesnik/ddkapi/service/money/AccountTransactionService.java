@@ -121,6 +121,7 @@ public class AccountTransactionService {
         debitTx.getMonies().add(money);
         debitTx.setCashType(CashType.CASH_1C);
         debitTx.setCash(money.getGivenCash());
+        debitTx.setTxDate(Date.from(money.getDateGiven().atStartOfDay(ZoneId.systemDefault()).toInstant()));
         accountTransactionRepository.save(debitTx);
     }
 
@@ -139,6 +140,7 @@ public class AccountTransactionService {
         debitTx.getMonies().add(money);
         debitTx.setCashType(CashType.CASH_1C);
         debitTx.setCash(money.getGivenCash());
+        debitTx.setTxDate(Date.from(money.getDateGiven().atStartOfDay(ZoneId.systemDefault()).toInstant()));
         accountTransactionRepository.save(debitTx);
     }
 
