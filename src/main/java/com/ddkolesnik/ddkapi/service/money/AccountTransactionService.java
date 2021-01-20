@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.Date;
 
+import static com.ddkolesnik.ddkapi.util.Constant.COMMISSION_RATE;
 import static com.ddkolesnik.ddkapi.util.Constant.DDK_USER_ID;
 
 /**
@@ -95,7 +96,7 @@ public class AccountTransactionService {
             }
             ConcludedWith concludedWith = ConcludedWith.fromTitle(userAgreement.getConcludedWith());
             if (concludedWith == ConcludedWith.NATURAL_PERSON) {
-                Money commission = new Money(money, 0.01);
+                Money commission = new Money(money, COMMISSION_RATE);
                 createCommissionCreditTransaction(money, commission, parentTx);
                 return commission;
             }

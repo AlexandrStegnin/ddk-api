@@ -94,4 +94,5 @@ public class Constant {
 
     public static final Long DDK_USER_ID = 322L;
 
+    public static final Double COMMISSION_RATE = 0.01010101;
 }

@@ -28,6 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.ddkolesnik.ddkapi.util.Constant.COMMISSION_RATE;
+
 /**
  * Сервис для работы с проводками из 1С
  *
@@ -39,8 +41,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class InvestorCashService {
-
-    private final Double COMMISSION_RATE = 0.01010101;
 
     private static final LocalDate FILTERED_DATE = LocalDate.of(2020, 6, 30);
 
