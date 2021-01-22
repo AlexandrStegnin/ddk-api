@@ -7,7 +7,7 @@ package com.ddkolesnik.ddkapi.util;
 public enum ConcludedWith {
 
     LEGAL_PERSON(1, "Юр. лицо"),
-    NATURAL_PERSON(2, "Физ. лицо"),
+    NATURAL_PERSON(2, "ФЛ"),
     BUSINESSMAN(3, "ИП");
 
     private final int id;
