@@ -82,6 +82,7 @@ public class UserAgreementService {
         }
         userAgreement.setConcludedFrom(investor.getId());
         userAgreement.setTaxRate(dto.getTaxRate());
+        userAgreement.setConcludedWith(dto.getConcludedWith());
         return userAgreementRepository.save(userAgreement);
     }
 
