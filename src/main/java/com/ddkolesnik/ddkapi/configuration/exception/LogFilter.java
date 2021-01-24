@@ -19,8 +19,8 @@ public class LogFilter implements Filter {
             chain.doFilter(request, response);
         } catch (Exception e) {
             if (e instanceof RequestRejectedException) {
-                log.info("Произошла ошибка RequestRejectedException...");
-                log.info("Запрашиваемый URL: {}", request.getLocalAddr());
+                log.warn("Произошла ошибка RequestRejectedException...");
+                log.warn("Запрашиваемый URL: {}", request.getLocalAddr());
             }
             throw e;
         }
