@@ -73,7 +73,7 @@ public class AccountTransactionService {
             AccountTransaction creditTx = createCreditTransaction(owner, money, false);
             createDebitTransaction(creditTx, money);
         } catch (Exception e) {
-            log.error(e.getLocalizedMessage());
+            log.error("Произошла ошибка: {}", e.getMessage());
         }
     }
 
