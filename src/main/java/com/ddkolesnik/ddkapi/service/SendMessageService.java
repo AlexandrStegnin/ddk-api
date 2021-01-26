@@ -51,6 +51,9 @@ public class SendMessageService {
         }
         WebClient webClient = WebClient.create(MAIL_APP_BASE_URL);
         AppUser user = appUserService.findByLogin(login);
+        if (user.getProfile().getEmail() == null) {
+            return;
+        }
         AppUserDTO userDTO = new AppUserDTO();
         userDTO.setEmail(user.getProfile().getEmail());
         webClient.post()
