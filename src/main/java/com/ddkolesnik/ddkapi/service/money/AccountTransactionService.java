@@ -135,6 +135,11 @@ public class AccountTransactionService {
      */
     private void createDebitTransaction(AccountTransaction creditTx, Money money) {
         Account recipient = accountService.findByOwnerId(money.getUnderFacility().getId(), OwnerType.UNDER_FACILITY);
+        if (recipient == null) {
+            String msg = String.format("Не найден счёт получателя [%s]", money.getUnderFacility().getName());
+            log.error(msg);
+            throw new ApiException(msg, HttpStatus.NOT_FOUND);
+        }
         AccountTransaction debitTx = new AccountTransaction(recipient);
         debitTx.setOperationType(OperationType.DEBIT);
         debitTx.setPayer(creditTx.getOwner());
