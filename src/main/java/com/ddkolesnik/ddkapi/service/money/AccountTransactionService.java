@@ -66,7 +66,7 @@ public class AccountTransactionService {
         Account owner = accountService.findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         if (owner == null) {
             log.error("Не найден счёт пользователя");
-            return;
+            throw new ApiException("Не найден счёт пользователя", HttpStatus.NOT_FOUND);
         }
         try {
             createInvestorDebitTransaction(owner, money);
@@ -86,7 +86,7 @@ public class AccountTransactionService {
         Account owner = accountService.findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         if (owner == null) {
             log.error("Не найден счёт пользователя");
-            return null;
+            throw new ApiException("Не найден счёт пользователя", HttpStatus.NOT_FOUND);
         }
         try {
             AccountTransaction parentTx = createCreditTransaction(owner, money, true);
@@ -155,10 +155,16 @@ public class AccountTransactionService {
         CashType cashType = CashType.CASH_1C_CASHING;
         Account recipient = owner;
         Account payer = accountService.findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
+        if (payer == null) {
+            throw new ApiException("Не найден счёт пользователя ДДК", HttpStatus.NOT_FOUND);
+        }
         if (!cashing) {
             givenCash = givenCash.negate();
             cashType = CashType.CASH_1C;
             recipient = accountService.findByOwnerId(money.getFacility().getId(), OwnerType.FACILITY);
+            if (recipient == null) {
+                throw new ApiException(String.format("Не найден счёт объекта [%s]", money.getFacility().getFullName()), HttpStatus.NOT_FOUND);
+            }
             payer = owner;
         }
         AccountTransaction creditTx = new AccountTransaction(owner);
@@ -182,7 +188,13 @@ public class AccountTransactionService {
      */
     public void createCommissionCreditTransaction(Money money, Money commission, AccountTransaction parentTx) {
         Account owner = accountService.findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
+        if (owner == null) {
+            throw new ApiException("Не найден счёт инвестора [" + money.getInvestor().getLogin() + "]", HttpStatus.NOT_FOUND);
+        }
         Account payer = accountService.findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
+        if (payer == null) {
+            throw new ApiException("Не найден счёт пользователя ДДК", HttpStatus.NOT_FOUND);
+        }
         AccountTransaction creditTx = new AccountTransaction(owner);
         creditTx.setTxDate(Date.from(money.getDateGiven().atStartOfDay(ZoneId.systemDefault()).toInstant()));
         creditTx.setOperationType(OperationType.CREDIT);
