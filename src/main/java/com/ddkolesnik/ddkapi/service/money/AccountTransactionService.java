@@ -65,8 +65,9 @@ public class AccountTransactionService {
     public void transfer(Money money) {
         Account owner = accountService.findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         if (owner == null) {
-            log.error("Не найден счёт пользователя");
-            throw new ApiException("Не найден счёт пользователя", HttpStatus.NOT_FOUND);
+            String msg = String.format("Не найден счёт инвестора [%s]", money.getInvestor().getLogin());
+            log.error(msg);
+            throw new ApiException(msg, HttpStatus.NOT_FOUND);
         }
         try {
             createInvestorDebitTransaction(owner, money);
@@ -84,9 +85,10 @@ public class AccountTransactionService {
      */
     public Money cashing(Money money) {
         Account owner = accountService.findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
+        String msg = String.format("Не найден счёт инвестора [%s]", money.getInvestor().getLogin());
         if (owner == null) {
-            log.error("Не найден счёт пользователя");
-            throw new ApiException("Не найден счёт пользователя", HttpStatus.NOT_FOUND);
+            log.error(msg);
+            throw new ApiException(msg, HttpStatus.NOT_FOUND);
         }
         try {
             AccountTransaction parentTx = createCreditTransaction(owner, money, true);
@@ -156,14 +158,18 @@ public class AccountTransactionService {
         Account recipient = owner;
         Account payer = accountService.findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
         if (payer == null) {
-            throw new ApiException("Не найден счёт пользователя ДДК", HttpStatus.NOT_FOUND);
+            String msg = "Не найден счёт пользователя ДДК";
+            log.error(msg);
+            throw new ApiException(msg, HttpStatus.NOT_FOUND);
         }
         if (!cashing) {
             givenCash = givenCash.negate();
             cashType = CashType.CASH_1C;
             recipient = accountService.findByOwnerId(money.getFacility().getId(), OwnerType.FACILITY);
             if (recipient == null) {
-                throw new ApiException(String.format("Не найден счёт объекта [%s]", money.getFacility().getFullName()), HttpStatus.NOT_FOUND);
+                String msg = String.format("Не найден счёт объекта [%s]", money.getFacility().getFullName());
+                log.error(msg);
+                throw new ApiException(msg, HttpStatus.NOT_FOUND);
             }
             payer = owner;
         }
@@ -189,11 +195,15 @@ public class AccountTransactionService {
     public void createCommissionCreditTransaction(Money money, Money commission, AccountTransaction parentTx) {
         Account owner = accountService.findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         if (owner == null) {
-            throw new ApiException("Не найден счёт инвестора [" + money.getInvestor().getLogin() + "]", HttpStatus.NOT_FOUND);
+            String msg = String.format("Не найден счёт инвестора [%s]", money.getInvestor().getLogin());
+            log.error(msg);
+            throw new ApiException(msg, HttpStatus.NOT_FOUND);
         }
         Account payer = accountService.findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
         if (payer == null) {
-            throw new ApiException("Не найден счёт пользователя ДДК", HttpStatus.NOT_FOUND);
+            String msg = "Не найден счёт пользователя ДДК";
+            log.error(msg);
+            throw new ApiException(msg, HttpStatus.NOT_FOUND);
         }
         AccountTransaction creditTx = new AccountTransaction(owner);
         creditTx.setTxDate(Date.from(money.getDateGiven().atStartOfDay(ZoneId.systemDefault()).toInstant()));
