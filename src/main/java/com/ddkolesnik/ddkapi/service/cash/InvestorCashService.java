@@ -119,15 +119,36 @@ public class InvestorCashService {
         BigDecimal commissionSum = money.getGivenCash().multiply(BigDecimal.valueOf(COMMISSION_RATE));
         transactionLogService.update(money);
         update(money, dto, true);
-        Money commission = moneyRepository.findMoney(dto.getDateGiven(),
-                commissionSum, dto.getFacility(),
-                dto.getCashSource(), Constant.INVESTOR_PREFIX.concat(dto.getInvestorCode()));
+        AccountTransaction transaction = money.getTransaction();
+        Money commission = null;
+        if (transaction != null) {
+            AccountTransaction child = accountTransactionService.findByParent(transaction);
+            if (child != null) {
+                commission = moneyRepository.findByTransactionId(child.getId());
+            }
+        }
+        if (commission == null) {
+            commission = getCommission(dto, commissionSum);
+        }
         if (commission != null) {
             dto.setGivenCash(dto.getGivenCash().multiply(BigDecimal.valueOf(COMMISSION_RATE)));
             dto.setTransactionUUID(commission.getTransactionUUID());
             transactionLogService.update(commission);
             update(commission, dto, true);
         }
+    }
+
+    /**
+     * Найти сумму комиссии
+     *
+     * @param dto dto суммы из 1С
+     * @param commissionSum сумма комиссии
+     * @return найденная сумма
+     */
+    private Money getCommission(InvestorCashDTO dto, BigDecimal commissionSum) {
+        return moneyRepository.findMoney(dto.getDateGiven(),
+                commissionSum, dto.getFacility(),
+                dto.getCashSource(), Constant.INVESTOR_PREFIX.concat(dto.getInvestorCode()));
     }
 
     /**
