@@ -70,8 +70,8 @@ public class AccountTransactionService {
             throw new ApiException(msg, HttpStatus.NOT_FOUND);
         }
         try {
-            createInvestorDebitTransaction(owner, money);
-            AccountTransaction creditTx = createCreditTransaction(owner, money, false);
+            AccountTransaction investorDebitTx = createInvestorDebitTransaction(owner, money);
+            AccountTransaction creditTx = createCreditTransaction(owner, money, false, investorDebitTx);
             createDebitTransaction(creditTx, money);
         } catch (Exception e) {
             log.error("Произошла ошибка: {}", e.getMessage());
@@ -91,7 +91,7 @@ public class AccountTransactionService {
             throw new ApiException(msg, HttpStatus.NOT_FOUND);
         }
         try {
-            AccountTransaction parentTx = createCreditTransaction(owner, money, true);
+            AccountTransaction parentTx = createCreditTransaction(owner, money, true, null);
             UserAgreement userAgreement = userAgreementService.findByInvestorAndFacility(money.getInvestor(), money.getFacility());
             if (userAgreement == null) {
                 throw new ApiException("Не найдена информация \"С кем заключён договор\"", HttpStatus.NOT_FOUND);
@@ -114,8 +114,9 @@ public class AccountTransactionService {
      *
      * @param owner владелец счёта
      * @param money сумма
+     * @return созданную транзакцию
      */
-    private void createInvestorDebitTransaction(Account owner, Money money) {
+    private AccountTransaction createInvestorDebitTransaction(Account owner, Money money) {
         AccountTransaction debitTx = new AccountTransaction(owner);
         debitTx.setOperationType(OperationType.DEBIT);
         debitTx.setPayer(owner);
@@ -124,7 +125,7 @@ public class AccountTransactionService {
         debitTx.setCashType(CashType.CASH_1C);
         debitTx.setCash(money.getGivenCash());
         debitTx.setTxDate(Date.from(money.getDateGiven().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-        accountTransactionRepository.save(debitTx);
+        return accountTransactionRepository.save(debitTx);
     }
 
     /**
@@ -148,6 +149,7 @@ public class AccountTransactionService {
         debitTx.setCashType(CashType.CASH_1C);
         debitTx.setCash(money.getGivenCash());
         debitTx.setTxDate(Date.from(money.getDateGiven().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        debitTx.setParent(creditTx);
         accountTransactionRepository.save(debitTx);
     }
 
@@ -156,8 +158,10 @@ public class AccountTransactionService {
      *
      * @param owner   владелец
      * @param money   сумма
+     * @param cashing признак вывода суммы
+     * @param parentTx родительская транзакция
      */
-    private AccountTransaction createCreditTransaction(Account owner, Money money, boolean cashing) {
+    private AccountTransaction createCreditTransaction(Account owner, Money money, boolean cashing, AccountTransaction parentTx) {
         BigDecimal givenCash = money.getGivenCash();
         CashType cashType = CashType.CASH_1C_CASHING;
         Account recipient = owner;
@@ -179,6 +183,7 @@ public class AccountTransactionService {
             payer = owner;
         }
         AccountTransaction creditTx = new AccountTransaction(owner);
+        creditTx.setParent(parentTx);
         creditTx.setTxDate(Date.from(money.getDateGiven().atStartOfDay(ZoneId.systemDefault()).toInstant()));
         creditTx.setOperationType(OperationType.CREDIT);
         creditTx.setPayer(payer);
