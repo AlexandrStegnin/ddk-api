@@ -12,6 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * @author Alexandr Stegnin
  */
@@ -76,7 +79,7 @@ public class FacilityService {
             throw new ApiException("Номер договора уже используется.", HttpStatus.BAD_REQUEST);
         }
         Facility facility = new Facility();
-        facility.setName(dto.getName());
+        facility.setName(prepareName(dto));
         facility.setFullName(dto.getName());
         facility.setProjectUUID(dto.getProjectUUID());
         facilityRepository.save(facility);
@@ -109,6 +112,23 @@ public class FacilityService {
             return facility;
         }
         return facilityRepository.findByNameEqualsIgnoreCase(dto.getName());
+    }
+
+    /**
+     * Взять из названия объекта всё после первых 5+ чисел
+     *
+     * @param dto DTO для получения имени объекта
+     * @return результат обработки
+     */
+    private String prepareName(FacilityDTO dto) {
+        String name = dto.getName();
+        String result = name;
+        Pattern pattern = Pattern.compile("^\\d{5,}\\.?\\d?\\s+");
+        Matcher matcher = pattern.matcher(name);
+        if (matcher.find()) {
+            result = name.substring(matcher.group().length());
+        }
+        return result;
     }
 
 }
