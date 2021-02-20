@@ -99,6 +99,39 @@ public class TransactionLogService {
     }
 
     /**
+     * Создать запись категории обновление в логе по транзакции по счёту
+     *
+     * @param accountTransaction транзакция по счёту
+     */
+    public void update(AccountTransaction accountTransaction) {
+        TransactionLog log = new TransactionLog();
+        log.addAccountTransaction(accountTransaction);
+        log.setType(TransactionType.UPDATE);
+        log.setRollbackEnabled(true);
+        create(log);
+        blockLinkedLogs(accountTransaction, log);
+    }
+
+    /**
+     * Метод для блокирования отката операций, если в них участвовала транзакция по счёту инвестора
+     *
+     * @param accountTransaction транзакция по счёту
+     * @param log текущая операция логирования
+     */
+    private void blockLinkedLogs(AccountTransaction accountTransaction, TransactionLog log) {
+        List<TransactionLog> linkedLogs = transactionLogRepository.findByAccountTransactionsContains(accountTransaction);
+        linkedLogs.forEach(linkedLog -> {
+            if (linkedLog.getBlockedFrom() == null) {
+                if (!linkedLog.getId().equals(log.getId())) {
+                    linkedLog.setRollbackEnabled(false);
+                    linkedLog.setBlockedFrom(log);
+                    update(linkedLog);
+                }
+            }
+        });
+    }
+
+    /**
      * Метод для блокирования отката операций, если в них участвовала сумма инвестора
      *
      * @param cash сумма инвестора
