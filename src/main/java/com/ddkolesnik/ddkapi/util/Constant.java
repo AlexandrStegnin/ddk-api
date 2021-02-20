@@ -1,5 +1,7 @@
 package com.ddkolesnik.ddkapi.util;
 
+import java.math.BigDecimal;
+
 /**
  * @author Alexandr Stegnin
  */
@@ -94,5 +96,5 @@ public class Constant {
 
     public static final Long DDK_USER_ID = 322L;
 
-    public static final Double COMMISSION_RATE = 0.01010101;
+    public static final BigDecimal COMMISSION_RATE = new BigDecimal("0.01010101");
 }

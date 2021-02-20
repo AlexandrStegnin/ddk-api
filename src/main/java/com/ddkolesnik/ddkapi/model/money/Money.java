@@ -70,9 +70,9 @@ public class Money {
     @Column(name = "type_closing_id")
     private Long typeClosingId;
 
-    public Money(Money old, Double taxRate) {
+    public Money(Money old, BigDecimal taxRate) {
         this.id = null;
-        this.givenCash = old.getGivenCash().multiply(BigDecimal.valueOf((taxRate)));
+        this.givenCash = old.getGivenCash().multiply(taxRate);
         this.facility = old.getFacility();
         this.dateGiven = old.getDateGiven();
         this.investor = old.getInvestor();
