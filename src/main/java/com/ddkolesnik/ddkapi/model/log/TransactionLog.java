@@ -1,5 +1,6 @@
 package com.ddkolesnik.ddkapi.model.log;
 
+import com.ddkolesnik.ddkapi.model.money.AccountTransaction;
 import com.ddkolesnik.ddkapi.model.money.Money;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
@@ -37,6 +38,12 @@ public class TransactionLog {
             joinColumns = {@JoinColumn(name = "tx_id", referencedColumnName = "id")},
             inverseJoinColumns = @JoinColumn(name = "cash_id", referencedColumnName = "id"))
     private Set<Money> investorsCashes;
+
+    @ManyToMany
+    @JoinTable(name = "tx_log_acc_tx",
+            joinColumns = {@JoinColumn(name = "tx_id", referencedColumnName = "id")},
+            inverseJoinColumns = @JoinColumn(name = "acc_tx_id", referencedColumnName = "id"))
+    private Set<AccountTransaction> accountTransactions;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type")
