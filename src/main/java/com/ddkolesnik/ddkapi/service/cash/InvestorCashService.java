@@ -23,10 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.ddkolesnik.ddkapi.util.Constant.COMMISSION_RATE;
 
@@ -160,14 +157,9 @@ public class InvestorCashService {
         Money money = convert(dto);
         money.setDateClosing(dto.getDateGiven());
         money.setTypeClosingId(8L);
-        Money commission = accountTransactionService.cashing(money);
-        if (commission != null) {
-            Set<Money> monies = new HashSet<>();
-            monies.add(money);
-            monies.add(commission);
-            transactionLogService.create(monies);
-        } else {
-            transactionLogService.create(money);
+        AccountTransaction accountTransaction = accountTransactionService.cashing(money);
+        if (accountTransaction != null) {
+            transactionLogService.cashing(accountTransaction);
         }
     }
 

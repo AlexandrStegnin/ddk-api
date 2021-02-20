@@ -79,7 +79,7 @@ public class AccountTransactionService {
      *
      * @param money сумма для вывода
      */
-    public Money cashing(Money money) {
+    public AccountTransaction cashing(Money money) {
         Account owner = findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         try {
             AccountTransaction parentTx = createCashingCreditTransaction(owner, money);
@@ -90,8 +90,7 @@ public class AccountTransactionService {
             ConcludedWith concludedWith = ConcludedWith.fromTitle(userAgreement.getConcludedWith());
             if (concludedWith == ConcludedWith.NATURAL_PERSON) {
                 Money commission = new Money(money, COMMISSION_RATE);
-                createCommissionCreditTransaction(money, commission, parentTx);
-                return commission;
+                return createCommissionCreditTransaction(money, commission, parentTx);
             }
         } catch (Exception e) {
             log.error("Произошла ошибка: " + e.getLocalizedMessage());
@@ -192,7 +191,7 @@ public class AccountTransactionService {
      * @param money      сумма
      * @param commission сумма комиссии
      */
-    public void createCommissionCreditTransaction(Money money, Money commission, AccountTransaction parentTx) {
+    public AccountTransaction createCommissionCreditTransaction(Money money, Money commission, AccountTransaction parentTx) {
         Account owner = findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         Account payer = findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
         AccountTransaction creditTx = new AccountTransaction(owner);
@@ -203,7 +202,7 @@ public class AccountTransactionService {
         creditTx.setCashType(CashType.CASH_1C_COMMISSION);
         creditTx.setCash(commission.getGivenCash());
         creditTx.setParent(parentTx);
-        accountTransactionRepository.save(creditTx);
+        return accountTransactionRepository.save(creditTx);
     }
 
     /**
