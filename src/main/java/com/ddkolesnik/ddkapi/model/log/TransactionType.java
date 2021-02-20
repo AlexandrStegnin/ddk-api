@@ -12,7 +12,9 @@ public enum TransactionType {
     REINVESTMENT(4, "Реинвестирование"),
     CLOSING(5, "Закрытие"),
     CLOSING_RESALE(6, "Закрытие. Перепродажа доли"),
-    UNDEFINED(0, "Не определено");
+    UNDEFINED(0, "Не определено"),
+    CASHING(7, "Вывод"),
+    CASHING_COMMISSION(8, "Вывод. Комиссия");
 
     private final int id;
 
