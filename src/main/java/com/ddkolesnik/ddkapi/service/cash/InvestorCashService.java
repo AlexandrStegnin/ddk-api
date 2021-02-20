@@ -22,9 +22,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import static com.ddkolesnik.ddkapi.util.Constant.COMMISSION_RATE;
 
 /**
  * Сервис для работы с проводками из 1С
@@ -116,8 +120,14 @@ public class InvestorCashService {
      * @param dto                DTO из 1С
      */
     private void updateCashingTransaction(AccountTransaction accountTransaction, InvestorCashDTO dto) {
+        BigDecimal cash = accountTransaction.getCash();
         transactionLogService.update(accountTransaction);
         prepareAccountTransaction(accountTransaction, dto);
+        Set<AccountTransaction> child = accountTransaction.getChild();
+        child.forEach(c -> {
+            c.setCash(cash.multiply(COMMISSION_RATE));
+            accountTransactionService.update(c);
+        });
         accountTransactionService.update(accountTransaction);
     }
 
