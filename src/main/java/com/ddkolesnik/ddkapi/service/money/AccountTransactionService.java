@@ -181,7 +181,6 @@ public class AccountTransactionService {
         creditTx.setRecipient(owner);
         creditTx.setCashType(cashType);
         creditTx.setCash(givenCash);
-        money.setTransaction(creditTx);
         return accountTransactionRepository.save(creditTx);
     }
 
