@@ -64,7 +64,7 @@ public class InvestorCashService {
     public void update(InvestorCashDTO dto) {
         if (checkCash(dto)) {
             Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
-            if (dto.isDelete()) {
+            if (dto.isDelete() && money != null) {
                 delete(money);
             } else {
                 AccountingCode accountingCode = AccountingCode.fromCode(dto.getAccountingCode());
@@ -97,11 +97,15 @@ public class InvestorCashService {
      * @param dto DTO из 1С
      */
     private void cashing(InvestorCashDTO dto) {
-        AccountTransaction accountTransaction = accountTransactionService.findByTransactionUUID(dto.getTransactionUUID());
-        if (accountTransaction == null) {
-            createCashingTransaction(dto);
+        if (dto.isDelete()) {
+            accountTransactionService.deleteByTransactionUUID(dto.getTransactionUUID());
         } else {
-            updateCashingTransaction(accountTransaction, dto);
+            AccountTransaction accountTransaction = accountTransactionService.findByTransactionUUID(dto.getTransactionUUID());
+            if (accountTransaction == null) {
+                createCashingTransaction(dto);
+            } else {
+                updateCashingTransaction(accountTransaction, dto);
+            }
         }
     }
 
