@@ -269,4 +269,14 @@ public class AccountTransactionService {
         return account;
     }
 
+    /**
+     * Обновить транзакцию по счёту
+     *
+     * @param accountTransaction транзакция для обновления
+     * @return обновлённая транзакция
+     */
+    public AccountTransaction update(AccountTransaction accountTransaction) {
+        return accountTransactionRepository.save(accountTransaction);
+    }
+
 }
