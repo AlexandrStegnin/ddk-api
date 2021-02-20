@@ -181,6 +181,7 @@ public class AccountTransactionService {
         creditTx.setRecipient(owner);
         creditTx.setCashType(cashType);
         creditTx.setCash(givenCash);
+        creditTx.setTransactionUUID(money.getTransactionUUID());
         return accountTransactionRepository.save(creditTx);
     }
 
@@ -229,6 +230,16 @@ public class AccountTransactionService {
 
     public AccountTransaction findByParent(AccountTransaction parentTx) {
         return accountTransactionRepository.findByParentId(parentTx.getId());
+    }
+
+    /**
+     * Найти транзакцию по UUID
+     *
+     * @param uuid UUID транзакции
+     * @return найденная транзакция
+     */
+    public AccountTransaction findByTransactionUUID(String uuid) {
+        return accountTransactionRepository.findByTransactionUUID(uuid);
     }
 
     /**
