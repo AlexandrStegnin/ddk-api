@@ -13,4 +13,6 @@ public interface AccountTransactionRepository extends JpaRepository<AccountTrans
 
     AccountTransaction findByParentId(Long parentTxId);
 
+    AccountTransaction findByTransactionUUID(String uuid);
+
 }
