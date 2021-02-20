@@ -65,14 +65,9 @@ public class AccountTransactionService {
      */
     public void transfer(Money money) {
         Account owner = findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
-        if (owner == null) {
-            String msg = String.format("Не найден счёт инвестора [%s]", money.getInvestor().getLogin());
-            log.error(msg);
-            throw new ApiException(msg, HttpStatus.NOT_FOUND);
-        }
         try {
             AccountTransaction investorDebitTx = createInvestorDebitTransaction(owner, money);
-            AccountTransaction creditTx = createCreditTransaction(owner, money, false, investorDebitTx);
+            AccountTransaction creditTx = createCreditTransaction(owner, money, investorDebitTx);
             createDebitTransaction(creditTx, money);
         } catch (Exception e) {
             log.error("Произошла ошибка: {}", e.getMessage());
@@ -86,13 +81,8 @@ public class AccountTransactionService {
      */
     public Money cashing(Money money) {
         Account owner = findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
-        if (owner == null) {
-            String msg = String.format("Не найден счёт инвестора [%s]", money.getInvestor().getLogin());
-            log.error(msg);
-            throw new ApiException(msg, HttpStatus.NOT_FOUND);
-        }
         try {
-            AccountTransaction parentTx = createCreditTransaction(owner, money, true, null);
+            AccountTransaction parentTx = createCashingCreditTransaction(owner, money);
             UserAgreement userAgreement = userAgreementService.findByInvestorAndFacility(money.getInvestor(), money.getFacility());
             if (userAgreement == null) {
                 throw new ApiException("Не найдена информация \"С кем заключён договор\"", HttpStatus.NOT_FOUND);
@@ -137,11 +127,6 @@ public class AccountTransactionService {
      */
     private void createDebitTransaction(AccountTransaction creditTx, Money money) {
         Account recipient = findByOwnerId(money.getUnderFacility().getId(), OwnerType.UNDER_FACILITY);
-        if (recipient == null) {
-            String msg = String.format("Не найден счёт получателя [%s]", money.getUnderFacility().getName());
-            log.error(msg);
-            throw new ApiException(msg, HttpStatus.NOT_FOUND);
-        }
         AccountTransaction debitTx = new AccountTransaction(recipient);
         debitTx.setOperationType(OperationType.DEBIT);
         debitTx.setPayer(creditTx.getOwner());
@@ -157,43 +142,47 @@ public class AccountTransactionService {
     /**
      * Создать расходную транзакцию по счёту
      *
-     * @param owner   владелец
-     * @param money   сумма
-     * @param cashing признак вывода суммы
+     * @param owner    владелец
+     * @param money    сумма
      * @param parentTx родительская транзакция
      */
-    private AccountTransaction createCreditTransaction(Account owner, Money money, boolean cashing, AccountTransaction parentTx) {
-        BigDecimal givenCash = money.getGivenCash();
-        CashType cashType = CashType.CASH_1C_CASHING;
-        Account recipient = owner;
-        Account payer = findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
-        if (payer == null) {
-            String msg = "Не найден счёт пользователя ДДК";
-            log.error(msg);
-            throw new ApiException(msg, HttpStatus.NOT_FOUND);
-        }
-        if (!cashing) {
-            givenCash = givenCash.negate();
-            cashType = CashType.CASH_1C;
-            recipient = accountService.findByOwnerId(money.getFacility().getId(), OwnerType.FACILITY);
-            if (recipient == null) {
-                String msg = String.format("Не найден счёт объекта [%s]", money.getFacility().getFullName());
-                log.error(msg);
-                throw new ApiException(msg, HttpStatus.NOT_FOUND);
-            }
-            payer = owner;
-        }
+    private AccountTransaction createCreditTransaction(Account owner, Money money, AccountTransaction parentTx) {
+        BigDecimal givenCash = money.getGivenCash().negate();
+        CashType cashType = CashType.CASH_1C;
+        Account recipient = findByOwnerId(money.getFacility().getId(), OwnerType.FACILITY);
         AccountTransaction creditTx = new AccountTransaction(owner);
         creditTx.setParent(parentTx);
         creditTx.setTxDate(convertDate(money.getDateGiven()));
         creditTx.setOperationType(OperationType.CREDIT);
-        creditTx.setPayer(payer);
+        creditTx.setPayer(owner);
         creditTx.setRecipient(recipient);
         creditTx.getMonies().add(money);
         creditTx.setCashType(cashType);
         creditTx.setCash(givenCash);
         money.setTransaction(creditTx);
         moneyRepository.save(money);
+        return accountTransactionRepository.save(creditTx);
+    }
+
+    /**
+     * Создать расходную операцию при выводе средств
+     *
+     * @param owner    владелец счёта
+     * @param money    сумма к выводу
+     * @return созданная транзакция
+     */
+    private AccountTransaction createCashingCreditTransaction(Account owner, Money money) {
+        BigDecimal givenCash = money.getGivenCash();
+        CashType cashType = CashType.CASH_1C_CASHING;
+        Account payer = findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
+        AccountTransaction creditTx = new AccountTransaction(owner);
+        creditTx.setTxDate(convertDate(money.getDateGiven()));
+        creditTx.setOperationType(OperationType.CREDIT);
+        creditTx.setPayer(payer);
+        creditTx.setRecipient(owner);
+        creditTx.setCashType(cashType);
+        creditTx.setCash(givenCash);
+        money.setTransaction(creditTx);
         return accountTransactionRepository.save(creditTx);
     }
 
@@ -205,38 +194,22 @@ public class AccountTransactionService {
      */
     public void createCommissionCreditTransaction(Money money, Money commission, AccountTransaction parentTx) {
         Account owner = findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
-        if (owner == null) {
-            String msg = String.format("Не найден счёт инвестора [%s]", money.getInvestor().getLogin());
-            log.error(msg);
-            throw new ApiException(msg, HttpStatus.NOT_FOUND);
-        }
         Account payer = findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
-        if (payer == null) {
-            String msg = "Не найден счёт пользователя ДДК";
-            log.error(msg);
-            throw new ApiException(msg, HttpStatus.NOT_FOUND);
-        }
         AccountTransaction creditTx = new AccountTransaction(owner);
         creditTx.setTxDate(convertDate(money.getDateGiven()));
         creditTx.setOperationType(OperationType.CREDIT);
         creditTx.setPayer(payer);
         creditTx.setRecipient(owner);
-        creditTx.getMonies().add(money);
-        creditTx.getMonies().add(commission);
         creditTx.setCashType(CashType.CASH_1C_COMMISSION);
         creditTx.setCash(commission.getGivenCash());
         creditTx.setParent(parentTx);
-        commission.setTransaction(creditTx);
-        commission.setTypeClosingId(10L);
-        commission.setDateClosing(money.getDateClosing());
-        moneyRepository.save(commission);
         accountTransactionRepository.save(creditTx);
     }
 
     /**
      * Обновить сумму транзакции
      *
-     * @param money сумма для обновления
+     * @param money   сумма для обновления
      * @param cashing признак вывода денег
      */
     public void updateTransaction(Money money, boolean cashing) {
@@ -273,12 +246,18 @@ public class AccountTransactionService {
     /**
      * Найти счёт по id и типу владельца
      *
-     * @param ownerId id владельца
+     * @param ownerId   id владельца
      * @param ownerType тип владельца
      * @return найденный счёт
      */
     private Account findByOwnerId(Long ownerId, OwnerType ownerType) {
-        return accountService.findByOwnerId(ownerId, ownerType);
+        Account account = accountService.findByOwnerId(ownerId, ownerType);
+        if (account == null) {
+            String msg = String.format("Не найден счёт [%s %d]", ownerType.getTitle(), ownerId);
+            log.error(msg);
+            throw new ApiException(msg, HttpStatus.NOT_FOUND);
+        }
+        return account;
     }
 
 }
