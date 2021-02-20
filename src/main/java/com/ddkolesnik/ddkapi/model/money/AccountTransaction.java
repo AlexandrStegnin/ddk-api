@@ -90,6 +90,9 @@ public class AccountTransaction {
     @Column(name = "cash")
     private BigDecimal cash;
 
+    @Column(name = "transaction_uuid")
+    private String transactionUUID;
+
     public AccountTransaction(Account owner) {
         this.owner = owner;
     }
