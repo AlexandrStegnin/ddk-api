@@ -2,6 +2,7 @@ package com.ddkolesnik.ddkapi.service.log;
 
 import com.ddkolesnik.ddkapi.model.log.TransactionLog;
 import com.ddkolesnik.ddkapi.model.log.TransactionType;
+import com.ddkolesnik.ddkapi.model.money.AccountTransaction;
 import com.ddkolesnik.ddkapi.model.money.Money;
 import com.ddkolesnik.ddkapi.repository.log.TransactionLogRepository;
 import lombok.AccessLevel;
@@ -124,4 +125,18 @@ public class TransactionLogService {
     public void delete(List<TransactionLog> logs) {
         transactionLogRepository.deleteAll(logs);
     }
+
+    /**
+     * Создать запись в логе по операции вывода денег инвестора по данным из 1С
+     *
+     * @param accountTransaction транзакция по счету
+     */
+    public void cashing(AccountTransaction accountTransaction) {
+        TransactionLog log = new TransactionLog();
+        log.addAccountTransaction(accountTransaction);
+        log.setType(TransactionType.CASHING);
+        log.setRollbackEnabled(true);
+        create(log);
+    }
+
 }
