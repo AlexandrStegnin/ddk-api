@@ -102,7 +102,10 @@ public class InvestorCashService {
      */
     private void cashing(InvestorCashDTO dto) {
         if (dto.isDelete()) {
-            accountTransactionService.deleteByTransactionUUID(dto.getTransactionUUID());
+            AccountTransaction parent = accountTransactionService.findByTransactionUUID(dto.getTransactionUUID());
+            Set<AccountTransaction> child = parent.getChild();
+            child.forEach(accountTransactionService::delete);
+            accountTransactionService.delete(parent);
         } else {
             AccountTransaction accountTransaction = accountTransactionService.findByTransactionUUID(dto.getTransactionUUID());
             if (accountTransaction == null) {

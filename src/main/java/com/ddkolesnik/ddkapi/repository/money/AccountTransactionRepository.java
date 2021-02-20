@@ -15,6 +15,4 @@ public interface AccountTransactionRepository extends JpaRepository<AccountTrans
 
     AccountTransaction findByTransactionUUID(String uuid);
 
-    void deleteByTransactionUUID(String uuid);
-
 }
