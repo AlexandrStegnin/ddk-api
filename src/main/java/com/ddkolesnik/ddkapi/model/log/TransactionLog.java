@@ -7,6 +7,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import static com.ddkolesnik.ddkapi.util.Constant.CREATOR_1C;
@@ -43,7 +44,7 @@ public class TransactionLog {
     @JoinTable(name = "tx_log_acc_tx",
             joinColumns = {@JoinColumn(name = "tx_id", referencedColumnName = "id")},
             inverseJoinColumns = @JoinColumn(name = "acc_tx_id", referencedColumnName = "id"))
-    private Set<AccountTransaction> accountTransactions;
+    private Set<AccountTransaction> accountTransactions = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type")
@@ -61,6 +62,10 @@ public class TransactionLog {
     public void prePersist() {
         this.txDate = new Date();
         this.createdBy = CREATOR_1C;
+    }
+
+    public void addAccountTransaction(AccountTransaction accountTransaction) {
+        this.accountTransactions.add(accountTransaction);
     }
 
 }
