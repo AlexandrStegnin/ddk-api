@@ -262,4 +262,13 @@ public class AccountTransactionService {
         return accountTransactionRepository.save(accountTransaction);
     }
 
+    /**
+     * Удалить транзакцию
+     *
+     * @param uuid UUID транзакции из 1С
+     */
+    public void deleteByTransactionUUID(String uuid) {
+        accountTransactionRepository.deleteByTransactionUUID(uuid);
+    }
+
 }
