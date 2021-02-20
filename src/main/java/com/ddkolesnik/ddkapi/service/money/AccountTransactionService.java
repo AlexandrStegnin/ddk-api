@@ -166,8 +166,8 @@ public class AccountTransactionService {
     /**
      * Создать расходную операцию при выводе средств
      *
-     * @param owner    владелец счёта
-     * @param money    сумма к выводу
+     * @param owner владелец счёта
+     * @param money сумма к выводу
      * @return созданная транзакция
      */
     private AccountTransaction createCashingCreditTransaction(Account owner, Money money) {
@@ -208,10 +208,9 @@ public class AccountTransactionService {
     /**
      * Обновить сумму транзакции
      *
-     * @param money   сумма для обновления
-     * @param cashing признак вывода денег
+     * @param money сумма для обновления
      */
-    public void updateTransaction(Money money, boolean cashing) {
+    public void updateTransaction(Money money) {
         AccountTransaction transaction = money.getTransaction();
         if (transaction != null) {
             switch (transaction.getOperationType()) {
@@ -219,11 +218,7 @@ public class AccountTransactionService {
                     transaction.setCash(money.getGivenCash());
                     break;
                 case CREDIT:
-                    if (cashing) {
-                        transaction.setCash(money.getGivenCash());
-                    } else {
-                        transaction.setCash(money.getGivenCash().negate());
-                    }
+                    transaction.setCash(money.getGivenCash().negate());
             }
         }
     }

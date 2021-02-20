@@ -13,6 +13,7 @@ import com.ddkolesnik.ddkapi.service.money.InvestorService;
 import com.ddkolesnik.ddkapi.service.money.UnderFacilityService;
 import com.ddkolesnik.ddkapi.util.AccountingCode;
 import com.ddkolesnik.ddkapi.util.Constant;
+import com.ddkolesnik.ddkapi.util.DateUtils;
 import com.ddkolesnik.ddkapi.util.ShareType;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.*;
-
-import static com.ddkolesnik.ddkapi.util.Constant.COMMISSION_RATE;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Сервис для работы с проводками из 1С
@@ -70,7 +69,7 @@ public class InvestorCashService {
             } else {
                 AccountingCode accountingCode = AccountingCode.fromCode(dto.getAccountingCode());
                 if (accountingCode != null) {
-                    cashing(money, dto);
+                    cashing(dto);
                 } else {
                     if (money == null) {
                         money = moneyRepository.findMoney(dto.getDateGiven(), dto.getGivenCash(), dto.getFacility(),
@@ -81,11 +80,11 @@ public class InvestorCashService {
                             transactionLogService.create(money);
                         } else {
                             transactionLogService.update(money);
-                            update(money, dto, false);
+                            update(money, dto);
                         }
                     } else {
                         transactionLogService.update(money);
-                        update(money, dto, false);
+                        update(money, dto);
                     }
                 }
             }
@@ -95,57 +94,27 @@ public class InvestorCashService {
     /**
      * Вывести деньги по данным из 1С
      *
-     * @param money сумма
      * @param dto DTO из 1С
      */
-    private void cashing(Money money, InvestorCashDTO dto) {
-        if (money == null) {
+    private void cashing(InvestorCashDTO dto) {
+        AccountTransaction accountTransaction = accountTransactionService.findByTransactionUUID(dto.getTransactionUUID());
+        if (accountTransaction == null) {
             createCashingTransaction(dto);
         } else {
-            updateCashingTransaction(money, dto);
+            updateCashingTransaction(accountTransaction, dto);
         }
     }
 
     /**
      * Обновить транзакцию по выводу средств
      *
-     * @param money сумма
-     * @param dto DTO из 1С
+     * @param accountTransaction транзакция по счёту
+     * @param dto                DTO из 1С
      */
-    private void updateCashingTransaction(Money money, InvestorCashDTO dto) {
-        BigDecimal commissionSum = money.getGivenCash().multiply(BigDecimal.valueOf(COMMISSION_RATE));
-        transactionLogService.update(money);
-        update(money, dto, true);
-        AccountTransaction transaction = money.getTransaction();
-        Money commission = null;
-        if (transaction != null) {
-            AccountTransaction child = accountTransactionService.findByParent(transaction);
-            if (child != null) {
-                commission = moneyRepository.findByTransactionId(child.getId());
-            }
-        }
-        if (commission == null) {
-            commission = getCommission(dto, commissionSum);
-        }
-        if (commission != null) {
-            dto.setGivenCash(dto.getGivenCash().multiply(BigDecimal.valueOf(COMMISSION_RATE)));
-            dto.setTransactionUUID(commission.getTransactionUUID());
-            transactionLogService.update(commission);
-            update(commission, dto, true);
-        }
-    }
-
-    /**
-     * Найти сумму комиссии
-     *
-     * @param dto dto суммы из 1С
-     * @param commissionSum сумма комиссии
-     * @return найденная сумма
-     */
-    private Money getCommission(InvestorCashDTO dto, BigDecimal commissionSum) {
-        return moneyRepository.findMoney(dto.getDateGiven(),
-                commissionSum, dto.getFacility(),
-                dto.getCashSource(), Constant.INVESTOR_PREFIX.concat(dto.getInvestorCode()));
+    private void updateCashingTransaction(AccountTransaction accountTransaction, InvestorCashDTO dto) {
+        transactionLogService.update(accountTransaction);
+        prepareAccountTransaction(accountTransaction, dto);
+        accountTransactionService.update(accountTransaction);
     }
 
     /**
@@ -193,9 +162,9 @@ public class InvestorCashService {
      * @param money - существующая проводка
      * @param dto   - DTO объект из 1С
      */
-    private void update(Money money, InvestorCashDTO dto, boolean cashing) {
+    private void update(Money money, InvestorCashDTO dto) {
         prepareMoney(money, dto);
-        updateTransaction(money, cashing);
+        updateTransaction(money);
         moneyRepository.save(money);
     }
 
@@ -238,6 +207,17 @@ public class InvestorCashService {
         money.setGivenCash(dto.getGivenCash());
         money.setDateGiven(dto.getDateGiven());
         money.setTransactionUUID(dto.getTransactionUUID());
+    }
+
+    /**
+     * Поготовить к обновлению транзакцию
+     *
+     * @param accountTransaction существующая транзакция по счёту
+     * @param dto                DTO объект из 1С
+     */
+    private void prepareAccountTransaction(AccountTransaction accountTransaction, InvestorCashDTO dto) {
+        accountTransaction.setCash(dto.getGivenCash());
+        accountTransaction.setTxDate(DateUtils.convert(dto.getDateGiven()));
     }
 
     /**
@@ -349,8 +329,8 @@ public class InvestorCashService {
      *
      * @param money сумма для обновления
      */
-    private void updateTransaction(Money money, boolean cashing) {
-        accountTransactionService.updateTransaction(money, cashing);
+    private void updateTransaction(Money money) {
+        accountTransactionService.updateTransaction(money);
     }
 
 }
