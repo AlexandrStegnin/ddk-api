@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
@@ -63,7 +64,7 @@ public class AccountTransactionService {
      * @param money сумма для трансфера суммы
      */
     public void transfer(Money money) {
-        Account owner = accountService.findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
+        Account owner = findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         if (owner == null) {
             String msg = String.format("Не найден счёт инвестора [%s]", money.getInvestor().getLogin());
             log.error(msg);
@@ -84,9 +85,9 @@ public class AccountTransactionService {
      * @param money сумма для вывода
      */
     public Money cashing(Money money) {
-        Account owner = accountService.findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
-        String msg = String.format("Не найден счёт инвестора [%s]", money.getInvestor().getLogin());
+        Account owner = findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         if (owner == null) {
+            String msg = String.format("Не найден счёт инвестора [%s]", money.getInvestor().getLogin());
             log.error(msg);
             throw new ApiException(msg, HttpStatus.NOT_FOUND);
         }
@@ -124,7 +125,7 @@ public class AccountTransactionService {
         debitTx.getMonies().add(money);
         debitTx.setCashType(CashType.CASH_1C);
         debitTx.setCash(money.getGivenCash());
-        debitTx.setTxDate(Date.from(money.getDateGiven().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        debitTx.setTxDate(convertDate(money.getDateGiven()));
         return accountTransactionRepository.save(debitTx);
     }
 
@@ -135,7 +136,7 @@ public class AccountTransactionService {
      * @param money    сумма
      */
     private void createDebitTransaction(AccountTransaction creditTx, Money money) {
-        Account recipient = accountService.findByOwnerId(money.getUnderFacility().getId(), OwnerType.UNDER_FACILITY);
+        Account recipient = findByOwnerId(money.getUnderFacility().getId(), OwnerType.UNDER_FACILITY);
         if (recipient == null) {
             String msg = String.format("Не найден счёт получателя [%s]", money.getUnderFacility().getName());
             log.error(msg);
@@ -148,7 +149,7 @@ public class AccountTransactionService {
         debitTx.getMonies().add(money);
         debitTx.setCashType(CashType.CASH_1C);
         debitTx.setCash(money.getGivenCash());
-        debitTx.setTxDate(Date.from(money.getDateGiven().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        debitTx.setTxDate(convertDate(money.getDateGiven()));
         debitTx.setParent(creditTx);
         accountTransactionRepository.save(debitTx);
     }
@@ -165,7 +166,7 @@ public class AccountTransactionService {
         BigDecimal givenCash = money.getGivenCash();
         CashType cashType = CashType.CASH_1C_CASHING;
         Account recipient = owner;
-        Account payer = accountService.findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
+        Account payer = findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
         if (payer == null) {
             String msg = "Не найден счёт пользователя ДДК";
             log.error(msg);
@@ -184,7 +185,7 @@ public class AccountTransactionService {
         }
         AccountTransaction creditTx = new AccountTransaction(owner);
         creditTx.setParent(parentTx);
-        creditTx.setTxDate(Date.from(money.getDateGiven().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        creditTx.setTxDate(convertDate(money.getDateGiven()));
         creditTx.setOperationType(OperationType.CREDIT);
         creditTx.setPayer(payer);
         creditTx.setRecipient(recipient);
@@ -203,20 +204,20 @@ public class AccountTransactionService {
      * @param commission сумма комиссии
      */
     public void createCommissionCreditTransaction(Money money, Money commission, AccountTransaction parentTx) {
-        Account owner = accountService.findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
+        Account owner = findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         if (owner == null) {
             String msg = String.format("Не найден счёт инвестора [%s]", money.getInvestor().getLogin());
             log.error(msg);
             throw new ApiException(msg, HttpStatus.NOT_FOUND);
         }
-        Account payer = accountService.findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
+        Account payer = findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
         if (payer == null) {
             String msg = "Не найден счёт пользователя ДДК";
             log.error(msg);
             throw new ApiException(msg, HttpStatus.NOT_FOUND);
         }
         AccountTransaction creditTx = new AccountTransaction(owner);
-        creditTx.setTxDate(Date.from(money.getDateGiven().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        creditTx.setTxDate(convertDate(money.getDateGiven()));
         creditTx.setOperationType(OperationType.CREDIT);
         creditTx.setPayer(payer);
         creditTx.setRecipient(owner);
@@ -257,6 +258,27 @@ public class AccountTransactionService {
 
     public AccountTransaction findByParent(AccountTransaction parentTx) {
         return accountTransactionRepository.findByParentId(parentTx.getId());
+    }
+
+    /**
+     * Конвертировать LocalDate в java.util.Date
+     *
+     * @param date дата
+     * @return конвертированная дата
+     */
+    private Date convertDate(LocalDate date) {
+        return Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
+     * Найти счёт по id и типу владельца
+     *
+     * @param ownerId id владельца
+     * @param ownerType тип владельца
+     * @return найденный счёт
+     */
+    private Account findByOwnerId(Long ownerId, OwnerType ownerType) {
+        return accountService.findByOwnerId(ownerId, ownerType);
     }
 
 }
