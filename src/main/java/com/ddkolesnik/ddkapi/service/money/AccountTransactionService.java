@@ -11,6 +11,7 @@ import com.ddkolesnik.ddkapi.repository.money.MoneyRepository;
 import com.ddkolesnik.ddkapi.service.app.AccountService;
 import com.ddkolesnik.ddkapi.service.cash.UserAgreementService;
 import com.ddkolesnik.ddkapi.util.ConcludedWith;
+import com.ddkolesnik.ddkapi.util.DateUtils;
 import com.ddkolesnik.ddkapi.util.OperationType;
 import com.ddkolesnik.ddkapi.util.OwnerType;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 
 import static com.ddkolesnik.ddkapi.util.Constant.COMMISSION_RATE;
 import static com.ddkolesnik.ddkapi.util.Constant.DDK_USER_ID;
@@ -114,7 +112,7 @@ public class AccountTransactionService {
         debitTx.getMonies().add(money);
         debitTx.setCashType(CashType.CASH_1C);
         debitTx.setCash(money.getGivenCash());
-        debitTx.setTxDate(convertDate(money.getDateGiven()));
+        debitTx.setTxDate(DateUtils.convert(money.getDateGiven()));
         return accountTransactionRepository.save(debitTx);
     }
 
@@ -133,7 +131,7 @@ public class AccountTransactionService {
         debitTx.getMonies().add(money);
         debitTx.setCashType(CashType.CASH_1C);
         debitTx.setCash(money.getGivenCash());
-        debitTx.setTxDate(convertDate(money.getDateGiven()));
+        debitTx.setTxDate(DateUtils.convert(money.getDateGiven()));
         debitTx.setParent(creditTx);
         accountTransactionRepository.save(debitTx);
     }
@@ -151,7 +149,7 @@ public class AccountTransactionService {
         Account recipient = findByOwnerId(money.getFacility().getId(), OwnerType.FACILITY);
         AccountTransaction creditTx = new AccountTransaction(owner);
         creditTx.setParent(parentTx);
-        creditTx.setTxDate(convertDate(money.getDateGiven()));
+        creditTx.setTxDate(DateUtils.convert(money.getDateGiven()));
         creditTx.setOperationType(OperationType.CREDIT);
         creditTx.setPayer(owner);
         creditTx.setRecipient(recipient);
@@ -175,7 +173,7 @@ public class AccountTransactionService {
         CashType cashType = CashType.CASH_1C_CASHING;
         Account payer = findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
         AccountTransaction creditTx = new AccountTransaction(owner);
-        creditTx.setTxDate(convertDate(money.getDateGiven()));
+        creditTx.setTxDate(DateUtils.convert(money.getDateGiven()));
         creditTx.setOperationType(OperationType.CREDIT);
         creditTx.setPayer(payer);
         creditTx.setRecipient(owner);
@@ -195,7 +193,7 @@ public class AccountTransactionService {
         Account owner = findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         Account payer = findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
         AccountTransaction creditTx = new AccountTransaction(owner);
-        creditTx.setTxDate(convertDate(money.getDateGiven()));
+        creditTx.setTxDate(DateUtils.convert(money.getDateGiven()));
         creditTx.setOperationType(OperationType.CREDIT);
         creditTx.setPayer(payer);
         creditTx.setRecipient(owner);
@@ -235,16 +233,6 @@ public class AccountTransactionService {
      */
     public AccountTransaction findByTransactionUUID(String uuid) {
         return accountTransactionRepository.findByTransactionUUID(uuid);
-    }
-
-    /**
-     * Конвертировать LocalDate в java.util.Date
-     *
-     * @param date дата
-     * @return конвертированная дата
-     */
-    private Date convertDate(LocalDate date) {
-        return Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     /**
