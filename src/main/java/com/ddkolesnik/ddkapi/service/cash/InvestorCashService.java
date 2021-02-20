@@ -156,7 +156,6 @@ public class InvestorCashService {
     private void createCashingTransaction(InvestorCashDTO dto) {
         Money money = convert(dto);
         money.setDateClosing(dto.getDateGiven());
-        money.setTypeClosingId(8L);
         AccountTransaction accountTransaction = accountTransactionService.cashing(money);
         if (accountTransaction != null) {
             transactionLogService.cashing(accountTransaction);
