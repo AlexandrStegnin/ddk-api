@@ -28,7 +28,10 @@ public enum Kin {
         return null;
     }
 
-    public static Kin fromId(int id) {
+    public static Kin fromId(Integer id) {
+        if (id == null) {
+            return null;
+        }
         for (Kin kin : values()) {
             if (kin.getId() == id) {
                 return kin;
