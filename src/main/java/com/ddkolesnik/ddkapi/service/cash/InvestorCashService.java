@@ -1,9 +1,13 @@
 package com.ddkolesnik.ddkapi.service.cash;
 
 import com.ddkolesnik.ddkapi.dto.cash.InvestorCashDTO;
+import com.ddkolesnik.ddkapi.model.app.Account;
+import com.ddkolesnik.ddkapi.model.app.AppUser;
 import com.ddkolesnik.ddkapi.model.cash.CashSource;
 import com.ddkolesnik.ddkapi.model.log.TransactionLog;
 import com.ddkolesnik.ddkapi.model.money.*;
+import com.ddkolesnik.ddkapi.repository.app.AccountRepository;
+import com.ddkolesnik.ddkapi.repository.app.AppUserRepository;
 import com.ddkolesnik.ddkapi.repository.money.MoneyRepository;
 import com.ddkolesnik.ddkapi.service.SendMessageService;
 import com.ddkolesnik.ddkapi.service.log.TransactionLogService;
@@ -11,10 +15,7 @@ import com.ddkolesnik.ddkapi.service.money.AccountTransactionService;
 import com.ddkolesnik.ddkapi.service.money.FacilityService;
 import com.ddkolesnik.ddkapi.service.money.InvestorService;
 import com.ddkolesnik.ddkapi.service.money.UnderFacilityService;
-import com.ddkolesnik.ddkapi.util.AccountingCode;
-import com.ddkolesnik.ddkapi.util.Constant;
-import com.ddkolesnik.ddkapi.util.DateUtils;
-import com.ddkolesnik.ddkapi.util.ShareType;
+import com.ddkolesnik.ddkapi.util.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.ddkolesnik.ddkapi.util.Constant.COMMISSION_RATE;
+import static com.ddkolesnik.ddkapi.util.Constant.INVESTOR_PREFIX;
 
 /**
  * Сервис для работы с проводками из 1С
@@ -59,6 +61,10 @@ public class InvestorCashService {
     UnderFacilityService underFacilityService;
 
     AccountTransactionService accountTransactionService;
+
+    AppUserRepository appUserRepository;
+
+    AccountRepository accountRepository;
 
     /**
      * Создать или обновить проводку, пришедшую из 1С
@@ -240,6 +246,11 @@ public class InvestorCashService {
         accountTransaction.setTxDate(DateUtils.convert(dto.getDateGiven()));
         AccountingCode accountingCode = AccountingCode.fromCode(dto.getAccountingCode());
         accountTransaction.setAccountingCode(accountingCode.getCode());
+        if (!accountTransaction.getOwner().getOwnerName().equalsIgnoreCase(INVESTOR_PREFIX.concat(dto.getInvestorCode()))) {
+            AppUser investor = appUserRepository.findByLogin(INVESTOR_PREFIX.concat(dto.getInvestorCode()));
+            Account account = accountRepository.findByOwnerIdAndOwnerType(investor.getId(), OwnerType.INVESTOR);
+            accountTransaction.setOwner(account);
+        }
     }
 
     /**
