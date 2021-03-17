@@ -1,11 +1,13 @@
 package com.ddkolesnik.ddkapi.service.app;
 
 import com.ddkolesnik.ddkapi.dto.app.AppUserDTO;
+import com.ddkolesnik.ddkapi.model.app.Account;
 import com.ddkolesnik.ddkapi.model.app.AppUser;
 import com.ddkolesnik.ddkapi.model.security.Role;
 import com.ddkolesnik.ddkapi.repository.app.AppUserRepository;
 import com.ddkolesnik.ddkapi.service.security.RoleService;
 import com.ddkolesnik.ddkapi.util.Kin;
+import com.ddkolesnik.ddkapi.util.OwnerType;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +58,10 @@ public class AppUserService {
      */
     private void update(AppUser user) {
         appUserRepository.save(user);
+        Account account = accountService.findByOwnerId(user.getId(), OwnerType.INVESTOR);
+        if (account == null) {
+            accountService.createAccount(user);
+        }
     }
 
     /**
