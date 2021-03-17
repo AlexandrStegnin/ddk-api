@@ -126,9 +126,11 @@ public class InvestorCashService {
         BigDecimal cash = accountTransaction.getCash();
         transactionLogService.update(accountTransaction);
         prepareAccountTransaction(accountTransaction, dto);
+        AccountingCode accountingCode = AccountingCode.fromCode(dto.getAccountingCode());
         Set<AccountTransaction> child = accountTransaction.getChild();
         child.forEach(c -> {
             c.setCash(cash.multiply(COMMISSION_RATE));
+            c.setAccountingCode(accountingCode.getCode());
             accountTransactionService.update(c);
         });
         accountTransactionService.update(accountTransaction);
@@ -142,7 +144,8 @@ public class InvestorCashService {
     private void createCashingTransaction(InvestorCashDTO dto) {
         Money money = convert(dto);
         money.setDateClosing(dto.getDateGiven());
-        AccountTransaction accountTransaction = accountTransactionService.cashing(money);
+        AccountingCode accountingCode = AccountingCode.fromCode(dto.getAccountingCode());
+        AccountTransaction accountTransaction = accountTransactionService.cashing(money, accountingCode);
         if (accountTransaction != null) {
             transactionLogService.cashing(accountTransaction);
         }
@@ -235,6 +238,8 @@ public class InvestorCashService {
     private void prepareAccountTransaction(AccountTransaction accountTransaction, InvestorCashDTO dto) {
         accountTransaction.setCash(dto.getGivenCash());
         accountTransaction.setTxDate(DateUtils.convert(dto.getDateGiven()));
+        AccountingCode accountingCode = AccountingCode.fromCode(dto.getAccountingCode());
+        accountTransaction.setAccountingCode(accountingCode.getCode());
     }
 
     /**

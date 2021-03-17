@@ -93,6 +93,9 @@ public class AccountTransaction {
     @Column(name = "transaction_uuid")
     private String transactionUUID;
 
+    @Column(name = "accounting_code")
+    private String accountingCode;
+
     public AccountTransaction(Account owner) {
         this.owner = owner;
     }

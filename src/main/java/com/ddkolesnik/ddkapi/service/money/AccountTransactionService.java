@@ -10,10 +10,7 @@ import com.ddkolesnik.ddkapi.repository.money.AccountTransactionRepository;
 import com.ddkolesnik.ddkapi.repository.money.MoneyRepository;
 import com.ddkolesnik.ddkapi.service.app.AccountService;
 import com.ddkolesnik.ddkapi.service.cash.UserAgreementService;
-import com.ddkolesnik.ddkapi.util.ConcludedWith;
-import com.ddkolesnik.ddkapi.util.DateUtils;
-import com.ddkolesnik.ddkapi.util.OperationType;
-import com.ddkolesnik.ddkapi.util.OwnerType;
+import com.ddkolesnik.ddkapi.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -76,11 +73,12 @@ public class AccountTransactionService {
      * Вывести деньги со счёта по данным из 1С
      *
      * @param money сумма для вывода
+     * @param accountingCode статья проводки
      */
-    public AccountTransaction cashing(Money money) {
+    public AccountTransaction cashing(Money money, AccountingCode accountingCode) {
         Account owner = findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         try {
-            AccountTransaction parentTx = createCashingCreditTransaction(owner, money);
+            AccountTransaction parentTx = createCashingCreditTransaction(owner, money, accountingCode);
             UserAgreement userAgreement = userAgreementService.findByInvestorAndFacility(money.getInvestor(), money.getFacility());
             if (userAgreement == null) {
                 throw new ApiException("Не найдена информация \"С кем заключён договор\"", HttpStatus.NOT_FOUND);
@@ -90,11 +88,11 @@ public class AccountTransactionService {
                 Money commission = new Money(money, COMMISSION_RATE);
                 return createCommissionCreditTransaction(money, commission, parentTx);
             }
+            return parentTx;
         } catch (Exception e) {
             log.error("Произошла ошибка: " + e.getLocalizedMessage());
             return null;
         }
-        return null;
     }
 
     /**
@@ -166,9 +164,10 @@ public class AccountTransactionService {
      *
      * @param owner владелец счёта
      * @param money сумма к выводу
+     * @param accountingCode статья проводки
      * @return созданная транзакция
      */
-    private AccountTransaction createCashingCreditTransaction(Account owner, Money money) {
+    private AccountTransaction createCashingCreditTransaction(Account owner, Money money, AccountingCode accountingCode) {
         BigDecimal givenCash = money.getGivenCash();
         CashType cashType = CashType.CASH_1C_CASHING;
         Account payer = findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
@@ -180,6 +179,7 @@ public class AccountTransactionService {
         creditTx.setCashType(cashType);
         creditTx.setCash(givenCash);
         creditTx.setTransactionUUID(money.getTransactionUUID());
+        creditTx.setAccountingCode(accountingCode.getCode());
         return accountTransactionRepository.save(creditTx);
     }
 
