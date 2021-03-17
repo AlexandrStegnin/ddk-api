@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.ddkolesnik.ddkapi.util.Constant.INVESTOR_PREFIX;
+
 /**
  * Сервис для управления пользователями
  *
@@ -33,8 +35,6 @@ import java.util.stream.Collectors;
 public class AppUserService {
 
     private static final String ROLE_INVESTOR = "ROLE_INVESTOR";
-
-    private static final String INVESTOR_PREFIX = "investor";
 
     BCryptPasswordEncoder encoder;
 
