@@ -123,6 +123,13 @@ public class AccountService {
         return accountNumber;
     }
 
+    /**
+     * Найти счёт по типу и id владельца. При неудачной попытке попытаться создать счёт
+     *
+     * @param ownerId id владельца
+     * @param ownerType тип владельца
+     * @return найденный/созданный счёт
+     */
     public Account findByOwnerId(Long ownerId, OwnerType ownerType) {
         return accountRepository.findByOwnerIdAndOwnerType(ownerId, ownerType);
     }
