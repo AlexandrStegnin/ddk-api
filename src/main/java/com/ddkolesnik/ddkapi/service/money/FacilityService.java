@@ -2,9 +2,11 @@ package com.ddkolesnik.ddkapi.service.money;
 
 import com.ddkolesnik.ddkapi.configuration.exception.ApiException;
 import com.ddkolesnik.ddkapi.dto.money.FacilityDTO;
+import com.ddkolesnik.ddkapi.model.app.Account;
 import com.ddkolesnik.ddkapi.model.money.Facility;
 import com.ddkolesnik.ddkapi.repository.money.FacilityRepository;
 import com.ddkolesnik.ddkapi.service.app.AccountService;
+import com.ddkolesnik.ddkapi.util.OwnerType;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -67,6 +69,10 @@ public class FacilityService {
         facility.setName(dto.getName());
         facility.setFullName(dto.getName());
         facilityRepository.save(facility);
+        Account account = accountService.findByOwnerId(facility.getId(), OwnerType.FACILITY);
+        if (account == null) {
+            accountService.createAccount(facility);
+        }
     }
 
     /**
