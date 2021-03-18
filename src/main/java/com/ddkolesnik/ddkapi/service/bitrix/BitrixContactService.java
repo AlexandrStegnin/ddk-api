@@ -91,6 +91,7 @@ public class BitrixContactService {
         contacts.forEach(contact -> users.stream()
                 .filter(user -> Objects.nonNull(user.getPartnerCode()) &&
                         user.getPartnerCode().endsWith(contact.getCode()))
+                .filter(user -> Objects.nonNull(user.getEmail()))
                 .forEach(user -> {
                     if (contact.getEmails().size() == 1) {
                         contact.getEmails().stream().findFirst().ifPresent(email -> {

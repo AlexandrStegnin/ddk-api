@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -35,6 +36,6 @@ public class BitrixContactDTO {
 
     @ArraySchema(schema = @Schema(implementation = BitrixEmailDTO.class,
             name = "emails", description = "Адреса электронной почты инвестора"))
-    Set<BitrixEmailDTO> emails;
+    Set<BitrixEmailDTO> emails = new HashSet<>();
 
 }
