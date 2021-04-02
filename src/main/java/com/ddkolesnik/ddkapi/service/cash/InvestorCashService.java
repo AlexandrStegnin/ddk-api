@@ -129,7 +129,7 @@ public class InvestorCashService {
      * @param dto                DTO из 1С
      */
     private void updateCashingTransaction(AccountTransaction accountTransaction, InvestorCashDTO dto) {
-        BigDecimal cash = accountTransaction.getCash();
+        BigDecimal cash = dto.getGivenCash();
         transactionLogService.update(accountTransaction);
         prepareAccountTransaction(accountTransaction, dto);
         AccountingCode accountingCode = AccountingCode.fromCode(dto.getAccountingCode());
