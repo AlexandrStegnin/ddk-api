@@ -8,7 +8,10 @@ public enum ConcludedWith {
 
     LEGAL_PERSON(1, "Юр. лицо"),
     NATURAL_PERSON(2, "ФЛ"),
-    BUSINESSMAN(3, "ИП");
+    BUSINESSMAN(3, "ИП"),
+    NATURAL_PERSON_PLATFORM(4, "ФЛ-платформа"),
+    BUSINESSMAN_PLATFORM(5,  "ИП-платформа"),
+    SELF_EMPLOYED_PLATFORM(6, "Самозаняты-платформа");
 
     private final int id;
 
@@ -37,6 +40,10 @@ public enum ConcludedWith {
             }
         }
         return LEGAL_PERSON;
+    }
+
+    public static boolean needCreateCommission(ConcludedWith concludedWith) {
+        return concludedWith == NATURAL_PERSON || concludedWith == NATURAL_PERSON_PLATFORM;
     }
 
 }

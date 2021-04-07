@@ -84,7 +84,7 @@ public class AccountTransactionService {
                 throw new ApiException("Не найдена информация \"С кем заключён договор\"", HttpStatus.NOT_FOUND);
             }
             ConcludedWith concludedWith = ConcludedWith.fromTitle(userAgreement.getConcludedWith());
-            if (concludedWith == ConcludedWith.NATURAL_PERSON) {
+            if (ConcludedWith.needCreateCommission(concludedWith)) {
                 Money commission = new Money(money, COMMISSION_RATE);
                 return createCommissionCreditTransaction(money, commission, parentTx);
             }
