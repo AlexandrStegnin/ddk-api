@@ -8,7 +8,8 @@ public enum AccountingCode {
 
     CASHING("НФ-000027", "Вывод Клиентов"),
     CASHING_BODY("НФ-000184", "Вывод Клиентов Тело"),
-    CASHING_COMMISSION("НФ-000167", "Вывод Клиентов Проценты");
+    CASHING_COMMISSION("НФ-000167", "Вывод Клиентов Проценты"),
+    RESALE_SHARE("НФ-000259", "Перепродажа доли");
 
     private final String code;
 
