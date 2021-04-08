@@ -61,7 +61,7 @@ public class AccountTransactionService {
     public void transfer(Money money) {
         Account owner = findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         try {
-            AccountTransaction investorDebitTx = createInvestorDebitTransaction(owner, money);
+            AccountTransaction investorDebitTx = createInvestorDebitTransaction(owner, money, CashType.CASH_1C);
             AccountTransaction creditTx = createCreditTransaction(owner, money, investorDebitTx);
             createDebitTransaction(creditTx, money);
         } catch (Exception e) {
@@ -102,13 +102,13 @@ public class AccountTransactionService {
      * @param money сумма
      * @return созданную транзакцию
      */
-    private AccountTransaction createInvestorDebitTransaction(Account owner, Money money) {
+    private AccountTransaction createInvestorDebitTransaction(Account owner, Money money, CashType cashType) {
         AccountTransaction debitTx = new AccountTransaction(owner);
         debitTx.setOperationType(OperationType.DEBIT);
         debitTx.setPayer(owner);
         debitTx.setRecipient(owner);
         debitTx.getMonies().add(money);
-        debitTx.setCashType(CashType.CASH_1C);
+        debitTx.setCashType(cashType);
         debitTx.setCash(money.getGivenCash());
         debitTx.setTxDate(DateUtils.convert(money.getDateGiven()));
         return accountTransactionRepository.save(debitTx);
