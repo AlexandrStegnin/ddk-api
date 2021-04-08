@@ -102,7 +102,7 @@ public class AccountTransactionService {
      * @param money сумма
      * @return созданную транзакцию
      */
-    private AccountTransaction createInvestorDebitTransaction(Account owner, Money money, CashType cashType) {
+    public AccountTransaction createInvestorDebitTransaction(Account owner, Money money, CashType cashType) {
         AccountTransaction debitTx = new AccountTransaction(owner);
         debitTx.setOperationType(OperationType.DEBIT);
         debitTx.setPayer(owner);
