@@ -15,7 +15,9 @@ public enum CashType {
     CASH_1C(6, "Проводка из 1С"),
     INVESTMENT_BODY(7, "Тело инвестиций"),
     CASH_1C_COMMISSION(8, "Проводка из 1С. Комиссия"),
-    CASH_1C_CASHING(9, "Проводка из 1С. Вывод");
+    CASH_1C_CASHING(9, "Проводка из 1С. Вывод"),
+    RESALE_SHARE(10, "Перепродажа доли"),
+    RE_BUY_SHARE(11, "Перепокупка доли");
 
     private final int id;
 
