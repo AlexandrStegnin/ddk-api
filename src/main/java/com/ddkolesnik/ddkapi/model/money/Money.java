@@ -1,5 +1,6 @@
 package com.ddkolesnik.ddkapi.model.money;
 
+import com.ddkolesnik.ddkapi.model.app.AppUser;
 import com.ddkolesnik.ddkapi.model.cash.CashSource;
 import com.ddkolesnik.ddkapi.util.ShareType;
 import lombok.*;
@@ -60,20 +61,20 @@ public class Money {
     ShareType shareType;
 
     @Column(name = "state")
-    private String state = "MATCHING";
+    String state = "MATCHING";
 
     @ManyToOne
     @JoinColumn(name = "acc_tx_id")
-    private AccountTransaction transaction;
+    AccountTransaction transaction;
 
     @Column(name = "type_closing_id")
-    private Long typeClosingId;
+    Long typeClosingId;
 
     @Column(name = "new_cash_detail_id")
-    private Long newCashDetailId;
+    Long newCashDetailId;
 
     @Column(name = "real_date_given")
-    private LocalDate realDateGiven;
+    LocalDate realDateGiven;
 
     public Money(Money old, BigDecimal taxRate) {
         this.id = null;
@@ -90,17 +91,20 @@ public class Money {
         this.transaction = old.getTransaction();
     }
 
-    public Money(Money old) {
+    public Money(Money old, AppUser buyer, Long newCashDetailId, LocalDate realDateGiven) {
         this.givenCash = old.getGivenCash();
         this.facility = old.getFacility();
         this.dateGiven = old.getDateGiven();
-        this.investor = old.getInvestor();
         this.transactionUUID = UUID.randomUUID().toString();
         this.cashSource = old.getCashSource();
         this.underFacility = old.getUnderFacility();
         this.shareType = old.getShareType();
         this.state = old.getState();
         this.transaction = old.getTransaction();
+        this.investor = new Investor();
+        this.investor.setLogin(buyer.getLogin());
+        this.newCashDetailId = newCashDetailId;
+        this.realDateGiven = realDateGiven;
     }
 
 }
