@@ -137,7 +137,7 @@ public class InvestorCashService {
      */
     private void resaleShare(InvestorCashDTO dto) {
         if (dto.isDelete()) {
-            //TODO in progress
+            deleteResale(dto);
         } else {
             Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
             if (Objects.nonNull(money)) {
@@ -169,7 +169,7 @@ public class InvestorCashService {
                 dto.getFacility(), dto.getCashSource(), login);
         if (Objects.nonNull(openedMoney)) {
             Investor investor = investorService.findByLogin(buyer.getLogin());
-            Money buyMoney = new Money(openedMoney, investor, 4L, dto.getDateGiven());
+            Money buyMoney = new Money(openedMoney, investor, 4L, dto.getDateGiven(), dto.getTransactionUUID());
             createResaleTransaction(dto, buyMoney, buyer);
             openedMoney.setTypeClosingId(9L);
             openedMoney.setDateClosing(dto.getDateGiven());
@@ -192,6 +192,19 @@ public class InvestorCashService {
         }
         AccountTransaction debitTx = accountTransactionService.createInvestorDebitTransaction(owner, buyMoney, CashType.RE_BUY_SHARE);
         accountTransactionService.createCreditTransaction(owner, buyMoney, debitTx, CashType.RE_BUY_SHARE);
+    }
+
+    /**
+     * Удалить проводку перепродажи, пришедшую через 1С
+     *
+     * @param dto DTO для удаления
+     */
+    private void deleteResale(InvestorCashDTO dto) {
+        Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
+        if (Objects.isNull(money)) {
+            throw new ApiException("Не найдена сумма для удаления", HttpStatus.NOT_FOUND);
+        }
+
     }
 
     /**

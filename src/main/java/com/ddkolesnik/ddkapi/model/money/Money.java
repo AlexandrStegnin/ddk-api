@@ -90,11 +90,11 @@ public class Money {
         this.transaction = old.getTransaction();
     }
 
-    public Money(Money old, Investor buyer, Long newCashDetailId, LocalDate realDateGiven) {
+    public Money(Money old, Investor buyer, Long newCashDetailId, LocalDate realDateGiven, String transactionUUID) {
         this.givenCash = old.getGivenCash();
         this.facility = old.getFacility();
         this.dateGiven = old.getDateGiven();
-        this.transactionUUID = UUID.randomUUID().toString();
+        this.transactionUUID = transactionUUID;
         this.cashSource = old.getCashSource();
         this.underFacility = old.getUnderFacility();
         this.shareType = old.getShareType();
