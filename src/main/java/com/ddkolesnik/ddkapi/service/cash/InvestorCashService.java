@@ -202,6 +202,7 @@ public class InvestorCashService {
      */
     private void deleteResale(InvestorCashDTO dto) {
         Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
+        Money relatedMoney;
         if (Objects.isNull(money)) {
             throw new ApiException("Не найдена сумма для удаления", HttpStatus.NOT_FOUND);
         }
@@ -209,6 +210,21 @@ public class InvestorCashService {
         if (Objects.isNull(transaction)) {
             throw new ApiException("Не найдена транзакция по перепродаже доли", HttpStatus.NOT_FOUND);
         }
+        AccountTransaction parentTx = transaction.getParent();
+        accountTransactionService.delete(transaction);
+        if (Objects.nonNull(parentTx)) {
+            accountTransactionService.delete(parentTx);
+        }
+        Long sourceMoneyId = money.getSourceMoneyId();
+        if (Objects.nonNull(sourceMoneyId)) {
+            relatedMoney = moneyRepository.findById(sourceMoneyId).orElse(null);
+            if (Objects.nonNull(relatedMoney)) {
+                relatedMoney.setTypeClosingId(null);
+                relatedMoney.setDateClosing(null);
+                moneyRepository.save(relatedMoney);
+            }
+        }
+        moneyRepository.delete(money);
     }
 
     /**
