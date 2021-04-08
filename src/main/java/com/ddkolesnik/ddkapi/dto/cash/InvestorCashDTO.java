@@ -51,4 +51,7 @@ public class InvestorCashDTO {
     @Schema(implementation = String.class, name = "accountingCode", description = "Код бухгалтерского учёта (статьи)", example = "НФ-000001")
     String accountingCode;
 
+    @Schema(implementation = String.class, name = "investorSellerCode", description = "Код инвестора, продающего долю")
+    String investorSellerCode;
+
 }
