@@ -30,7 +30,8 @@ public interface MoneyRepository extends JpaRepository<Money, Long>, JpaSpecific
                     @Param("login") String login);
 
     @Query("SELECT m FROM Money m WHERE m.dateGiven = :dateGiven AND m.givenCash BETWEEN :cashFrom AND :cashTo AND " +
-            "m.facility.fullName = :facilityName AND m.cashSource.organization = :organizationId AND m.investor.login = :login")
+            "m.facility.fullName = :facilityName AND m.cashSource.organization = :organizationId AND m.investor.login = :login " +
+            "AND m.dateClosing IS NULL AND m.typeClosingId IS NULL")
     Money findMoneyAround(@Param("dateGiven") LocalDate dateGiven, @Param("cashFrom") BigDecimal from, @Param("cashTo") BigDecimal to,
                     @Param("facilityName") String facilityName, @Param("organizationId") String organizationId,
                     @Param("login") String login);
