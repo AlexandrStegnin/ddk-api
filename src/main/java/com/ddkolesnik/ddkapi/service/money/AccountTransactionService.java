@@ -62,7 +62,7 @@ public class AccountTransactionService {
         Account owner = findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         try {
             AccountTransaction investorDebitTx = createInvestorDebitTransaction(owner, money, CashType.CASH_1C);
-            AccountTransaction creditTx = createCreditTransaction(owner, money, investorDebitTx);
+            AccountTransaction creditTx = createCreditTransaction(owner, money, investorDebitTx, CashType.CASH_1C);
             createDebitTransaction(creditTx, money);
         } catch (Exception e) {
             log.error("Произошла ошибка: {}", e.getMessage());
@@ -142,9 +142,8 @@ public class AccountTransactionService {
      * @param money    сумма
      * @param parentTx родительская транзакция
      */
-    private AccountTransaction createCreditTransaction(Account owner, Money money, AccountTransaction parentTx) {
+    public AccountTransaction createCreditTransaction(Account owner, Money money, AccountTransaction parentTx, CashType cashType) {
         BigDecimal givenCash = money.getGivenCash().negate();
-        CashType cashType = CashType.CASH_1C;
         Account recipient = findByOwnerId(money.getFacility().getId(), OwnerType.FACILITY);
         AccountTransaction creditTx = new AccountTransaction(owner);
         creditTx.setParent(parentTx);
