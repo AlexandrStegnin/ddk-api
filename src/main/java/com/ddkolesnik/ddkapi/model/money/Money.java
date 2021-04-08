@@ -66,9 +66,14 @@ public class Money {
     @JoinColumn(name = "acc_tx_id")
     private AccountTransaction transaction;
 
-    //TODO переделать на вид закрытия из БД
     @Column(name = "type_closing_id")
     private Long typeClosingId;
+
+    @Column(name = "new_cash_detail_id")
+    private Long newCashDetailId;
+
+    @Column(name = "real_date_given")
+    private LocalDate realDateGiven;
 
     public Money(Money old, BigDecimal taxRate) {
         this.id = null;
