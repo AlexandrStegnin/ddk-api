@@ -204,7 +204,10 @@ public class InvestorCashService {
         if (Objects.isNull(money)) {
             throw new ApiException("Не найдена сумма для удаления", HttpStatus.NOT_FOUND);
         }
+        AccountTransaction transaction = money.getTransaction();
+        if (Objects.nonNull(transaction)) {
 
+        }
     }
 
     /**
@@ -288,15 +291,18 @@ public class InvestorCashService {
         if (money != null) {
             List<TransactionLog> logs = transactionLogService.findByCash(money);
             List<Money> monies = new ArrayList<>();
-            if (money.getTransaction() != null) {
-                AccountTransaction parentTx = accountTransactionService.findByParent(money.getTransaction());
-                if (parentTx != null) {
+            AccountTransaction transaction = money.getTransaction();
+            if (Objects.nonNull(transaction)) {
+                AccountTransaction parentTx = accountTransactionService.findByParent(transaction);
+                if (Objects.nonNull(parentTx)) {
                     monies.addAll(parentTx.getMonies());
                     accountTransactionService.delete(parentTx);
                 }
-                accountTransactionService.delete(money.getTransaction());
+                accountTransactionService.delete(transaction);
             }
-            transactionLogService.delete(logs);
+            if (Objects.nonNull(logs)) {
+                transactionLogService.delete(logs);
+            }
             moneyRepository.deleteByTransactionUUID(money.getTransactionUUID());
             moneyRepository.deleteAll(monies);
         }
