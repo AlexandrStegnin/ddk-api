@@ -90,4 +90,17 @@ public class Money {
         this.transaction = old.getTransaction();
     }
 
+    public Money(Money old) {
+        this.givenCash = old.getGivenCash();
+        this.facility = old.getFacility();
+        this.dateGiven = old.getDateGiven();
+        this.investor = old.getInvestor();
+        this.transactionUUID = UUID.randomUUID().toString();
+        this.cashSource = old.getCashSource();
+        this.underFacility = old.getUnderFacility();
+        this.shareType = old.getShareType();
+        this.state = old.getState();
+        this.transaction = old.getTransaction();
+    }
+
 }
