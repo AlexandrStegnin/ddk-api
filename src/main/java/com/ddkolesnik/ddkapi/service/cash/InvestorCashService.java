@@ -77,11 +77,11 @@ public class InvestorCashService {
      */
     public void update(InvestorCashDTO dto) {
         if (checkCash(dto)) {
+            AccountingCode accountingCode = AccountingCode.fromCode(dto.getAccountingCode());
             Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
-            if (dto.isDelete() && money != null) {
+            if (dto.isDelete() && Objects.nonNull(money) && Objects.isNull(accountingCode)) {
                 delete(money);
             } else {
-                AccountingCode accountingCode = AccountingCode.fromCode(dto.getAccountingCode());
                 if (accountingCode != null) {
                     if (accountingCode == AccountingCode.RESALE_SHARE) {
                         resaleShare(dto);
@@ -205,8 +205,8 @@ public class InvestorCashService {
             throw new ApiException("Не найдена сумма для удаления", HttpStatus.NOT_FOUND);
         }
         AccountTransaction transaction = money.getTransaction();
-        if (Objects.nonNull(transaction)) {
-
+        if (Objects.isNull(transaction)) {
+            throw new ApiException("Не найдена транзакция по перепродаже доли", HttpStatus.NOT_FOUND);
         }
     }
 
