@@ -75,6 +75,9 @@ public class Money {
     @Column(name = "real_date_given")
     LocalDate realDateGiven;
 
+    @Column(name = "source_id")
+    Long sourceMoneyId;
+
     public Money(Money old, BigDecimal taxRate) {
         this.id = null;
         this.givenCash = old.getGivenCash().multiply(taxRate);
@@ -103,6 +106,7 @@ public class Money {
         this.investor = buyer;
         this.newCashDetailId = newCashDetailId;
         this.realDateGiven = realDateGiven;
+        this.sourceMoneyId = old.getId();
     }
 
 }
