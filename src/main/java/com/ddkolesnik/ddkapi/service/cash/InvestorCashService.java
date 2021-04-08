@@ -190,7 +190,8 @@ public class InvestorCashService {
         if (Objects.isNull(owner)) {
             throw new ApiException("Не найден счёт инвестора покупателя", HttpStatus.NOT_FOUND);
         }
-        AccountTransaction debitTx = accountTransactionService.createInvestorDebitTransaction(owner, buyMoney, CashType.RE_BUY_SHARE);
+        AccountTransaction debitTx = accountTransactionService.createInvestorDebitTransaction(owner, buyMoney,
+                CashType.RE_BUY_SHARE, dto.getAccountingCode());
         accountTransactionService.createCreditTransaction(owner, buyMoney, debitTx, CashType.RE_BUY_SHARE);
     }
 

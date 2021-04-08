@@ -61,7 +61,7 @@ public class AccountTransactionService {
     public void transfer(Money money) {
         Account owner = findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         try {
-            AccountTransaction investorDebitTx = createInvestorDebitTransaction(owner, money, CashType.CASH_1C);
+            AccountTransaction investorDebitTx = createInvestorDebitTransaction(owner, money, CashType.CASH_1C, null);
             AccountTransaction creditTx = createCreditTransaction(owner, money, investorDebitTx, CashType.CASH_1C);
             createDebitTransaction(creditTx, money);
         } catch (Exception e) {
@@ -100,9 +100,12 @@ public class AccountTransactionService {
      *
      * @param owner владелец счёта
      * @param money сумма
+     * @param accountingCode код проводки
+     * @param cashType вид денег
      * @return созданную транзакцию
      */
-    public AccountTransaction createInvestorDebitTransaction(Account owner, Money money, CashType cashType) {
+    public AccountTransaction createInvestorDebitTransaction(Account owner, Money money,
+                                                             CashType cashType, String accountingCode) {
         AccountTransaction debitTx = new AccountTransaction(owner);
         debitTx.setOperationType(OperationType.DEBIT);
         debitTx.setPayer(owner);
@@ -112,6 +115,7 @@ public class AccountTransactionService {
         debitTx.setCash(money.getGivenCash());
         debitTx.setTxDate(DateUtils.convert(money.getDateGiven()));
         debitTx.setTransactionUUID(money.getTransactionUUID());
+        debitTx.setAccountingCode(accountingCode);
         return accountTransactionRepository.save(debitTx);
     }
 
@@ -154,6 +158,7 @@ public class AccountTransactionService {
         creditTx.getMonies().add(money);
         creditTx.setCashType(cashType);
         creditTx.setCash(givenCash);
+        creditTx.setAccountingCode(parentTx.getAccountingCode());
         money.setTransaction(creditTx);
         moneyRepository.save(money);
         return accountTransactionRepository.save(creditTx);
