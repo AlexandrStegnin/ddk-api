@@ -1,9 +1,11 @@
 package com.ddkolesnik.ddkapi.service.cash;
 
+import com.ddkolesnik.ddkapi.configuration.exception.ApiException;
 import com.ddkolesnik.ddkapi.dto.cash.InvestorCashDTO;
 import com.ddkolesnik.ddkapi.model.app.Account;
 import com.ddkolesnik.ddkapi.model.app.AppUser;
 import com.ddkolesnik.ddkapi.model.cash.CashSource;
+import com.ddkolesnik.ddkapi.model.log.CashType;
 import com.ddkolesnik.ddkapi.model.log.TransactionLog;
 import com.ddkolesnik.ddkapi.model.money.*;
 import com.ddkolesnik.ddkapi.repository.app.AccountRepository;
@@ -19,6 +21,7 @@ import com.ddkolesnik.ddkapi.util.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +30,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static com.ddkolesnik.ddkapi.util.Constant.COMMISSION_RATE;
@@ -79,7 +83,11 @@ public class InvestorCashService {
             } else {
                 AccountingCode accountingCode = AccountingCode.fromCode(dto.getAccountingCode());
                 if (accountingCode != null) {
-                    cashing(dto);
+                    if (accountingCode == AccountingCode.RESALE_SHARE) {
+                        resaleShare(dto);
+                    } else {
+                        cashing(dto);
+                    }
                 } else {
                     if (money == null) {
                         money = moneyRepository.findMoney(dto.getDateGiven(), dto.getGivenCash(), dto.getFacility(),
@@ -120,6 +128,70 @@ public class InvestorCashService {
                 updateCashingTransaction(accountTransaction, dto);
             }
         }
+    }
+
+    /**
+     * Провести перепродажу долю по данным из 1С
+     *
+     * @param dto DTO для перепродажи
+     */
+    private void resaleShare(InvestorCashDTO dto) {
+        if (dto.isDelete()) {
+            //TODO in progress
+        } else {
+            Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
+            if (Objects.nonNull(money)) {
+                //TODO in progress
+            } else {
+                createResaleShare(dto);
+            }
+        }
+    }
+
+    /**
+     * Создать проводку по перепродаже доли
+     *
+     * @param dto DTO суммы для перепродажи
+     */
+    private void createResaleShare(InvestorCashDTO dto) {
+        BigDecimal fromCash = dto.getGivenCash().subtract(BigDecimal.valueOf(0.5));
+        BigDecimal toCash = dto.getGivenCash().add(BigDecimal.valueOf(0.5));
+        String investorSellerCode = dto.getInvestorSellerCode();
+        if (Objects.isNull(investorSellerCode)) {
+            throw new ApiException("Не указан код инвестора продавца", HttpStatus.PRECONDITION_FAILED);
+        }
+        String login = INVESTOR_PREFIX.concat(investorSellerCode);
+        AppUser buyer = appUserRepository.findByLogin(INVESTOR_PREFIX.concat(dto.getInvestorCode()));
+        if (Objects.isNull(buyer)) {
+            throw new ApiException("Не найден инвестор покупатель.", HttpStatus.NOT_FOUND);
+        }
+        Money openedMoney = moneyRepository.findMoneyAround(dto.getDateGiven(), fromCash, toCash,
+                dto.getFacility(), dto.getCashSource(), login);
+        if (Objects.nonNull(openedMoney)) {
+            Investor investor = investorService.findByLogin(buyer.getLogin());
+            Money buyMoney = new Money(openedMoney, investor, 4L, dto.getDateGiven());
+            createResaleTransaction(dto, buyMoney, buyer);
+            openedMoney.setTypeClosingId(9L);
+            openedMoney.setDateClosing(dto.getDateGiven());
+            moneyRepository.save(openedMoney);
+        } else {
+            throw new ApiException("Недостаточно денег для перепродажи", HttpStatus.PRECONDITION_FAILED);
+        }
+    }
+
+    /**
+     * Создать транзакции по счетам клиентов
+     *  @param dto DTO суммы для перепродажи
+     * @param buyMoney сумма у инвестора покупателя
+     * @param buyer инвестор покупатель
+     */
+    private void createResaleTransaction(InvestorCashDTO dto, Money buyMoney, AppUser buyer) {
+        Account owner = accountRepository.findByOwnerIdAndOwnerType(buyer.getId(), OwnerType.INVESTOR);
+        if (Objects.isNull(owner)) {
+            throw new ApiException("Не найден счёт инвестора покупателя", HttpStatus.NOT_FOUND);
+        }
+        AccountTransaction debitTx = accountTransactionService.createInvestorDebitTransaction(owner, buyMoney, CashType.RE_BUY_SHARE);
+        accountTransactionService.createCreditTransaction(owner, buyMoney, debitTx, CashType.RE_BUY_SHARE);
     }
 
     /**
