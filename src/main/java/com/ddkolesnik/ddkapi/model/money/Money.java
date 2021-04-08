@@ -1,6 +1,5 @@
 package com.ddkolesnik.ddkapi.model.money;
 
-import com.ddkolesnik.ddkapi.model.app.AppUser;
 import com.ddkolesnik.ddkapi.model.cash.CashSource;
 import com.ddkolesnik.ddkapi.util.ShareType;
 import lombok.*;
@@ -91,7 +90,7 @@ public class Money {
         this.transaction = old.getTransaction();
     }
 
-    public Money(Money old, AppUser buyer, Long newCashDetailId, LocalDate realDateGiven) {
+    public Money(Money old, Investor buyer, Long newCashDetailId, LocalDate realDateGiven) {
         this.givenCash = old.getGivenCash();
         this.facility = old.getFacility();
         this.dateGiven = old.getDateGiven();
@@ -101,8 +100,7 @@ public class Money {
         this.shareType = old.getShareType();
         this.state = old.getState();
         this.transaction = old.getTransaction();
-        this.investor = new Investor();
-        this.investor.setLogin(buyer.getLogin());
+        this.investor = buyer;
         this.newCashDetailId = newCashDetailId;
         this.realDateGiven = realDateGiven;
     }
