@@ -36,4 +36,5 @@ public interface MoneyRepository extends JpaRepository<Money, Long>, JpaSpecific
                     @Param("facilityName") String facilityName, @Param("organizationId") String organizationId,
                     @Param("login") String login);
 
+    Money findBySourceMoneyId(Long sourceMoneyId);
 }
