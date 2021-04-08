@@ -141,11 +141,128 @@ public class InvestorCashService {
         } else {
             Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
             if (Objects.nonNull(money)) {
-                //TODO in progress
+                updateResale(dto, money);
             } else {
                 createResaleShare(dto);
             }
         }
+    }
+
+    /**
+     * Обновить сумму перепродажи доли
+     *
+     * @param dto DTO обновлённой суммы
+     * @param purchasedMoney купленная сумма нового инвестора для обновления
+     */
+    private void updateResale(InvestorCashDTO dto, Money purchasedMoney) {
+        Investor investor = findInvestor(dto.getInvestorCode());
+        CashSource cashSource = findCashSource(dto.getCashSource());
+        updatePurchasedMoney(dto, purchasedMoney, investor, cashSource);
+        Long sourceMoneyId = purchasedMoney.getSourceMoneyId();
+        if (Objects.nonNull(sourceMoneyId)) {
+            updateResaleMoney(dto, sourceMoneyId, cashSource);
+        }
+    }
+
+    /**
+     * Обновить проводку по купленной сумме (открытой для нового инвестора)
+     *
+     * @param dto DTO для обновления
+     * @param purchasedMoney купленная сумма
+     * @param investor инвестор
+     * @param cashSource источник денег
+     */
+    private void updatePurchasedMoney(InvestorCashDTO dto, Money purchasedMoney, Investor investor, CashSource cashSource) {
+        purchasedMoney.setGivenCash(dto.getGivenCash());
+        purchasedMoney.setDateGiven(dto.getDateGiven());
+        purchasedMoney.setTransactionUUID(dto.getTransactionUUID());
+        if (!purchasedMoney.getInvestor().getLogin().equalsIgnoreCase(INVESTOR_PREFIX.concat(dto.getInvestorCode()))) {
+            purchasedMoney.setInvestor(investor);
+        }
+        if (!purchasedMoney.getCashSource().getOrganization().equalsIgnoreCase(dto.getCashSource())) {
+            purchasedMoney.setCashSource(cashSource);
+        }
+        moneyRepository.save(purchasedMoney);
+        AccountTransaction transaction = getTransaction(purchasedMoney);
+        AccountTransaction parentTx = getParentTx(transaction);
+        transaction.setCash(dto.getGivenCash().negate());
+        parentTx.setCash(dto.getGivenCash());
+        if (!transaction.getOwner().getOwnerName().equalsIgnoreCase(investor.getLogin())) {
+            Account owner = accountRepository.findByOwnerIdAndOwnerType(investor.getId(), OwnerType.INVESTOR);
+            if (Objects.isNull(owner)) {
+                throw new ApiException("Не найден счёт инвестора", HttpStatus.NOT_FOUND);
+            }
+            transaction.setOwner(owner);
+            transaction.setPayer(owner);
+            parentTx.setOwner(owner);
+            parentTx.setPayer(owner);
+            parentTx.setRecipient(owner);
+        }
+        accountTransactionService.update(transaction);
+        accountTransactionService.update(parentTx);
+    }
+
+    /**
+     * Обновить перепроданную сумму
+     *  @param dto DTO для обновления
+     * @param sourceMoneyId id перекупленной суммы
+     * @param cashSource источник денег
+     */
+    private void updateResaleMoney(InvestorCashDTO dto, Long sourceMoneyId, CashSource cashSource) {
+        Money resaleMoney = moneyRepository.findById(sourceMoneyId).orElse(null);
+        if (Objects.isNull(resaleMoney)) {
+            throw new ApiException("Не найдена перепроданная сумма", HttpStatus.NOT_FOUND);
+        }
+        if (Objects.nonNull(cashSource)) {
+            resaleMoney.setCashSource(cashSource);
+        }
+        resaleMoney.setGivenCash(dto.getGivenCash());
+        resaleMoney.setDateGiven(dto.getDateGiven());
+        moneyRepository.save(resaleMoney);
+        updateResaleTransactions(resaleMoney, dto);
+    }
+
+    /**
+     * Обновить транзакции, участвующие в перепродаже
+     *
+     * @param money сумма
+     * @param dto DTO для изменения
+     */
+    private void updateResaleTransactions(Money money, InvestorCashDTO dto) {
+        AccountTransaction transaction = getTransaction(money);
+        AccountTransaction parentTx = getParentTx(transaction);
+        transaction.setCash(dto.getGivenCash().negate());
+        parentTx.setCash(dto.getGivenCash());
+        accountTransactionService.update(transaction);
+        accountTransactionService.update(parentTx);
+    }
+
+    /**
+     * Получить транзакцию из суммы
+     *
+     * @param money сумма
+     * @return транзакция
+     */
+    private AccountTransaction getTransaction(Money money) {
+        AccountTransaction transaction = money.getTransaction();
+        if (Objects.isNull(transaction)) {
+            throw new ApiException("Не найдена транзакция", HttpStatus.NOT_FOUND);
+        }
+        return transaction;
+    }
+
+    /**
+     * Получить родительскую транзакцию
+     *
+     * @param transaction транзакция
+     * @return родительская транзакция
+     */
+    private AccountTransaction getParentTx(AccountTransaction transaction) {
+        AccountTransaction parentTx = transaction.getParent();
+        if (Objects.isNull(parentTx)) {
+            throw new ApiException("Не найдена транзакция", HttpStatus.NOT_FOUND);
+        }
+        return parentTx;
     }
 
     /**
