@@ -111,6 +111,7 @@ public class AccountTransactionService {
         debitTx.setCashType(cashType);
         debitTx.setCash(money.getGivenCash());
         debitTx.setTxDate(DateUtils.convert(money.getDateGiven()));
+        debitTx.setTransactionUUID(money.getTransactionUUID());
         return accountTransactionRepository.save(debitTx);
     }
 
