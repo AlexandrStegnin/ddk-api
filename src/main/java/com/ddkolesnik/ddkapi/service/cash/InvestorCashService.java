@@ -141,7 +141,7 @@ public class InvestorCashService {
         } else {
             Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
             if (Objects.nonNull(money)) {
-                updateResale(dto, money);
+                throw new ApiException("Обновление проводки перепродажи доли не предусмотрено", HttpStatus.BAD_REQUEST);
             } else {
                 createResaleShare(dto);
             }
