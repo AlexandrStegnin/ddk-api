@@ -101,7 +101,6 @@ public class Money {
         this.cashSource = old.getCashSource();
         this.underFacility = old.getUnderFacility();
         this.shareType = old.getShareType();
-        this.state = old.getState();
         this.transaction = old.getTransaction();
         this.investor = buyer;
         this.newCashDetailId = newCashDetailId;
