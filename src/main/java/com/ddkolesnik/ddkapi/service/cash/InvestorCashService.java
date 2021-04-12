@@ -21,6 +21,7 @@ import com.ddkolesnik.ddkapi.util.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,7 @@ import static com.ddkolesnik.ddkapi.util.Constant.INVESTOR_PREFIX;
  * @author Alexandr Stegnin
  */
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -282,8 +284,7 @@ public class InvestorCashService {
         if (Objects.isNull(buyer)) {
             throw new ApiException("Не найден инвестор покупатель.", HttpStatus.NOT_FOUND);
         }
-        Money openedMoney = moneyRepository.findMoneyAround(dto.getDateGiven(), fromCash, toCash,
-                dto.getFacility(), dto.getCashSource(), login);
+        Money openedMoney = moneyRepository.findMoneyAround(fromCash, toCash, dto.getFacility(), dto.getCashSource(), login);
         if (Objects.nonNull(openedMoney)) {
             Investor investor = investorService.findByLogin(buyer.getLogin());
             Money buyMoney = new Money(openedMoney, investor, 4L, dto.getDateGiven(), dto.getTransactionUUID());
