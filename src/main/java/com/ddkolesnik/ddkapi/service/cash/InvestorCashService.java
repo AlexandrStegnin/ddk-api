@@ -79,22 +79,23 @@ public class InvestorCashService {
      */
     public void update(InvestorCashDTO dto) {
         if (checkCash(dto)) {
+            boolean isResale = Objects.nonNull(dto.getInvestorSellerCode());
             AccountingCode accountingCode = AccountingCode.fromCode(dto.getAccountingCode());
             Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
-            if (dto.isDelete() && Objects.nonNull(money) && Objects.isNull(accountingCode)) {
+            if (dto.isDelete() && Objects.nonNull(money) && Objects.isNull(accountingCode) && !isResale) {
                 delete(money);
             } else {
-                if (accountingCode != null) {
-                    if (accountingCode == AccountingCode.RESALE_SHARE) {
+                if (Objects.nonNull(accountingCode) || isResale) {
+                    if (!AccountingCode.isCashing(accountingCode)) {
                         resaleShare(dto);
                     } else {
                         cashing(dto);
                     }
                 } else {
-                    if (money == null) {
+                    if (Objects.isNull(money)) {
                         money = moneyRepository.findMoney(dto.getDateGiven(), dto.getGivenCash(), dto.getFacility(),
                                 dto.getCashSource(), Constant.INVESTOR_PREFIX.concat(dto.getInvestorCode()));
-                        if (money == null) {
+                        if (Objects.isNull(money)) {
                             money = create(dto);
                             sendMessage(money.getInvestor());
                             transactionLogService.create(money);
