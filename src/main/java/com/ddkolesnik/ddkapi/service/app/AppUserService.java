@@ -98,7 +98,6 @@ public class AppUserService {
         }
         prepareUser(user, appUserDTO);
         update(user);
-        accountService.createAccount(user);
     }
 
     /**
