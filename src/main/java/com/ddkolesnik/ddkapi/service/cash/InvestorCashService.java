@@ -171,7 +171,9 @@ public class InvestorCashService {
         Money openedMoney = moneyRepository.findMoneyAround(fromCash, toCash, dto.getFacility(), login);
         if (Objects.nonNull(openedMoney)) {
             Investor investor = investorService.findByLogin(buyer.getLogin());
-            Money buyMoney = new Money(openedMoney, investor, 4L, dto.getDateGiven(), dto.getTransactionUUID());
+            CashSource cashSource = findCashSource(dto.getCashSource());
+            Money buyMoney = new Money(openedMoney, investor, 4L, dto.getDateGiven(),
+                    dto.getTransactionUUID(), cashSource);
             createResaleTransaction(dto, buyMoney, buyer);
             openedMoney.setTypeClosingId(9L);
             openedMoney.setDateClosing(dto.getDateGiven());
