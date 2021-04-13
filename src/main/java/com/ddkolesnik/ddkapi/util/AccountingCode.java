@@ -40,4 +40,8 @@ public enum AccountingCode {
         return null;
     }
 
+    public static boolean isCashing(AccountingCode code) {
+        return code == CASHING || code == CASHING_BODY || code == CASHING_COMMISSION;
+    }
+
 }
