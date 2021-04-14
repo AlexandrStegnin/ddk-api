@@ -79,18 +79,15 @@ public class InvestorCashService {
      */
     public void update(InvestorCashDTO dto) {
         if (checkCash(dto)) {
-            boolean isResale = Objects.nonNull(dto.getInvestorSellerCode());
-            AccountingCode accountingCode = AccountingCode.fromCode(dto.getAccountingCode());
+            AccountingCode code = AccountingCode.fromCode(dto.getAccountingCode());
             Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
-            if (dto.isDelete() && Objects.nonNull(money) && Objects.isNull(accountingCode) && !isResale) {
+            if (dto.isDelete() && Objects.nonNull(money) && Objects.isNull(code)) {
                 delete(money);
             } else {
-                if (Objects.nonNull(accountingCode) || isResale) {
-                    if (!AccountingCode.isCashing(accountingCode)) {
-                        resaleShare(dto);
-                    } else {
-                        cashing(dto);
-                    }
+                if (AccountingCode.isResale(code)) {
+                    resaleShare(dto);
+                } else if (AccountingCode.isCashing(code)) {
+                    cashing(dto);
                 } else {
                     if (Objects.isNull(money)) {
                         money = moneyRepository.findMoney(dto.getDateGiven(), dto.getGivenCash(), dto.getFacility(),
@@ -179,6 +176,7 @@ public class InvestorCashService {
             openedMoney.setDateClosing(dto.getDateGiven());
             moneyRepository.save(openedMoney);
         } else {
+            log.error("Недостаточно денег для перепродажи: {}", dto);
             throw new ApiException("Недостаточно денег для перепродажи", HttpStatus.PRECONDITION_FAILED);
         }
     }
