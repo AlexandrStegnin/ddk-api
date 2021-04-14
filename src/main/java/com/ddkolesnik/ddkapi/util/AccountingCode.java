@@ -9,7 +9,8 @@ public enum AccountingCode {
     CASHING("НФ-000027", "Вывод Клиентов"),
     CASHING_BODY("НФ-000184", "Вывод Клиентов Тело"),
     CASHING_COMMISSION("НФ-000167", "Вывод Клиентов Проценты"),
-    RESALE_SHARE("НФ-000259", "Перепродажа доли");
+    RESALE_SHARE("НФ-000259", "Перепродажа доли"),
+    RESALE_SHARE_DEL("НФ-000039", "Перепродажа (удаление)");
 
     private final String code;
 
@@ -42,6 +43,10 @@ public enum AccountingCode {
 
     public static boolean isCashing(AccountingCode code) {
         return code == CASHING || code == CASHING_BODY || code == CASHING_COMMISSION;
+    }
+
+    public static boolean isResale(AccountingCode code) {
+        return code == RESALE_SHARE || code == RESALE_SHARE_DEL;
     }
 
 }
