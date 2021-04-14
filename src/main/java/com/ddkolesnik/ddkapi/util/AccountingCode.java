@@ -41,12 +41,12 @@ public enum AccountingCode {
         return null;
     }
 
-    public static boolean isCashing(AccountingCode code) {
-        return code == CASHING || code == CASHING_BODY || code == CASHING_COMMISSION;
+    public boolean isCashing() {
+        return this == CASHING || this == CASHING_BODY || this == CASHING_COMMISSION;
     }
 
-    public static boolean isResale(AccountingCode code) {
-        return code == RESALE_SHARE || code == RESALE_SHARE_DEL;
+    public boolean isResale() {
+        return this == RESALE_SHARE || this == RESALE_SHARE_DEL;
     }
 
 }

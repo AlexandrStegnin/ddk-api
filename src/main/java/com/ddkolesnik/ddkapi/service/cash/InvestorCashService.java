@@ -84,9 +84,9 @@ public class InvestorCashService {
             if (dto.isDelete() && Objects.nonNull(money) && Objects.isNull(code)) {
                 delete(money);
             } else {
-                if (AccountingCode.isResale(code)) {
+                if (code.isResale()) {
                     resaleShare(dto);
-                } else if (AccountingCode.isCashing(code)) {
+                } else if (code.isCashing()) {
                     cashing(dto);
                 } else {
                     if (Objects.isNull(money)) {
