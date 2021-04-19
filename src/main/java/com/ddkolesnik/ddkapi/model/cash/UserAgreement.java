@@ -46,4 +46,10 @@ public class UserAgreement {
     @Column(name = "tax_rate")
     Double taxRate;
 
+    /**
+     * От кого заключён договор (название организации)
+     */
+    @Column(name = "organization")
+    String organization;
+
 }

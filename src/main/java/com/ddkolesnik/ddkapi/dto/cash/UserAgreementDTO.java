@@ -35,4 +35,8 @@ public class UserAgreementDTO {
     @Schema(implementation = Double.class, name = "taxRate", description = "Налоговая ставка")
     Double taxRate;
 
+//    @NotBlank(message = "От кого заключён договор (организация) должно быть заполнено")
+    @Schema(implementation = String.class, name = "organization", description = "От кого заключён договор (организация)")
+    String organization;
+
 }

@@ -91,6 +91,7 @@ public class UserAgreementService {
         userAgreement.setConcludedFrom(investor.getId());
         userAgreement.setTaxRate(dto.getTaxRate());
         userAgreement.setConcludedWith(dto.getConcludedWith());
+        userAgreement.setOrganization(dto.getOrganization());
         return userAgreementRepository.save(userAgreement);
     }
 
