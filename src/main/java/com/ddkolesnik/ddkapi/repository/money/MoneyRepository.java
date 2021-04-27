@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * @author Alexandr Stegnin
@@ -34,6 +35,12 @@ public interface MoneyRepository extends JpaRepository<Money, Long>, JpaSpecific
             "AND m.dateClosing IS NULL AND m.typeClosingId IS NULL")
     Money findMoneyAround(@Param("cashFrom") BigDecimal from, @Param("cashTo") BigDecimal to,
                     @Param("facilityName") String facilityName, @Param("login") String login);
+
+    @Query("SELECT m FROM Money m WHERE m.givenCash <= :givenCash AND " +
+            "m.facility.fullName = :facilityName AND m.investor.login = :login " +
+            "AND m.dateClosing IS NULL AND m.typeClosingId IS NULL")
+    List<Money> getMonies(@Param("givenCash") BigDecimal givenCash, @Param("facilityName") String facilityName,
+                          @Param("login") String login);
 
     Money findBySourceMoneyId(Long sourceMoneyId);
 }
