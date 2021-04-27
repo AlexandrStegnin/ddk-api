@@ -29,10 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.ddkolesnik.ddkapi.util.Constant.COMMISSION_RATE;
 import static com.ddkolesnik.ddkapi.util.Constant.INVESTOR_PREFIX;
@@ -155,7 +153,6 @@ public class InvestorCashService {
      */
     private void createResaleShare(InvestorCashDTO dto) {
         BigDecimal fromCash = dto.getGivenCash().subtract(BigDecimal.valueOf(0.5));
-        BigDecimal toCash = dto.getGivenCash().add(BigDecimal.valueOf(0.5));
         String investorSellerCode = dto.getInvestorSellerCode();
         if (Objects.isNull(investorSellerCode)) {
             throw new ApiException("Не указан код инвестора продавца", HttpStatus.PRECONDITION_FAILED);
@@ -165,16 +162,27 @@ public class InvestorCashService {
         if (Objects.isNull(buyer)) {
             throw new ApiException("Не найден инвестор покупатель.", HttpStatus.NOT_FOUND);
         }
-        Money openedMoney = moneyRepository.findMoneyAround(fromCash, toCash, dto.getFacility(), login);
-        if (Objects.nonNull(openedMoney)) {
+        List<Money> openedMonies = moneyRepository.getMonies(fromCash, dto.getFacility(), login);
+        if (!openedMonies.isEmpty()) {
             Investor investor = investorService.findByLogin(buyer.getLogin());
             CashSource cashSource = findCashSource(dto.getCashSource());
+            Money openedMoney = openedMonies.get(0);
             Money buyMoney = new Money(openedMoney, investor, 4L, dto.getDateGiven(),
                     dto.getTransactionUUID(), cashSource);
+            BigDecimal givenCash = openedMonies.stream()
+                    .map(Money::getGivenCash)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            buyMoney.setGivenCash(givenCash);
+            String source = openedMonies.stream()
+                    .map(m -> m.getId().toString())
+                    .collect(Collectors.joining("|"));
+            buyMoney.setSource(source);
             createResaleTransaction(dto, buyMoney, buyer);
-            openedMoney.setTypeClosingId(9L);
-            openedMoney.setDateClosing(dto.getDateGiven());
-            moneyRepository.save(openedMoney);
+            openedMonies.forEach(money -> {
+                money.setTypeClosingId(9L);
+                money.setDateClosing(dto.getDateGiven());
+            });
+            moneyRepository.saveAll(openedMonies);
         } else {
             log.error("Недостаточно денег для перепродажи: {}", dto);
             throw new ApiException("Недостаточно денег для перепродажи", HttpStatus.PRECONDITION_FAILED);
@@ -225,6 +233,20 @@ public class InvestorCashService {
                 relatedMoney.setDateClosing(null);
                 moneyRepository.save(relatedMoney);
             }
+        }
+        String source = money.getSource();
+        if (Objects.nonNull(source)) {
+            List<Long> ids = Arrays.stream(source.split("\\|"))
+                    .map(Long::valueOf)
+                    .collect(Collectors.toList());
+            ids.forEach(id -> {
+                Money m = moneyRepository.findById(id).orElse(null);
+                if (Objects.nonNull(m)) {
+                    m.setTypeClosingId(null);
+                    m.setDateClosing(null);
+                    moneyRepository.save(m);
+                }
+            });
         }
         moneyRepository.delete(money);
     }
