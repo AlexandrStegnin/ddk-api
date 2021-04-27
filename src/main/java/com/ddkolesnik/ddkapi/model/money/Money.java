@@ -78,6 +78,9 @@ public class Money {
     @Column(name = "source_id")
     Long sourceMoneyId;
 
+    @Column(name = "source")
+    String source;
+
     public Money(Money old, BigDecimal taxRate) {
         this.id = null;
         this.givenCash = old.getGivenCash().multiply(taxRate);
@@ -107,6 +110,7 @@ public class Money {
         this.newCashDetailId = newCashDetailId;
         this.realDateGiven = realDateGiven;
         this.sourceMoneyId = old.getId();
+        this.source = old.getId().toString();
     }
 
 }
