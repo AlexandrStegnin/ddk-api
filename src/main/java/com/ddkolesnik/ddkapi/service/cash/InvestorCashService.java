@@ -365,6 +365,10 @@ public class InvestorCashService {
         money.setGivenCash(dto.getGivenCash());
         money.setDateGiven(dto.getDateGiven());
         money.setTransactionUUID(dto.getTransactionUUID());
+        if (!dto.getCashSource().equalsIgnoreCase(money.getCashSource().getOrganization())) {
+            CashSource cashSource = findCashSource(dto.getCashSource());
+            money.setCashSource(cashSource);
+        }
     }
 
     /**
