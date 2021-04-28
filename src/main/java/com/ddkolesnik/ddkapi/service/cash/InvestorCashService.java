@@ -152,7 +152,7 @@ public class InvestorCashService {
      * @param dto DTO суммы для перепродажи
      */
     private void createResaleShare(InvestorCashDTO dto) {
-        BigDecimal fromCash = dto.getGivenCash().subtract(BigDecimal.valueOf(0.5));
+        BigDecimal fromCash = dto.getGivenCash().add(BigDecimal.valueOf(0.5));
         String investorSellerCode = dto.getInvestorSellerCode();
         if (Objects.isNull(investorSellerCode)) {
             throw new ApiException("Не указан код инвестора продавца", HttpStatus.PRECONDITION_FAILED);
