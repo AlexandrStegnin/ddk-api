@@ -17,14 +17,14 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import static com.ddkolesnik.ddkapi.util.Constant.*;
+import static com.ddkolesnik.ddkapi.util.Constant.PATH_INVESTOR_CASH;
+import static com.ddkolesnik.ddkapi.util.Constant.PATH_INVESTOR_CASH_UPDATE;
 
 /**
  * Контроллер для работы с проводками из 1С
@@ -56,9 +56,7 @@ public class InvestorCashController {
                                                  @PathVariable(name = "token") @ValidToken String token,
                                                  @Parameter(description = "Проводка из 1С", schema = @Schema(implementation = InvestorCashDTO.class))
                                                  @Valid @RequestBody InvestorCashDTO dto) {
-        investorCashService.update(dto);
-        log.info("Проводка успешно обновлена [{}]", dto);
-        return new ApiSuccessResponse(HttpStatus.OK, "Данные успешно сохранены");
+        return investorCashService.update(dto);
     }
 
 }

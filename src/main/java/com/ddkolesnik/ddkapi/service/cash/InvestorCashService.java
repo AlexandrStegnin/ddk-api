@@ -1,6 +1,7 @@
 package com.ddkolesnik.ddkapi.service.cash;
 
 import com.ddkolesnik.ddkapi.configuration.exception.ApiException;
+import com.ddkolesnik.ddkapi.configuration.exception.ApiSuccessResponse;
 import com.ddkolesnik.ddkapi.dto.cash.InvestorCashDTO;
 import com.ddkolesnik.ddkapi.model.app.Account;
 import com.ddkolesnik.ddkapi.model.app.AppUser;
@@ -70,12 +71,7 @@ public class InvestorCashService {
 
     AccountRepository accountRepository;
 
-    /**
-     * Создать или обновить проводку, пришедшую из 1С
-     *
-     * @param dto - DTO объект из 1С
-     */
-    public void update(InvestorCashDTO dto) {
+    public ApiSuccessResponse update(InvestorCashDTO dto) {
         if (checkCash(dto)) {
             AccountingCode code = AccountingCode.fromCode(dto.getAccountingCode());
             Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
@@ -104,7 +100,9 @@ public class InvestorCashService {
                     }
                 }
             }
+            log.info("Проводка успешно обновлена [{}]", dto);
         }
+        return new ApiSuccessResponse(HttpStatus.OK, "Данные успешно сохранены");
     }
 
     /**
@@ -369,6 +367,10 @@ public class InvestorCashService {
             CashSource cashSource = findCashSource(dto.getCashSource());
             money.setCashSource(cashSource);
         }
+        if (!dto.getInvestorCode().equalsIgnoreCase(extractInvestorCode(money))) {
+            Investor investor = findInvestor(dto.getInvestorCode());
+            money.setInvestor(investor);
+        }
     }
 
     /**
@@ -500,6 +502,10 @@ public class InvestorCashService {
      */
     private void updateTransaction(Money money) {
         accountTransactionService.updateTransaction(money);
+    }
+
+    private String extractInvestorCode(Money money) {
+        return money.getInvestor().getLogin().replaceAll("\\D+", "");
     }
 
 }
