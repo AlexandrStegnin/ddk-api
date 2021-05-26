@@ -222,6 +222,10 @@ public class AccountTransactionService {
                     break;
                 case CREDIT:
                     transaction.setCash(money.getGivenCash().negate());
+                    Account recipient = findByOwnerId(money.getFacility().getId(), OwnerType.FACILITY);
+                    if (isNotSameRecipient(transaction.getRecipient(), recipient)) {
+                        transaction.setRecipient(recipient);
+                    }
             }
         }
     }
@@ -265,6 +269,10 @@ public class AccountTransactionService {
      */
     public AccountTransaction update(AccountTransaction accountTransaction) {
         return accountTransactionRepository.save(accountTransaction);
+    }
+
+    private boolean isNotSameRecipient(Account current, Account found) {
+        return !current.getId().equals(found.getId());
     }
 
 }
