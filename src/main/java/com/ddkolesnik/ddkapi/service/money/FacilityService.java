@@ -66,7 +66,7 @@ public class FacilityService {
      */
     private void updateFacility(Facility facility, FacilityDTO dto) {
         facility.setProjectUUID(dto.getProjectUUID());
-        facility.setName(dto.getName());
+        facility.setName(prepareName(dto));
         facility.setFullName(dto.getName());
         facilityRepository.save(facility);
         Account account = accountService.findByOwnerId(facility.getId(), OwnerType.FACILITY);
