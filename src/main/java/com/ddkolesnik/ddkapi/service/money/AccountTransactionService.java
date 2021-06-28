@@ -1,5 +1,8 @@
 package com.ddkolesnik.ddkapi.service.money;
 
+import static com.ddkolesnik.ddkapi.util.Constant.COMMISSION_RATE;
+import static com.ddkolesnik.ddkapi.util.Constant.DDK_USER_ID;
+
 import com.ddkolesnik.ddkapi.configuration.exception.ApiException;
 import com.ddkolesnik.ddkapi.model.app.Account;
 import com.ddkolesnik.ddkapi.model.cash.UserAgreement;
@@ -10,15 +13,16 @@ import com.ddkolesnik.ddkapi.repository.money.AccountTransactionRepository;
 import com.ddkolesnik.ddkapi.repository.money.MoneyRepository;
 import com.ddkolesnik.ddkapi.service.app.AccountService;
 import com.ddkolesnik.ddkapi.service.cash.UserAgreementService;
-import com.ddkolesnik.ddkapi.util.*;
+import com.ddkolesnik.ddkapi.util.AccountingCode;
+import com.ddkolesnik.ddkapi.util.ConcludedWith;
+import com.ddkolesnik.ddkapi.util.DateUtils;
+import com.ddkolesnik.ddkapi.util.OperationType;
+import com.ddkolesnik.ddkapi.util.OwnerType;
+import java.math.BigDecimal;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-
-import static com.ddkolesnik.ddkapi.util.Constant.COMMISSION_RATE;
-import static com.ddkolesnik.ddkapi.util.Constant.DDK_USER_ID;
 
 /**
  * @author Alexandr Stegnin
@@ -226,6 +230,9 @@ public class AccountTransactionService {
                     if (isNotSameRecipient(transaction.getRecipient(), recipient)) {
                         transaction.setRecipient(recipient);
                     }
+            }
+            if (Objects.nonNull(transaction.getParent())) {
+                transaction.getParent().setCash(money.getGivenCash());
             }
         }
     }
