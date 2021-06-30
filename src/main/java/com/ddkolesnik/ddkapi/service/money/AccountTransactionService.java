@@ -1,11 +1,9 @@
 package com.ddkolesnik.ddkapi.service.money;
 
-import static com.ddkolesnik.ddkapi.util.Constant.COMMISSION_RATE;
 import static com.ddkolesnik.ddkapi.util.Constant.DDK_USER_ID;
 
 import com.ddkolesnik.ddkapi.configuration.exception.ApiException;
 import com.ddkolesnik.ddkapi.model.app.Account;
-import com.ddkolesnik.ddkapi.model.cash.UserAgreement;
 import com.ddkolesnik.ddkapi.model.log.CashType;
 import com.ddkolesnik.ddkapi.model.money.AccountTransaction;
 import com.ddkolesnik.ddkapi.model.money.Money;
@@ -14,7 +12,6 @@ import com.ddkolesnik.ddkapi.repository.money.MoneyRepository;
 import com.ddkolesnik.ddkapi.service.app.AccountService;
 import com.ddkolesnik.ddkapi.service.cash.UserAgreementService;
 import com.ddkolesnik.ddkapi.util.AccountingCode;
-import com.ddkolesnik.ddkapi.util.ConcludedWith;
 import com.ddkolesnik.ddkapi.util.DateUtils;
 import com.ddkolesnik.ddkapi.util.OperationType;
 import com.ddkolesnik.ddkapi.util.OwnerType;
@@ -82,17 +79,7 @@ public class AccountTransactionService {
     public AccountTransaction cashing(Money money, AccountingCode accountingCode) {
         Account owner = findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
         try {
-            AccountTransaction parentTx = createCashingCreditTransaction(owner, money, accountingCode);
-            UserAgreement userAgreement = userAgreementService.findByInvestorAndFacility(money.getInvestor(), money.getFacility());
-            if (userAgreement == null) {
-                throw new ApiException("Не найдена информация \"С кем заключён договор\"", HttpStatus.NOT_FOUND);
-            }
-            ConcludedWith concludedWith = ConcludedWith.fromTitle(userAgreement.getConcludedWith());
-            if (ConcludedWith.needCreateCommission(concludedWith)) {
-                Money commission = new Money(money, COMMISSION_RATE);
-                return createCommissionCreditTransaction(money, commission, parentTx);
-            }
-            return parentTx;
+            return createCashingCreditTransaction(owner, money, accountingCode);
         } catch (Exception e) {
             log.error("Произошла ошибка: " + e.getLocalizedMessage());
             return null;
@@ -189,26 +176,6 @@ public class AccountTransactionService {
         creditTx.setCash(givenCash);
         creditTx.setTransactionUUID(money.getTransactionUUID());
         creditTx.setAccountingCode(accountingCode.getCode());
-        return accountTransactionRepository.save(creditTx);
-    }
-
-    /**
-     * Создать расходную транзакцию по счёту на сумму комиссии
-     *
-     * @param money      сумма
-     * @param commission сумма комиссии
-     */
-    public AccountTransaction createCommissionCreditTransaction(Money money, Money commission, AccountTransaction parentTx) {
-        Account owner = findByOwnerId(money.getInvestor().getId(), OwnerType.INVESTOR);
-        Account payer = findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
-        AccountTransaction creditTx = new AccountTransaction(owner);
-        creditTx.setTxDate(DateUtils.convert(money.getDateGiven()));
-        creditTx.setOperationType(OperationType.CREDIT);
-        creditTx.setPayer(payer);
-        creditTx.setRecipient(owner);
-        creditTx.setCashType(CashType.CASH_1C_COMMISSION);
-        creditTx.setCash(commission.getGivenCash());
-        creditTx.setParent(parentTx);
         return accountTransactionRepository.save(creditTx);
     }
 
