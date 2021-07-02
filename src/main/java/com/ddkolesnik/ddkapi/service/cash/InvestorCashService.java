@@ -492,7 +492,7 @@ public class InvestorCashService {
      * @return результат проверки
      */
     private boolean checkCash(InvestorCashDTO dto) {
-        boolean isAfterFilteredDate = Objects.nonNull(dto.getGivenCash())
+        boolean isAfterFilteredDate = Objects.nonNull(dto.getDateGiven())
             && dto.getDateGiven().isAfter(FILTERED_DATE);
         if (!isAfterFilteredDate) {
             log.info("Сумма не прошла первичную проверку {}", dto);
