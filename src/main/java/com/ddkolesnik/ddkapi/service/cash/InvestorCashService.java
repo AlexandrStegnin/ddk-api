@@ -492,7 +492,7 @@ public class InvestorCashService {
      * @return результат проверки
      */
     private boolean checkCash(InvestorCashDTO dto) {
-        return dto.getDateGiven().isAfter(FILTERED_DATE);
+        return Objects.nonNull(dto.getGivenCash()) && dto.getDateGiven().isAfter(FILTERED_DATE);
     }
 
     /**
