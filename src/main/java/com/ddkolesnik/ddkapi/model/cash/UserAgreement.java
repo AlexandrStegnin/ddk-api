@@ -1,5 +1,6 @@
 package com.ddkolesnik.ddkapi.model.cash;
 
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -52,4 +53,11 @@ public class UserAgreement {
     @Column(name = "organization")
     String organization;
 
+    @Column(name = "modified_time")
+    LocalDateTime modifiedTime;
+
+    @PreUpdate
+    public void preUpdate() {
+        this.modifiedTime = LocalDateTime.now();
+    }
 }
