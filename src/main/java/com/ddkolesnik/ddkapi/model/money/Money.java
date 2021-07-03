@@ -113,4 +113,25 @@ public class Money {
         this.source = old.getId().toString();
     }
 
+    public Money(Money old) {
+        this.id = null;
+        this.givenCash = null;
+        this.facility = old.getFacility();
+        this.dateGiven = old.getDateGiven();
+        this.investor = old.getInvestor();
+        this.dateClosing = old.getDateClosing();
+        this.transactionUUID = UUID.randomUUID().toString();
+        this.cashSource = old.getCashSource();
+        this.underFacility = old.getUnderFacility();
+        this.shareType = old.getShareType();
+        this.state = old.getState();
+        this.transaction = old.getTransaction();
+        this.investor = old.getInvestor();
+        this.newCashDetailId = old.getNewCashDetailId();
+        this.realDateGiven = old.getRealDateGiven();
+        this.sourceMoneyId = old.getId();
+        this.source = old.getId().toString();
+        this.typeClosingId = old.getTypeClosingId();
+    }
+
 }

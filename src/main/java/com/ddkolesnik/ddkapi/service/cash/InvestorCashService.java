@@ -34,6 +34,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -161,41 +162,87 @@ public class InvestorCashService {
      * @param dto DTO суммы для перепродажи
      */
     private void createResaleShare(InvestorCashDTO dto) {
-        BigDecimal fromCash = dto.getGivenCash().add(BigDecimal.valueOf(0.5));
         String investorSellerCode = dto.getInvestorSellerCode();
         if (Objects.isNull(investorSellerCode)) {
             throw new ApiException("Не указан код инвестора продавца", HttpStatus.PRECONDITION_FAILED);
         }
-        String login = INVESTOR_PREFIX.concat(investorSellerCode);
-        AppUser buyer = appUserRepository.findByLogin(INVESTOR_PREFIX.concat(dto.getInvestorCode()));
+        String sellerLogin = INVESTOR_PREFIX.concat(investorSellerCode);
+        String buyerLogin = INVESTOR_PREFIX.concat(dto.getInvestorCode());
+        AppUser buyer = appUserRepository.findByLogin(buyerLogin);
         if (Objects.isNull(buyer)) {
             throw new ApiException("Не найден инвестор покупатель.", HttpStatus.NOT_FOUND);
         }
-        List<Money> openedMonies = moneyRepository.getMonies(fromCash, dto.getFacility(), login);
-        if (!openedMonies.isEmpty()) {
-            Investor investor = investorService.findByLogin(buyer.getLogin());
-            CashSource cashSource = findCashSource(dto.getCashSource());
-            Money openedMoney = openedMonies.get(0);
-            Money buyMoney = new Money(openedMoney, investor, 4L, dto.getDateGiven(),
-                    dto.getTransactionUUID(), cashSource);
-            BigDecimal givenCash = openedMonies.stream()
-                    .map(Money::getGivenCash)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            buyMoney.setGivenCash(givenCash);
-            String source = openedMonies.stream()
-                    .map(m -> m.getId().toString())
-                    .collect(Collectors.joining("|"));
-            buyMoney.setSource(source);
-            createResaleTransaction(dto, buyMoney, buyer);
-            openedMonies.forEach(money -> {
-                money.setTypeClosingId(9L);
-                money.setDateClosing(dto.getDateGiven());
-            });
-            moneyRepository.saveAll(openedMonies);
-        } else {
-            log.error("Недостаточно денег для перепродажи: {}", dto);
-            throw new ApiException("Недостаточно денег для перепродажи", HttpStatus.PRECONDITION_FAILED);
+        String facility = dto.getFacility();
+        List<Money> sellerMonies = moneyRepository.getMoniesByInvestorAndFacility(sellerLogin, facility);
+
+        BigDecimal buyerSum = dto.getGivenCash();
+        checkSellerMonies(sellerMonies, buyerSum);
+
+        resaleShare(sellerMonies, buyer, dto);
+    }
+
+    private void checkSellerMonies(List<Money> sellerMonies, BigDecimal buyerSum) {
+        BigDecimal sellerSum = sellerMonies.stream()
+            .map(Money::getGivenCash)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (sellerMonies.isEmpty() || sellerSum.compareTo(buyerSum) < 0) {
+            String message = String.format("Недостаточно денег для перепродажи. Сумма продавца = %s", sellerSum.longValue());
+            log.error(message);
+            throw new ApiException(message, HttpStatus.PRECONDITION_FAILED);
         }
+    }
+
+    private void resaleShare(List<Money> sellerMonies, AppUser buyer, InvestorCashDTO dto) {
+        BigDecimal buyerSum = dto.getGivenCash();
+        BigDecimal sellerSum = sellerMonies.stream()
+            .map(Money::getGivenCash)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (isBuyerSumLowerThanSellerSum(buyerSum, sellerSum)) {
+            Money sellerBiggestSum = sellerMonies.stream().max(Comparator.comparing(Money::getGivenCash))
+                .orElseThrow();
+            divideMonies(sellerBiggestSum, buyerSum);
+
+            closeSellerAndOpenBuyerMonies(sellerBiggestSum, buyer, dto);
+        } else if (isBuyerSumEqualToSellerSum(buyerSum, sellerSum)) {
+            for (Money sellerMoney : sellerMonies) {
+                closeSellerAndOpenBuyerMonies(sellerMoney, buyer, dto);
+            }
+        }
+    }
+
+    private void closeSellerAndOpenBuyerMonies(Money sellerSum, AppUser buyer, InvestorCashDTO dto) {
+        Investor investor = investorService.findByLogin(buyer.getLogin());
+        CashSource cashSource = findCashSource(dto.getCashSource());
+
+        Money buyMoney = new Money(sellerSum, investor, 4L, dto.getDateGiven(),
+            dto.getTransactionUUID(), cashSource);
+
+        String source = sellerSum.getId().toString();
+        buyMoney.setSource(source);
+        createResaleTransaction(dto, buyMoney, buyer);
+        sellerSum.setTypeClosingId(9L);
+        sellerSum.setDateClosing(dto.getDateGiven());
+        moneyRepository.save(sellerSum);
+    }
+
+    private boolean isBuyerSumLowerThanSellerSum(BigDecimal buyerSum, BigDecimal sellerSum) {
+        return buyerSum.compareTo(sellerSum) < 0;
+    }
+
+    private boolean isBuyerSumEqualToSellerSum(BigDecimal buyerSum, BigDecimal sellerSum) {
+        return buyerSum.compareTo(sellerSum) == 0;
+    }
+
+    private void divideMonies(Money sellerBiggestSum, BigDecimal buyerSum) {
+        BigDecimal newSellerSum = sellerBiggestSum.getGivenCash().subtract(buyerSum);
+        Money newSellerMoney = new Money(sellerBiggestSum);
+        newSellerMoney.setGivenCash(newSellerSum);
+        newSellerMoney.setSource(sellerBiggestSum.getId().toString());
+        sellerBiggestSum.setGivenCash(buyerSum);
+        moneyRepository.save(sellerBiggestSum);
+        moneyRepository.save(newSellerMoney);
     }
 
     /**
@@ -258,6 +305,18 @@ public class InvestorCashService {
             });
         }
         moneyRepository.delete(money);
+        List<Money> sourceMonies = moneyRepository.findBySource(sourceMoneyId.toString());
+        if (sourceMonies.size() == 1) {
+            Money sourceMoney = sourceMonies.get(0);
+            if (Objects.nonNull(sourceMoney.getSourceMoneyId())) {
+                Money parentMoney = moneyRepository.findById(sourceMonies.get(0).getSourceMoneyId()).orElse(null);
+                if (Objects.nonNull(parentMoney)) {
+                    parentMoney.setGivenCash(parentMoney.getGivenCash().add(sourceMoney.getGivenCash()));
+                    moneyRepository.save(parentMoney);
+                    moneyRepository.delete(sourceMoney);
+                }
+            }
+        }
     }
 
     /**
