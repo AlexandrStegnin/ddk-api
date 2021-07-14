@@ -305,15 +305,17 @@ public class InvestorCashService {
             });
         }
         moneyRepository.delete(money);
-        List<Money> sourceMonies = moneyRepository.findBySource(sourceMoneyId.toString());
-        if (sourceMonies.size() == 1) {
-            Money sourceMoney = sourceMonies.get(0);
-            if (Objects.nonNull(sourceMoney.getSourceMoneyId())) {
-                Money parentMoney = moneyRepository.findById(sourceMonies.get(0).getSourceMoneyId()).orElse(null);
-                if (Objects.nonNull(parentMoney)) {
-                    parentMoney.setGivenCash(parentMoney.getGivenCash().add(sourceMoney.getGivenCash()));
-                    moneyRepository.save(parentMoney);
-                    moneyRepository.delete(sourceMoney);
+        if (Objects.nonNull(sourceMoneyId)) {
+            List<Money> sourceMonies = moneyRepository.findBySource(sourceMoneyId.toString());
+            if (sourceMonies.size() == 1) {
+                Money sourceMoney = sourceMonies.get(0);
+                if (Objects.nonNull(sourceMoney.getSourceMoneyId())) {
+                    Money parentMoney = moneyRepository.findById(sourceMonies.get(0).getSourceMoneyId()).orElse(null);
+                    if (Objects.nonNull(parentMoney)) {
+                        parentMoney.setGivenCash(parentMoney.getGivenCash().add(sourceMoney.getGivenCash()));
+                        moneyRepository.save(parentMoney);
+                        moneyRepository.delete(sourceMoney);
+                    }
                 }
             }
         }
