@@ -1,5 +1,7 @@
 package com.ddkolesnik.ddkapi.service.cash;
 
+import static com.ddkolesnik.ddkapi.util.Constant.INVESTOR_PREFIX;
+
 import com.ddkolesnik.ddkapi.configuration.exception.ApiException;
 import com.ddkolesnik.ddkapi.dto.cash.UserAgreementDTO;
 import com.ddkolesnik.ddkapi.model.app.AppUser;
@@ -9,13 +11,12 @@ import com.ddkolesnik.ddkapi.model.money.Investor;
 import com.ddkolesnik.ddkapi.repository.cash.UserAgreementRepository;
 import com.ddkolesnik.ddkapi.service.app.AppUserService;
 import com.ddkolesnik.ddkapi.service.money.FacilityService;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import static com.ddkolesnik.ddkapi.util.Constant.INVESTOR_PREFIX;
 
 /**
  * @author Alexandr Stegnin
@@ -45,7 +46,7 @@ public class UserAgreementService {
     private UserAgreement create(UserAgreementDTO dto) {
         Facility facility = facilityService.findByFullName(dto.getFacility());
         AppUser investor = appUserService.findByLogin(dto.getConcludedFrom());
-        if (investor == null) {
+        if (Objects.isNull(investor)) {
             throw new ApiException("Пользователь [" + dto.getConcludedFrom() + "] не найден", HttpStatus.NOT_FOUND);
         }
         UserAgreement userAgreement = new UserAgreement();
@@ -53,6 +54,7 @@ public class UserAgreementService {
         userAgreement.setConcludedWith(dto.getConcludedWith());
         userAgreement.setTaxRate(dto.getTaxRate());
         userAgreement.setConcludedFrom(investor.getId());
+        userAgreement.setOrganization(dto.getOrganization());
         return userAgreementRepository.save(userAgreement);
     }
 
@@ -66,11 +68,11 @@ public class UserAgreementService {
         Facility facility = facilityService.findByFullName(dto.getFacility());
         dto.setConcludedFrom(INVESTOR_PREFIX.concat(dto.getConcludedFrom()));
         AppUser investor = appUserService.findByLogin(dto.getConcludedFrom());
-        if (investor == null) {
+        if (Objects.isNull(investor)) {
             throw new ApiException("Пользователь [" + dto.getConcludedFrom() + "] не найден", HttpStatus.NOT_FOUND);
         }
         UserAgreement userAgreement = userAgreementRepository.findByFacilityIdAndConcludedFrom(facility.getId(), investor.getId());
-        if (userAgreement == null) {
+        if (Objects.isNull(userAgreement)) {
             return create(dto);
         }
         userAgreement.setConcludedFrom(investor.getId());
