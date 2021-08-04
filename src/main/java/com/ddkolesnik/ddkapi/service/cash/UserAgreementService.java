@@ -7,7 +7,6 @@ import com.ddkolesnik.ddkapi.dto.cash.UserAgreementDTO;
 import com.ddkolesnik.ddkapi.model.app.AppUser;
 import com.ddkolesnik.ddkapi.model.cash.UserAgreement;
 import com.ddkolesnik.ddkapi.model.money.Facility;
-import com.ddkolesnik.ddkapi.model.money.Investor;
 import com.ddkolesnik.ddkapi.repository.cash.UserAgreementRepository;
 import com.ddkolesnik.ddkapi.service.app.AppUserService;
 import com.ddkolesnik.ddkapi.service.money.FacilityService;
@@ -49,12 +48,13 @@ public class UserAgreementService {
         if (Objects.isNull(investor)) {
             throw new ApiException("Пользователь [" + dto.getConcludedFrom() + "] не найден", HttpStatus.NOT_FOUND);
         }
-        UserAgreement userAgreement = new UserAgreement();
-        userAgreement.setFacilityId(facility.getId());
-        userAgreement.setConcludedWith(dto.getConcludedWith());
-        userAgreement.setTaxRate(dto.getTaxRate());
-        userAgreement.setConcludedFrom(investor.getId());
-        userAgreement.setOrganization(dto.getOrganization());
+        UserAgreement userAgreement = UserAgreement.builder()
+            .facilityId(facility.getId())
+            .concludedWith(dto.getConcludedWith())
+            .taxRate(dto.getTaxRate())
+            .concludedFrom(investor.getId())
+            .organization(dto.getOrganization())
+            .build();
         return userAgreementRepository.save(userAgreement);
     }
 
@@ -74,22 +74,10 @@ public class UserAgreementService {
         UserAgreement userAgreement = userAgreementRepository.findByFacilityIdAndConcludedFrom(facility.getId(), investor.getId());
         if (Objects.isNull(userAgreement)) {
             return create(dto);
+        } else {
+            userAgreementRepository.delete(userAgreement);
         }
-        userAgreement.setConcludedFrom(investor.getId());
-        userAgreement.setTaxRate(dto.getTaxRate());
-        userAgreement.setConcludedWith(dto.getConcludedWith());
-        userAgreement.setOrganization(dto.getOrganization());
-        return userAgreementRepository.save(userAgreement);
+        return create(dto);
     }
 
-    /**
-     * Найти инфо о том, с кем заключён договор
-     *
-     * @param investor инвестор
-     * @param facility объект
-     * @return найденная информация
-     */
-    public UserAgreement findByInvestorAndFacility(Investor investor, Facility facility) {
-        return userAgreementRepository.findByFacilityIdAndConcludedFrom(facility.getId(), investor.getId());
-    }
 }
