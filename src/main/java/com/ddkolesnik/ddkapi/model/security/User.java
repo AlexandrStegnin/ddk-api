@@ -16,7 +16,7 @@ import java.util.Set;
 
 @Data
 @Entity
-@Table(name = "app_user", schema = "pss_projects", catalog = "pss_projects")
+@Table(name = "app_user", schema = "investments", catalog = "investments")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User implements UserDetails {
 

@@ -16,7 +16,7 @@ import static com.ddkolesnik.ddkapi.util.Constant.ROLE_PREFIX;
 
 @Data
 @Entity
-@Table(name = "app_role", schema = "pss_projects", catalog = "pss_projects")
+@Table(name = "app_role", schema = "investments", catalog = "investments")
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false, of = "id")
 public class Role extends AbstractEntity implements GrantedAuthority {
