@@ -1,8 +1,5 @@
 package com.ddkolesnik.ddkapi.service.cash;
 
-import static com.ddkolesnik.ddkapi.util.Constant.COMMISSION_RATE;
-import static com.ddkolesnik.ddkapi.util.Constant.INVESTOR_PREFIX;
-
 import com.ddkolesnik.ddkapi.configuration.exception.ApiException;
 import com.ddkolesnik.ddkapi.configuration.exception.ApiSuccessResponse;
 import com.ddkolesnik.ddkapi.dto.cash.InvestorCashDTO;
@@ -11,11 +8,7 @@ import com.ddkolesnik.ddkapi.model.app.AppUser;
 import com.ddkolesnik.ddkapi.model.cash.CashSource;
 import com.ddkolesnik.ddkapi.model.log.CashType;
 import com.ddkolesnik.ddkapi.model.log.TransactionLog;
-import com.ddkolesnik.ddkapi.model.money.AccountTransaction;
-import com.ddkolesnik.ddkapi.model.money.Facility;
-import com.ddkolesnik.ddkapi.model.money.Investor;
-import com.ddkolesnik.ddkapi.model.money.Money;
-import com.ddkolesnik.ddkapi.model.money.UnderFacility;
+import com.ddkolesnik.ddkapi.model.money.*;
 import com.ddkolesnik.ddkapi.repository.app.AccountRepository;
 import com.ddkolesnik.ddkapi.repository.app.AppUserRepository;
 import com.ddkolesnik.ddkapi.repository.money.MoneyRepository;
@@ -25,20 +18,7 @@ import com.ddkolesnik.ddkapi.service.money.AccountTransactionService;
 import com.ddkolesnik.ddkapi.service.money.FacilityService;
 import com.ddkolesnik.ddkapi.service.money.InvestorService;
 import com.ddkolesnik.ddkapi.service.money.UnderFacilityService;
-import com.ddkolesnik.ddkapi.util.AccountingCode;
-import com.ddkolesnik.ddkapi.util.Constant;
-import com.ddkolesnik.ddkapi.util.DateUtils;
-import com.ddkolesnik.ddkapi.util.OwnerType;
-import com.ddkolesnik.ddkapi.util.ShareType;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.ddkolesnik.ddkapi.util.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -47,6 +27,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.ddkolesnik.ddkapi.util.Constant.COMMISSION_RATE;
+import static com.ddkolesnik.ddkapi.util.Constant.INVESTOR_PREFIX;
 
 /**
  * Сервис для работы с проводками из 1С
@@ -205,16 +193,15 @@ public class InvestorCashService {
           .map(Money::getGivenCash)
           .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-      if (isBuyerSumLowerThanSellerSum(buyerSum, sellerSum)) {
-        Money sellerBiggestSum = sellerMonies.stream().max(Comparator.comparing(Money::getGivenCash))
-            .orElseThrow();
-        divideMonies(sellerBiggestSum, buyerSum);
-
-        closeSellerAndOpenBuyerMonies(sellerBiggestSum, buyer, dto);
-      } else if (isBuyerSumEqualToSellerSum(buyerSum, sellerSum)) {
+      if (isBuyerSumAroundSellerSum(buyerSum, sellerSum)) {
         for (Money sellerMoney : sellerMonies) {
           closeSellerAndOpenBuyerMonies(sellerMoney, buyer, dto);
         }
+      } else if (isBuyerSumLowerThanSellerSum(buyerSum, sellerSum)) {
+        Money sellerBiggestSum = sellerMonies.stream().max(Comparator.comparing(Money::getGivenCash))
+            .orElseThrow();
+        divideMonies(sellerBiggestSum, buyerSum);
+        closeSellerAndOpenBuyerMonies(sellerBiggestSum, buyer, dto);
       }
     } else {
         closeSellerAndOpenBuyerMonies(sellerEqualSum, buyer, dto);
@@ -240,8 +227,10 @@ public class InvestorCashService {
     return buyerSum.compareTo(sellerSum) < 0;
   }
 
-  private boolean isBuyerSumEqualToSellerSum(BigDecimal buyerSum, BigDecimal sellerSum) {
-    return buyerSum.compareTo(sellerSum) == 0;
+  private boolean isBuyerSumAroundSellerSum(BigDecimal buyerSum, BigDecimal sellerSum) {
+    BigDecimal inaccuracy = BigDecimal.valueOf(0.5);
+    return buyerSum.compareTo(sellerSum.subtract(inaccuracy)) >= 0 &&
+        buyerSum.compareTo(sellerSum.add(inaccuracy)) <= 0;
   }
 
   private void divideMonies(Money sellerBiggestSum, BigDecimal buyerSum) {
