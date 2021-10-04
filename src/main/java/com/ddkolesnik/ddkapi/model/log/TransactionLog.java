@@ -24,7 +24,7 @@ import static com.ddkolesnik.ddkapi.util.Constant.CREATOR_1C;
 public class TransactionLog {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
