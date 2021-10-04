@@ -4,6 +4,8 @@ import com.ddkolesnik.ddkapi.model.money.AccountTransaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @author Alexandr Stegnin
  */
@@ -13,6 +15,6 @@ public interface AccountTransactionRepository extends JpaRepository<AccountTrans
 
     AccountTransaction findByParentId(Long parentTxId);
 
-    AccountTransaction findByTransactionUUID(String uuid);
+    List<AccountTransaction> findByTransactionUUID(String uuid);
 
 }

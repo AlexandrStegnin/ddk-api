@@ -74,7 +74,7 @@ public class InvestorCashService {
   public ApiSuccessResponse update(InvestorCashDTO dto) {
     if (checkCash(dto)) {
       AccountingCode code = AccountingCode.fromCode(dto.getAccountingCode());
-      Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
+      Money money = getByTransactionUUID(dto);
       if (dto.isDelete() && Objects.nonNull(money) && Objects.isNull(code)) {
         delete(money);
       } else {
@@ -135,7 +135,7 @@ public class InvestorCashService {
     if (dto.isDelete()) {
       deleteResale(dto);
     } else {
-      Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
+      Money money = getByTransactionUUID(dto);
       if (Objects.nonNull(money)) {
         throw new ApiException("Обновление проводки перепродажи доли не предусмотрено", HttpStatus.BAD_REQUEST);
       } else {
@@ -266,7 +266,7 @@ public class InvestorCashService {
    * @param dto DTO для удаления
    */
   private void deleteResale(InvestorCashDTO dto) {
-    Money money = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
+    Money money = getByTransactionUUID(dto);
     Money relatedMoney;
     if (Objects.isNull(money)) {
       throw new ApiException("Не найдена сумма для удаления", HttpStatus.NOT_FOUND);
@@ -580,6 +580,18 @@ public class InvestorCashService {
 
   private String extractInvestorCode(Money money) {
     return money.getInvestor().getLogin().replaceAll("\\D+", "");
+  }
+
+  private Money getByTransactionUUID(InvestorCashDTO dto) {
+    List<Money> monies = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
+    if (monies.size() > 1) {
+      log.error("Найдено несколько сумм по UUID {}: {}", dto.getTransactionUUID(), monies);
+      throw new ApiException(
+          String.format("Найдено несколько сумм по UUID %s", dto.getTransactionUUID()), HttpStatus.BAD_REQUEST);
+    } else if (monies.size() == 0) {
+      return null;
+    }
+    return monies.get(0);
   }
 
 }

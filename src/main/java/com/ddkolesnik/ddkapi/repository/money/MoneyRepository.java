@@ -1,14 +1,15 @@
 package com.ddkolesnik.ddkapi.repository.money;
 
 import com.ddkolesnik.ddkapi.model.money.Money;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 
 /**
  * @author Alexandr Stegnin
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MoneyRepository extends JpaRepository<Money, Long>, JpaSpecificationExecutor<Money> {
 
-  Money findByTransactionUUID(String uuid);
+  List<Money> findByTransactionUUID(String uuid);
 
   Long countByInvestorIdAndDateClosingIsNull(Long investorId);
 

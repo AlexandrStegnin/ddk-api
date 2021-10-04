@@ -1,7 +1,5 @@
 package com.ddkolesnik.ddkapi.service.money;
 
-import static com.ddkolesnik.ddkapi.util.Constant.DDK_USER_ID;
-
 import com.ddkolesnik.ddkapi.configuration.exception.ApiException;
 import com.ddkolesnik.ddkapi.model.app.Account;
 import com.ddkolesnik.ddkapi.model.log.CashType;
@@ -15,11 +13,15 @@ import com.ddkolesnik.ddkapi.util.AccountingCode;
 import com.ddkolesnik.ddkapi.util.DateUtils;
 import com.ddkolesnik.ddkapi.util.OperationType;
 import com.ddkolesnik.ddkapi.util.OwnerType;
-import java.math.BigDecimal;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
+
+import static com.ddkolesnik.ddkapi.util.Constant.DDK_USER_ID;
 
 /**
  * @author Alexandr Stegnin
@@ -215,7 +217,14 @@ public class AccountTransactionService {
      * @return найденная транзакция
      */
     public AccountTransaction findByTransactionUUID(String uuid) {
-        return accountTransactionRepository.findByTransactionUUID(uuid);
+        List<AccountTransaction> accountTransactions = accountTransactionRepository.findByTransactionUUID(uuid);
+        if (accountTransactions.size() > 1) {
+            log.error("Найдено более 1 транзакции по UUID {}: {}", uuid, accountTransactions);
+            throw new ApiException(String.format("Найдено более 1 транзакции по UUID %s", uuid), HttpStatus.BAD_REQUEST);
+        } else if (accountTransactions.size() == 0) {
+            return null;
+        }
+        return accountTransactions.get(0);
     }
 
     /**
