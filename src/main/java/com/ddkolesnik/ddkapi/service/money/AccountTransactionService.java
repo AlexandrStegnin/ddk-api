@@ -8,11 +8,13 @@ import com.ddkolesnik.ddkapi.model.money.Money;
 import com.ddkolesnik.ddkapi.repository.money.AccountTransactionRepository;
 import com.ddkolesnik.ddkapi.repository.money.MoneyRepository;
 import com.ddkolesnik.ddkapi.service.app.AccountService;
-import com.ddkolesnik.ddkapi.service.cash.UserAgreementService;
 import com.ddkolesnik.ddkapi.util.AccountingCode;
 import com.ddkolesnik.ddkapi.util.DateUtils;
 import com.ddkolesnik.ddkapi.util.OperationType;
 import com.ddkolesnik.ddkapi.util.OwnerType;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,23 +31,13 @@ import static com.ddkolesnik.ddkapi.util.Constant.DDK_USER_ID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class AccountTransactionService {
 
-  private final AccountService accountService;
-
-  private final AccountTransactionRepository accountTransactionRepository;
-
-  private final MoneyRepository moneyRepository;
-
-  private final UserAgreementService userAgreementService;
-
-  public AccountTransactionService(AccountService accountService, AccountTransactionRepository accountTransactionRepository,
-                                   MoneyRepository moneyRepository, UserAgreementService userAgreementService) {
-    this.accountService = accountService;
-    this.accountTransactionRepository = accountTransactionRepository;
-    this.moneyRepository = moneyRepository;
-    this.userAgreementService = userAgreementService;
-  }
+  AccountTransactionRepository accountTransactionRepository;
+  MoneyRepository moneyRepository;
+  AccountService accountService;
 
   /**
    * Удалить транзакцию
@@ -99,6 +91,7 @@ public class AccountTransactionService {
    */
   public AccountTransaction createInvestorDebitTransaction(Account owner, Money money,
                                                            CashType cashType, String accountingCode) {
+    checkAvailableAccountTransactionByUUID(money.getTransactionUUID());
     AccountTransaction debitTx = new AccountTransaction(owner);
     debitTx.setOperationType(OperationType.DEBIT);
     debitTx.setPayer(owner);
@@ -166,6 +159,7 @@ public class AccountTransactionService {
    * @return созданная транзакция
    */
   private AccountTransaction createCashingCreditTransaction(Account owner, Money money, AccountingCode accountingCode) {
+    checkAvailableAccountTransactionByUUID(money.getTransactionUUID());
     BigDecimal givenCash = money.getGivenCash();
     CashType cashType = CashType.CASH_1C_CASHING;
     Account payer = findByOwnerId(DDK_USER_ID, OwnerType.INVESTOR);
@@ -255,6 +249,16 @@ public class AccountTransactionService {
 
   private boolean isNotSameRecipient(Account current, Account found) {
     return !current.getId().equals(found.getId());
+  }
+
+  private void checkAvailableAccountTransactionByUUID(String uuid) {
+    if (accountTransactionRepository.existsByTransactionUUID(uuid)) {
+      log.error("Транзакция с UUID {} уже существует. Продолжение операции невозможно", uuid);
+      throw new ApiException(
+          String.format("Транзакция с UUID %s уже существует. Продолжение операции невозможно", uuid),
+          HttpStatus.BAD_REQUEST
+      );
+    }
   }
 
 }

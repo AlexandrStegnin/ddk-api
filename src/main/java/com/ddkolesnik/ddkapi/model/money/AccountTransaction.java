@@ -26,77 +26,77 @@ import java.util.Set;
 @Table(name = "account_transaction")
 public class AccountTransaction {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @Column(name = "id")
+  private Long id;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "creation_time")
-    private Date creationTime;
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "creation_time")
+  private Date creationTime;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "modified_time")
-    private Date modifiedTime;
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "modified_time")
+  private Date modifiedTime;
 
-    @PrePersist
-    public void prePersist() {
-        if (this.creationTime == null) {
-            this.creationTime = new Date();
-        }
+  @PrePersist
+  public void prePersist() {
+    if (this.creationTime == null) {
+      this.creationTime = new Date();
     }
+  }
 
-    @PreUpdate
-    public void preUpdate() {
-        this.modifiedTime = new Date();
-    }
+  @PreUpdate
+  public void preUpdate() {
+    this.modifiedTime = new Date();
+  }
 
-    @ManyToOne
-    @JoinColumn(name = "parent_acc_tx_id")
-    private AccountTransaction parent;
+  @ManyToOne
+  @JoinColumn(name = "parent_acc_tx_id")
+  private AccountTransaction parent;
 
-    @OneToMany(mappedBy = "parent", orphanRemoval = true)
-    private Set<AccountTransaction> child;
+  @OneToMany(mappedBy = "parent", orphanRemoval = true)
+  private Set<AccountTransaction> child;
 
-    @Column(name = "tx_date")
-    private Date txDate = new Date();
+  @Column(name = "tx_date")
+  private Date txDate = new Date();
 
-    @Enumerated(EnumType.ORDINAL)
-    @Column(name = "operation_type")
-    private OperationType operationType;
+  @Enumerated(EnumType.ORDINAL)
+  @Column(name = "operation_type")
+  private OperationType operationType;
 
-    @ManyToOne
-    @JoinColumn(name = "payer_account_id")
-    private Account payer;
+  @ManyToOne
+  @JoinColumn(name = "payer_account_id")
+  private Account payer;
 
-    @OneToOne
-    @JoinColumn(name = "owner_account_id")
-    private Account owner;
+  @OneToOne
+  @JoinColumn(name = "owner_account_id")
+  private Account owner;
 
-    @ManyToOne
-    @JoinColumn(name = "recipient_account_id")
-    private Account recipient;
+  @ManyToOne
+  @JoinColumn(name = "recipient_account_id")
+  private Account recipient;
 
-    @OneToMany(mappedBy = "transaction")
-    private Set<Money> monies = new HashSet<>();
+  @OneToMany(mappedBy = "transaction")
+  private Set<Money> monies = new HashSet<>();
 
-    @Enumerated(EnumType.ORDINAL)
-    @Column(name = "cash_type_id")
-    private CashType cashType;
+  @Enumerated(EnumType.ORDINAL)
+  @Column(name = "cash_type_id")
+  private CashType cashType;
 
-    @Column(name = "blocked")
-    private boolean blocked = false;
+  @Column(name = "blocked")
+  private boolean blocked = false;
 
-    @Column(name = "cash")
-    private BigDecimal cash;
+  @Column(name = "cash")
+  private BigDecimal cash;
 
-    @Column(name = "transaction_uuid")
-    private String transactionUUID;
+  @Column(name = "transaction_uuid")
+  private String transactionUUID;
 
-    @Column(name = "accounting_code")
-    private String accountingCode;
+  @Column(name = "accounting_code")
+  private String accountingCode;
 
-    public AccountTransaction(Account owner) {
-        this.owner = owner;
-    }
+  public AccountTransaction(Account owner) {
+    this.owner = owner;
+  }
 }

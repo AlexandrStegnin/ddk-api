@@ -49,26 +49,16 @@ import static com.ddkolesnik.ddkapi.util.Constant.INVESTOR_PREFIX;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class InvestorCashService {
 
-  private static final LocalDate FILTERED_DATE = LocalDate.of(2020, 6, 30);
-
+  static LocalDate FILTERED_DATE = LocalDate.of(2020, 6, 30);
   MoneyRepository moneyRepository;
-
   InvestorService investorService;
-
   FacilityService facilityService;
-
   CashSourceService cashSourceService;
-
   SendMessageService messageService;
-
   TransactionLogService transactionLogService;
-
   UnderFacilityService underFacilityService;
-
   AccountTransactionService accountTransactionService;
-
   AppUserRepository appUserRepository;
-
   AccountRepository accountRepository;
 
   public ApiSuccessResponse update(InvestorCashDTO dto) {

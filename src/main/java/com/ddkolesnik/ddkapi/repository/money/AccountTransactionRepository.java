@@ -9,12 +9,13 @@ import java.util.List;
 /**
  * @author Alexandr Stegnin
  */
-
 @Repository
 public interface AccountTransactionRepository extends JpaRepository<AccountTransaction, Long> {
 
-    AccountTransaction findByParentId(Long parentTxId);
+  AccountTransaction findByParentId(Long parentTxId);
 
-    List<AccountTransaction> findByTransactionUUID(String uuid);
+  List<AccountTransaction> findByTransactionUUID(String uuid);
+
+  boolean existsByTransactionUUID(String uuid);
 
 }
