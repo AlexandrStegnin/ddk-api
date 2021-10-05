@@ -26,7 +26,7 @@ import javax.persistence.*;
 public class UserAgreement {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long id;
 
     /**

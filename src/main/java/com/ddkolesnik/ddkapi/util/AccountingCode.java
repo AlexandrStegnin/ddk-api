@@ -1,9 +1,16 @@
 package com.ddkolesnik.ddkapi.util;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
 /**
  * @author Alexandr Stegnin
  */
-
+@Getter
+@RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum AccountingCode {
 
     CASHING("НФ-000027", "Вывод Клиентов"),
@@ -12,22 +19,8 @@ public enum AccountingCode {
     RESALE_SHARE("НФ-000259", "Перепродажа доли"),
     RESALE_SHARE_DEL("НФ-000039", "Перепродажа (удаление)");
 
-    private final String code;
-
-    private final String title;
-
-    AccountingCode(String code, String title) {
-        this.code = code;
-        this.title = title;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getTitle() {
-        return title;
-    }
+    String code;
+    String title;
 
     public static AccountingCode fromCode(String code) {
         if (code == null) {
