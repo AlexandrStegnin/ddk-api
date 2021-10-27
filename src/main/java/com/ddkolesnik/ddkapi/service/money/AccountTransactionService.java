@@ -214,7 +214,7 @@ public class AccountTransactionService {
     if (accountTransactions.size() > 1) {
       log.error("Найдено более 1 транзакции по UUID {}: {}", uuid, accountTransactions);
       throw new ApiException(String.format("Найдено более 1 транзакции по UUID %s", uuid), HttpStatus.BAD_REQUEST);
-    } else if (accountTransactions.size() == 0) {
+    } else if (accountTransactions.isEmpty()) {
       return null;
     }
     return accountTransactions.get(0);
@@ -252,13 +252,13 @@ public class AccountTransactionService {
   }
 
   private void checkAvailableAccountTransactionByUUID(String uuid) {
-    if (accountTransactionRepository.existsByTransactionUUID(uuid)) {
-      log.error("Транзакция с UUID {} уже существует. Продолжение операции невозможно", uuid);
-      throw new ApiException(
-          String.format("Транзакция с UUID %s уже существует. Продолжение операции невозможно", uuid),
-          HttpStatus.BAD_REQUEST
-      );
-    }
+//    if (accountTransactionRepository.existsByTransactionUUID(uuid)) {
+//      log.error("Транзакция с UUID {} уже существует. Продолжение операции невозможно", uuid);
+//      throw new ApiException(
+//          String.format("Транзакция с UUID %s уже существует. Продолжение операции невозможно", uuid),
+//          HttpStatus.BAD_REQUEST
+//      );
+//    }
   }
 
 }

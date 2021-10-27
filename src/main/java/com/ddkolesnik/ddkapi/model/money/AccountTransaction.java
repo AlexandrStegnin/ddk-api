@@ -27,7 +27,8 @@ import java.util.Set;
 public class AccountTransaction {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_transaction_generator")
+  @SequenceGenerator(name = "account_transaction_generator", sequenceName = "account_transaction_id_seq")
   @Column(name = "id")
   private Long id;
 

@@ -23,6 +23,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -64,10 +65,11 @@ public class InvestorCashService {
   public ApiSuccessResponse update(InvestorCashDTO dto) {
     if (checkCash(dto)) {
       AccountingCode code = AccountingCode.fromCode(dto.getAccountingCode());
-      Money money = getByTransactionUUID(dto);
-      if (dto.isDelete() && Objects.nonNull(money) && Objects.isNull(code)) {
-        delete(money);
+      List<Money> monies = getByTransactionUUID(dto);
+      if (dto.isDelete() && !monies.isEmpty() && Objects.isNull(code)) {
+        monies.forEach(this::delete);
       } else {
+        Money money = monies.get(0);
         if (Objects.nonNull(code) && code.isResale()) {
           resaleShare(dto);
         } else if (Objects.nonNull(code) && code.isCashing()) {
@@ -125,8 +127,8 @@ public class InvestorCashService {
     if (dto.isDelete()) {
       deleteResale(dto);
     } else {
-      Money money = getByTransactionUUID(dto);
-      if (Objects.nonNull(money)) {
+      List<Money> monies = getByTransactionUUID(dto);
+      if (!monies.isEmpty()) {
         throw new ApiException("Обновление проводки перепродажи доли не предусмотрено", HttpStatus.BAD_REQUEST);
       } else {
         createResaleShare(dto);
@@ -256,20 +258,39 @@ public class InvestorCashService {
    * @param dto DTO для удаления
    */
   private void deleteResale(InvestorCashDTO dto) {
-    Money money = getByTransactionUUID(dto);
-    Money relatedMoney;
-    if (Objects.isNull(money)) {
+    List<Money> monies = getByTransactionUUID(dto);
+    if (monies.isEmpty()) {
       throw new ApiException("Не найдена сумма для удаления", HttpStatus.NOT_FOUND);
     }
-    AccountTransaction transaction = money.getTransaction();
-    if (Objects.isNull(transaction)) {
-      throw new ApiException("Не найдена транзакция по перепродаже доли", HttpStatus.NOT_FOUND);
+    for (Money money : monies) {
+      deleteAccountTransactions(money);
+      Long sourceMoneyId = releaseRelatedMonies(money);
+      releaseMoniesBySource(money);
+      moneyRepository.delete(money);
+      releaseParentAndDeleteSourceMoney(sourceMoneyId);
     }
-    AccountTransaction parentTx = transaction.getParent();
-    accountTransactionService.delete(transaction);
-    if (Objects.nonNull(parentTx)) {
-      accountTransactionService.delete(parentTx);
+  }
+
+  private void releaseParentAndDeleteSourceMoney(Long sourceMoneyId) {
+    if (Objects.nonNull(sourceMoneyId)) {
+      List<Money> sourceMonies = moneyRepository.findBySource(sourceMoneyId.toString());
+      if (sourceMonies.size() == 1) {
+        Money sourceMoney = sourceMonies.get(0);
+        if (Objects.nonNull(sourceMoney.getSourceMoneyId())) {
+          Money parentMoney = moneyRepository.findById(sourceMonies.get(0).getSourceMoneyId()).orElse(null);
+          if (Objects.nonNull(parentMoney)) {
+            parentMoney.setGivenCash(parentMoney.getGivenCash().add(sourceMoney.getGivenCash()));
+            moneyRepository.save(parentMoney);
+            moneyRepository.delete(sourceMoney);
+          }
+        }
+      }
     }
+  }
+
+  @Nullable
+  private Long releaseRelatedMonies(Money money) {
+    Money relatedMoney;
     Long sourceMoneyId = money.getSourceMoneyId();
     if (Objects.nonNull(sourceMoneyId)) {
       relatedMoney = moneyRepository.findById(sourceMoneyId).orElse(null);
@@ -279,6 +300,10 @@ public class InvestorCashService {
         moneyRepository.save(relatedMoney);
       }
     }
+    return sourceMoneyId;
+  }
+
+  private void releaseMoniesBySource(Money money) {
     String source = money.getSource();
     if (Objects.nonNull(source)) {
       List<Long> ids = Arrays.stream(source.split("\\|"))
@@ -293,20 +318,17 @@ public class InvestorCashService {
         }
       });
     }
-    moneyRepository.delete(money);
-    if (Objects.nonNull(sourceMoneyId)) {
-      List<Money> sourceMonies = moneyRepository.findBySource(sourceMoneyId.toString());
-      if (sourceMonies.size() == 1) {
-        Money sourceMoney = sourceMonies.get(0);
-        if (Objects.nonNull(sourceMoney.getSourceMoneyId())) {
-          Money parentMoney = moneyRepository.findById(sourceMonies.get(0).getSourceMoneyId()).orElse(null);
-          if (Objects.nonNull(parentMoney)) {
-            parentMoney.setGivenCash(parentMoney.getGivenCash().add(sourceMoney.getGivenCash()));
-            moneyRepository.save(parentMoney);
-            moneyRepository.delete(sourceMoney);
-          }
-        }
-      }
+  }
+
+  private void deleteAccountTransactions(Money money) {
+    AccountTransaction transaction = money.getTransaction();
+    if (Objects.isNull(transaction)) {
+      throw new ApiException("Не найдена транзакция по перепродаже доли", HttpStatus.NOT_FOUND);
+    }
+    AccountTransaction parentTx = transaction.getParent();
+    accountTransactionService.delete(transaction);
+    if (Objects.nonNull(parentTx)) {
+      accountTransactionService.delete(parentTx);
     }
   }
 
@@ -572,16 +594,8 @@ public class InvestorCashService {
     return money.getInvestor().getLogin().replaceAll("\\D+", "");
   }
 
-  private Money getByTransactionUUID(InvestorCashDTO dto) {
-    List<Money> monies = moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
-    if (monies.size() > 1) {
-      log.error("Найдено несколько сумм по UUID {}: {}", dto.getTransactionUUID(), monies);
-      throw new ApiException(
-          String.format("Найдено несколько сумм по UUID %s", dto.getTransactionUUID()), HttpStatus.BAD_REQUEST);
-    } else if (monies.size() == 0) {
-      return null;
-    }
-    return monies.get(0);
+  private List<Money> getByTransactionUUID(InvestorCashDTO dto) {
+    return moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
   }
 
 }

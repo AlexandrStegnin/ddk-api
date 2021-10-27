@@ -1,14 +1,10 @@
 package com.ddkolesnik.ddkapi.model.cash;
 
-import java.time.LocalDateTime;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 /**
  * Сущность для хранения инфо о том, с кем заключён договор
@@ -25,45 +21,46 @@ import javax.persistence.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserAgreement {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_agreement_generator")
+  @SequenceGenerator(name = "user_agreement_generator", sequenceName = "user_agreement_id_seq")
+  Long id;
 
-    /**
-     * ID объекта
-     */
-    @Column(name = "facility_id")
-    Long facilityId;
+  /**
+   * ID объекта
+   */
+  @Column(name = "facility_id")
+  Long facilityId;
 
-    /**
-     * С кем заключён договор (ЮЛ/ФЛ)
-     */
-    @Column(name = "concluded_with")
-    String concludedWith;
+  /**
+   * С кем заключён договор (ЮЛ/ФЛ)
+   */
+  @Column(name = "concluded_with")
+  String concludedWith;
 
-    /**
-     * От кого заключён договор (id инвестора)
-     */
-    @Column(name = "concluded_from")
-    Long concludedFrom;
+  /**
+   * От кого заключён договор (id инвестора)
+   */
+  @Column(name = "concluded_from")
+  Long concludedFrom;
 
-    /**
-     * Налоговая ставка (%)
-     */
-    @Column(name = "tax_rate")
-    Double taxRate;
+  /**
+   * Налоговая ставка (%)
+   */
+  @Column(name = "tax_rate")
+  Double taxRate;
 
-    /**
-     * От кого заключён договор (название организации)
-     */
-    @Column(name = "organization")
-    String organization;
+  /**
+   * От кого заключён договор (название организации)
+   */
+  @Column(name = "organization")
+  String organization;
 
-    @Column(name = "modified_time")
-    LocalDateTime modifiedTime;
+  @Column(name = "modified_time")
+  LocalDateTime modifiedTime;
 
-    @PreUpdate
-    public void preUpdate() {
-        this.modifiedTime = LocalDateTime.now();
-    }
+  @PreUpdate
+  public void preUpdate() {
+    this.modifiedTime = LocalDateTime.now();
+  }
 }

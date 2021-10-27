@@ -21,53 +21,54 @@ import java.time.LocalDate;
 @Table(name = "investor_cash_log")
 public class InvestorCashLog {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "investor_cash_log_generator")
+  @SequenceGenerator(name = "investor_cash_log_generator", sequenceName = "investor_cash_log_id_seq")
+  @Column(name = "id")
+  private Long id;
 
-    @Column(name = "cash_id")
-    private Long cashId;
+  @Column(name = "cash_id")
+  private Long cashId;
 
-    @OneToOne
-    @JoinColumn(name = "investor_id")
-    private Investor investor;
+  @OneToOne
+  @JoinColumn(name = "investor_id")
+  private Investor investor;
 
-    @OneToOne
-    @JoinColumn(name = "facility_id")
-    private Facility facility;
+  @OneToOne
+  @JoinColumn(name = "facility_id")
+  private Facility facility;
 
-    @Column(name = "given_cash")
-    private BigDecimal givenCash;
+  @Column(name = "given_cash")
+  private BigDecimal givenCash;
 
-    @Column(name = "date_given_cash")
-    private LocalDate dateGiven;
+  @Column(name = "date_given_cash")
+  private LocalDate dateGiven;
 
-    @OneToOne
-    @JoinColumn(name = "cash_source_id")
-    private CashSource cashSource;
+  @OneToOne
+  @JoinColumn(name = "cash_source_id")
+  private CashSource cashSource;
 
-    @Column(name = "date_closing_invest")
-    private LocalDate dateClosing;
+  @Column(name = "date_closing_invest")
+  private LocalDate dateClosing;
 
-    @OneToOne
-    @JoinColumn(name = "tx_id")
-    private TransactionLog transactionLog;
+  @OneToOne
+  @JoinColumn(name = "tx_id")
+  private TransactionLog transactionLog;
 
-    @Enumerated
-    @Column(name = "instance_of")
-    private CashType instanceOf;
+  @Enumerated
+  @Column(name = "instance_of")
+  private CashType instanceOf;
 
-    public InvestorCashLog(Money cash, TransactionLog log) {
-        this.cashId = cash.getId();
-        this.investor = cash.getInvestor();
-        this.facility = cash.getFacility();
-        this.givenCash = cash.getGivenCash();
-        this.dateGiven = cash.getDateGiven();
-        this.cashSource = cash.getCashSource();
-        this.dateClosing = cash.getDateClosing();
-        this.transactionLog = log;
-        this.instanceOf = CashType.CASH_1C;
-    }
+  public InvestorCashLog(Money cash, TransactionLog log) {
+    this.cashId = cash.getId();
+    this.investor = cash.getInvestor();
+    this.facility = cash.getFacility();
+    this.givenCash = cash.getGivenCash();
+    this.dateGiven = cash.getDateGiven();
+    this.cashSource = cash.getCashSource();
+    this.dateClosing = cash.getDateClosing();
+    this.transactionLog = log;
+    this.instanceOf = CashType.CASH_1C;
+  }
 
 }

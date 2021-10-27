@@ -15,23 +15,23 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class UserProfile {
 
-    @Id
-    private Long id;
+  @Id
+  private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
-    @MapsId
-    private AppUser user;
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "id")
+  @MapsId
+  private AppUser user;
 
-    @Column(name = "last_name")
-    private String lastName;
+  @Column(name = "last_name")
+  private String lastName;
 
-    @Column(name = "first_name")
-    private String firstName;
+  @Column(name = "first_name")
+  private String firstName;
 
-    @Column(name = "patronymic")
-    private String patronymic;
+  @Column(name = "patronymic")
+  private String patronymic;
 
-    private String email;
+  private String email;
 
 }

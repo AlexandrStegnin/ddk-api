@@ -16,24 +16,22 @@ import javax.persistence.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Facility {
 
-    @Id
-    @TableGenerator(name = "facilitySeqStore", table = "SEQ_STORE",
-            pkColumnName = "SEQ_NAME", pkColumnValue = "FACILITY.ID.PK",
-            valueColumnName = "SEQ_VALUE", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "facilitySeqStore")
-    @Column(name = "id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "facility_generator")
+  @SequenceGenerator(name = "facility_generator", sequenceName = "facility_id_seq")
+  @Column(name = "id")
+  private Long id;
 
-    @Column(name = "name")
-    String name;
+  @Column(name = "name")
+  String name;
 
-    @Column(name = "full_name")
-    String fullName;
+  @Column(name = "full_name")
+  String fullName;
 
-    @Column(name = "city")
-    String city;
+  @Column(name = "city")
+  String city;
 
-    @Column(name = "project_uuid")
-    String projectUUID;
-    
+  @Column(name = "project_uuid")
+  String projectUUID;
+
 }

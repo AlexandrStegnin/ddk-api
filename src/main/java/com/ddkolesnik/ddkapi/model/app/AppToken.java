@@ -1,17 +1,13 @@
 package com.ddkolesnik.ddkapi.model.app;
 
-import com.ddkolesnik.ddkapi.model.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 /**
@@ -24,24 +20,28 @@ import java.time.LocalDate;
 @Data
 @Entity
 @Table(name = "app_token")
-@EqualsAndHashCode(callSuper = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AppToken extends AbstractEntity {
+public class AppToken {
 
-    @Column(name = "app_name")
-    String name;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "app_token_generator")
+  @SequenceGenerator(name = "app_token_generator", sequenceName = "app_token_id_seq")
+  Long id;
 
-    @Column(name = "token")
-    String token;
+  @Column(name = "app_name")
+  String name;
 
-    @JsonIgnore
-    @CreationTimestamp
-    @Column(name = "creation_time")
-    LocalDate creationTime;
+  @Column(name = "token")
+  String token;
 
-    @JsonIgnore
-    @UpdateTimestamp
-    @Column(name = "modified_time")
-    LocalDate modifiedTime;
+  @JsonIgnore
+  @CreationTimestamp
+  @Column(name = "creation_time")
+  LocalDate creationTime;
+
+  @JsonIgnore
+  @UpdateTimestamp
+  @Column(name = "modified_time")
+  LocalDate modifiedTime;
 
 }

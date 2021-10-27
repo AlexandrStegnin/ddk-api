@@ -1,6 +1,5 @@
 package com.ddkolesnik.ddkapi.model.security;
 
-import com.ddkolesnik.ddkapi.model.AbstractEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -18,27 +17,29 @@ import static com.ddkolesnik.ddkapi.util.Constant.ROLE_PREFIX;
 @Entity
 @Table(name = "app_role", schema = "investments", catalog = "investments")
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false, of = "id")
-public class Role extends AbstractEntity implements GrantedAuthority {
+@EqualsAndHashCode(of = "id")
+public class Role implements GrantedAuthority {
 
-    @Id
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "app_role_log_generator")
+  @SequenceGenerator(name = "app_role_log_generator", sequenceName = "app_role_log_id_seq")
+  private Long id;
 
-    @Column(name = "name")
-    private String title;
+  @Column(name = "name")
+  private String title;
 
-    @Override
-    public String getAuthority() {
-        return title.startsWith(ROLE_PREFIX) ? title : ROLE_PREFIX + title;
-    }
+  @Override
+  public String getAuthority() {
+    return title.startsWith(ROLE_PREFIX) ? title : ROLE_PREFIX + title;
+  }
 
-    @PrePersist
-    public void setRole() {
-        if (!title.trim().toUpperCase().startsWith(ROLE_PREFIX)) title = ROLE_PREFIX + title.trim().toUpperCase();
-        else title = title.trim().toUpperCase();
-    }
+  @PrePersist
+  public void setRole() {
+    if (!title.trim().toUpperCase().startsWith(ROLE_PREFIX)) title = ROLE_PREFIX + title.trim().toUpperCase();
+    else title = title.trim().toUpperCase();
+  }
 
-    public Role(GrantedAuthority authority) {
-        this.title = authority.getAuthority();
-    }
+  public Role(GrantedAuthority authority) {
+    this.title = authority.getAuthority();
+  }
 }

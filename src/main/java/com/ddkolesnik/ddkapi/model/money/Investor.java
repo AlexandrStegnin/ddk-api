@@ -1,14 +1,10 @@
 package com.ddkolesnik.ddkapi.model.money;
 
-import com.ddkolesnik.ddkapi.model.AbstractEntity;
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.List;
 
 /**
@@ -19,11 +15,15 @@ import java.util.List;
 @Entity
 @Table(name = "app_user", schema = "investments", catalog = "investments")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@EqualsAndHashCode(callSuper = false)
-public class Investor extends AbstractEntity {
+public class Investor {
 
-    String login;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "app_user_generator")
+  @SequenceGenerator(name = "app_user_generator", sequenceName = "app_user_id_seq")
+  Long id;
 
-    @OneToMany(mappedBy = "investor")
-    List<Money> monies;
+  String login;
+
+  @OneToMany(mappedBy = "investor")
+  List<Money> monies;
 }

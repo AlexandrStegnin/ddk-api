@@ -18,13 +18,14 @@ import javax.persistence.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CashSource {
 
-    @Id
-    @GeneratedValue
-    Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cash_source_generator")
+  @SequenceGenerator(name = "cash_source_generator", sequenceName = "cash_source_id_seq")
+  Long id;
 
-    @Column(name = "name")
-    String name;
+  @Column(name = "name")
+  String name;
 
-    @Column(name = "organization_id")
-    String organization;
+  @Column(name = "organization_id")
+  String organization;
 }

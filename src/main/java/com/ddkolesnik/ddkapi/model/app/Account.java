@@ -18,21 +18,22 @@ import javax.persistence.*;
 @EqualsAndHashCode(of = {"id", "accountNumber"})
 public class Account {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_generator")
+  @SequenceGenerator(name = "account_generator", sequenceName = "account_id_seq")
+  @Column(name = "id")
+  private Long id;
 
-    @Column(name = "account_number")
-    private String accountNumber;
+  @Column(name = "account_number")
+  private String accountNumber;
 
-    @Column(name = "owner_id")
-    private Long ownerId;
+  @Column(name = "owner_id")
+  private Long ownerId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "owner_type")
-    private OwnerType ownerType;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "owner_type")
+  private OwnerType ownerType;
 
-    @Column(name = "owner_name")
-    private String ownerName;
+  @Column(name = "owner_name")
+  private String ownerName;
 }

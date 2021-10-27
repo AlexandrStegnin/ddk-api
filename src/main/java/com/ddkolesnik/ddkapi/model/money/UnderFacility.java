@@ -1,12 +1,8 @@
 package com.ddkolesnik.ddkapi.model.money;
 
-import com.ddkolesnik.ddkapi.model.AbstractEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * @author Alexandr Stegnin
@@ -15,10 +11,14 @@ import javax.persistence.Table;
 @Data
 @Entity
 @Table(name = "under_facility")
-@EqualsAndHashCode(callSuper = true)
-public class UnderFacility extends AbstractEntity {
+public class UnderFacility {
 
-    @Column(name = "name")
-    private String name;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "under_facility_generator")
+  @SequenceGenerator(name = "under_facility_generator", sequenceName = "under_facility_id_seq")
+  Long id;
+
+  @Column(name = "name")
+  private String name;
 
 }
