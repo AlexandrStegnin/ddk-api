@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Transactional
 @SpringBootTest
-public class InvestorCashServiceTest {
+class InvestorCashServiceTest {
 
     @Autowired
     private InvestorCashService investorCashService;
@@ -44,7 +44,7 @@ public class InvestorCashServiceTest {
     private FacilityRepository facilityRepository;
 
     @Test
-    public void createMoneyTest() {
+    void createMoneyTest() {
         InvestorCashDTO dto = getDTO();
         ApiSuccessResponse response = investorCashService.update(dto);
         assertTrue(response.getStatus().is2xxSuccessful());

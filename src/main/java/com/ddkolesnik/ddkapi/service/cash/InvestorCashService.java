@@ -50,7 +50,7 @@ import static com.ddkolesnik.ddkapi.util.Constant.INVESTOR_PREFIX;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class InvestorCashService {
 
-  static LocalDate FILTERED_DATE = LocalDate.of(2020, 6, 30);
+  private static final LocalDate FILTERED_DATE = LocalDate.of(2020, 6, 30);
   MoneyRepository moneyRepository;
   InvestorService investorService;
   FacilityService facilityService;
@@ -63,38 +63,45 @@ public class InvestorCashService {
   AccountRepository accountRepository;
 
   public ApiSuccessResponse update(InvestorCashDTO dto) {
-    if (checkCash(dto)) {
-      AccountingCode code = AccountingCode.fromCode(dto.getAccountingCode());
-      List<Money> monies = getByTransactionUUID(dto);
-      if (dto.isDelete() && !monies.isEmpty() && Objects.isNull(code)) {
-        monies.forEach(this::delete);
-      } else {
-        Money money = monies.get(0);
-        if (Objects.nonNull(code) && code.isResale()) {
-          resaleShare(dto);
-        } else if (Objects.nonNull(code) && code.isCashing()) {
-          cashing(dto);
-        } else {
-          if (Objects.isNull(money)) {
-            money = moneyRepository.findMoney(dto.getDateGiven(), dto.getGivenCash(), dto.getFacility(),
-                dto.getCashSource(), Constant.INVESTOR_PREFIX.concat(dto.getInvestorCode()));
-            if (Objects.isNull(money)) {
-              money = create(dto);
-              sendMessage(money.getInvestor());
-              transactionLogService.create(money);
-            } else {
-              transactionLogService.update(money);
-              update(money, dto);
-            }
-          } else {
-            transactionLogService.update(money);
-            update(money, dto);
-          }
-        }
-      }
-      log.info("Проводка успешно обновлена [{}]", dto);
+    if (isBeforeFilteredDate(dto)) {
+      return new ApiSuccessResponse(HttpStatus.PRECONDITION_FAILED, "Старая проводка, операция невозможна");
     }
+    AccountingCode code = AccountingCode.fromCode(dto.getAccountingCode());
+    List<Money> monies = getByTransactionUUID(dto);
+    if (isMoneyToDelete(dto, code, monies)) {
+      monies.forEach(this::delete);
+      return new ApiSuccessResponse(HttpStatus.OK, "Проводки успешно удалены");
+    }
+    Money money = monies.get(0);
+    if (AccountingCode.isResale(code)) {
+      resaleShare(dto);
+      return new ApiSuccessResponse(HttpStatus.OK, "Доля успешно перепродана");
+    }
+    if (AccountingCode.isCashing(code)) {
+      cashing(dto);
+      return new ApiSuccessResponse(HttpStatus.OK, "Деньги успешно выведены");
+    }
+    if (Objects.nonNull(money)) {
+      transactionLogService.update(money);
+      update(money, dto);
+      return new ApiSuccessResponse(HttpStatus.OK, "Данные успешно обновлены");
+    }
+    money = moneyRepository.findMoney(dto.getDateGiven(), dto.getGivenCash(), dto.getFacility(),
+        dto.getCashSource(), Constant.INVESTOR_PREFIX.concat(dto.getInvestorCode()));
+    if (Objects.isNull(money)) {
+      money = create(dto);
+      sendMessage(money.getInvestor());
+      transactionLogService.create(money);
+    } else {
+      transactionLogService.update(money);
+      update(money, dto);
+    }
+    log.info("Проводка успешно обновлена [{}]", dto);
     return new ApiSuccessResponse(HttpStatus.OK, "Данные успешно сохранены");
+  }
+
+  private boolean isMoneyToDelete(InvestorCashDTO dto, AccountingCode code, List<Money> monies) {
+    return dto.isDelete() && !monies.isEmpty() && Objects.isNull(code);
   }
 
   /**
@@ -196,7 +203,7 @@ public class InvestorCashService {
         closeSellerAndOpenBuyerMonies(sellerBiggestSum, buyer, dto);
       }
     } else {
-        closeSellerAndOpenBuyerMonies(sellerEqualSum, buyer, dto);
+      closeSellerAndOpenBuyerMonies(sellerEqualSum, buyer, dto);
     }
   }
 
@@ -563,7 +570,7 @@ public class InvestorCashService {
    * @param dto DTO денег
    * @return результат проверки
    */
-  private boolean checkCash(InvestorCashDTO dto) {
+  private boolean isBeforeFilteredDate(InvestorCashDTO dto) {
     boolean isAfterFilteredDate = Objects.nonNull(dto.getDateGiven())
         && dto.getDateGiven().isAfter(FILTERED_DATE);
     if (!isAfterFilteredDate) {
