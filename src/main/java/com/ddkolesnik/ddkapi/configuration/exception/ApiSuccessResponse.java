@@ -10,8 +10,6 @@ import org.springframework.http.HttpStatus;
 /**
  * @author Alexandr Stegnin
  */
-
-
 @Getter
 @RequiredArgsConstructor
 @Schema(name = "ApiSuccessResponse", description = "Информация об успешном выполнении запроса")
