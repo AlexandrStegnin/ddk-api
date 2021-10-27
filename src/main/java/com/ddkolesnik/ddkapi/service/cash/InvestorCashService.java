@@ -72,7 +72,6 @@ public class InvestorCashService {
       monies.forEach(this::delete);
       return new ApiSuccessResponse(HttpStatus.OK, "Проводки успешно удалены");
     }
-    Money money = monies.get(0);
     if (AccountingCode.isResale(code)) {
       resaleShare(dto);
       return new ApiSuccessResponse(HttpStatus.OK, "Доля успешно перепродана");
@@ -81,6 +80,7 @@ public class InvestorCashService {
       cashing(dto);
       return new ApiSuccessResponse(HttpStatus.OK, "Деньги успешно выведены");
     }
+    Money money = monies.isEmpty() ? null : monies.get(0);
     if (Objects.nonNull(money)) {
       transactionLogService.update(money);
       update(money, dto);
@@ -576,7 +576,7 @@ public class InvestorCashService {
     if (!isAfterFilteredDate) {
       log.info("Сумма не прошла первичную проверку {}", dto);
     }
-    return isAfterFilteredDate;
+    return !isAfterFilteredDate;
   }
 
   /**
