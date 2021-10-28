@@ -297,10 +297,9 @@ public class InvestorCashService {
 
   @Nullable
   private Long releaseRelatedMonies(Money money) {
-    Money relatedMoney;
     Long sourceMoneyId = money.getSourceMoneyId();
     if (Objects.nonNull(sourceMoneyId)) {
-      relatedMoney = moneyRepository.findById(sourceMoneyId).orElse(null);
+      Money relatedMoney = moneyRepository.findById(sourceMoneyId).orElse(null);
       if (Objects.nonNull(relatedMoney)) {
         relatedMoney.setTypeClosingId(null);
         relatedMoney.setDateClosing(null);
