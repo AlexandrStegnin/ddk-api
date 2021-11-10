@@ -25,16 +25,11 @@ public interface MoneyRepository extends JpaRepository<Money, Long>, JpaSpecific
   void deleteByTransactionUUID(String transactionUUID);
 
   @Query("SELECT m FROM Money m WHERE m.dateGiven = :dateGiven AND m.givenCash = :givenCash AND " +
-      "m.facility.fullName = :facilityName AND m.cashSource.organization = :organizationId AND m.investor.login = :login")
+      "m.facility.fullName = :facilityName AND m.cashSource.organization = :organizationId AND m.investor.login = :login " +
+      "AND m.transactionUUID IS NULL")
   Money findMoney(@Param("dateGiven") LocalDate dateGiven, @Param("givenCash") BigDecimal givenCash,
                   @Param("facilityName") String facilityName, @Param("organizationId") String organizationId,
                   @Param("login") String login);
-
-  @Query("SELECT m FROM Money m WHERE m.givenCash <= :givenCash AND " +
-      "m.facility.fullName = :facilityName AND m.investor.login = :login " +
-      "AND m.dateClosing IS NULL AND m.typeClosingId IS NULL")
-  List<Money> getMonies(@Param("givenCash") BigDecimal givenCash, @Param("facilityName") String facilityName,
-                        @Param("login") String login);
 
   @Query("SELECT m FROM Money m " +
       "WHERE m.investor.login = :login " +
