@@ -50,9 +50,9 @@ public class InvestorCashController {
   @Operation(summary = "Создание проводки на основании данных из 1С", tags = {"InvestorCash"})
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Успешно",
-          content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiSuccessResponse.class)))),
+          content = @Content(schema = @Schema(implementation = ApiSuccessResponse.class))),
       @ApiResponse(responseCode = "Error", description = "Произошла ошибка",
-          content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class))))})
+          content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))})
   @PostMapping(value = PATH_INVESTOR_CASH + PATH_INVESTOR_CASH_UPDATE, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ApiSuccessResponse createInvestorCash(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
                                                @PathVariable(name = "token") @ValidToken String token,
@@ -64,9 +64,9 @@ public class InvestorCashController {
   @Operation(summary = "Создание проводки на основании данных из 1С", tags = {"InvestorCash"})
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Успешно",
-          content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiSuccessResponse.class)))),
+          content = @Content(schema = @Schema(implementation = ApiSuccessResponse.class))),
       @ApiResponse(responseCode = "Error", description = "Произошла ошибка",
-          content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiErrorResponse.class))))})
+          content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))})
   @PostMapping(value = PATH_INVESTOR_CASH_V2 + PATH_INVESTOR_CASH_UPDATE,
       consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ApiSuccessResponse createInvestorCashList(@Parameter(description = "Ключ приложения.", schema = @Schema(implementation = String.class))
