@@ -26,6 +26,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,18 @@ public class InvestorCashService {
   ResaleShareService resaleShareService;
   CashingService cashingService;
   MoneyMapper moneyMapper;
+
+  public ApiSuccessResponse update(List<InvestorCashDTO> dtoList) {
+    if (dtoList.isEmpty()) {
+      return new ApiSuccessResponse(HttpStatus.PRECONDITION_FAILED, "Список сумм не может быть пустым");
+    }
+    InvestorCashDTO dto = dtoList.get(0);
+    BigDecimal sumCash = dtoList.stream()
+        .map(InvestorCashDTO::getGivenCash)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    dto.setGivenCash(sumCash);
+    return update(dto);
+  }
 
   public ApiSuccessResponse update(InvestorCashDTO dto) {
     if (isBeforeFilteredDate(dto)) {
