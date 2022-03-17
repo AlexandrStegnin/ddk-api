@@ -2,6 +2,7 @@ package com.ddkolesnik.ddkapi.repository.cash;
 
 import com.ddkolesnik.ddkapi.model.cash.CashSource;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CashSourceRepository extends JpaRepository<CashSource, Long> {
 
-    CashSource findByOrganization(String organization);
+  @Query("SELECT cs FROM CashSource cs WHERE lower(cs.organization) = lower(:organization) ")
+  CashSource findByOrganization(String organization);
 
 }

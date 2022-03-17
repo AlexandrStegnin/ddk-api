@@ -20,16 +20,16 @@ import org.springframework.stereotype.Service;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class CashSourceService {
 
-    CashSourceRepository cashSourceRepository;
+  CashSourceRepository cashSourceRepository;
 
-    public CashSource findByOrganization(String organization) {
-        CashSource cashSource = cashSourceRepository.findByOrganization(organization);
-        if (cashSource == null) {
-            String message = String.format("Источник денег [%s] не найден.", organization);
-            log.error(message);
-            throw new ApiException(message, HttpStatus.NOT_FOUND);
-        }
-        return cashSource;
+  public CashSource findByOrganization(String organization) {
+    CashSource cashSource = cashSourceRepository.findByOrganization(organization);
+    if (cashSource == null) {
+      String message = String.format("Источник денег [%s] не найден.", organization);
+      log.error(message);
+      throw new ApiException(message, HttpStatus.NOT_FOUND);
     }
+    return cashSource;
+  }
 
 }
