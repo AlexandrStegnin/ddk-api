@@ -1,5 +1,8 @@
 package com.ddkolesnik.ddkapi.controller.app;
 
+import static com.ddkolesnik.ddkapi.util.Constant.FACILITIES;
+import static com.ddkolesnik.ddkapi.util.Constant.UPDATE_FACILITY;
+
 import com.ddkolesnik.ddkapi.configuration.annotation.ValidToken;
 import com.ddkolesnik.ddkapi.configuration.exception.ApiErrorResponse;
 import com.ddkolesnik.ddkapi.configuration.exception.ApiSuccessResponse;
@@ -13,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,12 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-
-import static com.ddkolesnik.ddkapi.util.Constant.FACILITIES;
-import static com.ddkolesnik.ddkapi.util.Constant.UPDATE_FACILITY;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Alexandr Stegnin
@@ -55,7 +58,7 @@ public class FacilityController {
                                      @Parameter(description = "Объект", schema = @Schema(implementation = FacilityDTO.class))
                                      @Valid @RequestBody FacilityDTO facility) {
         facilityService.update(facility);
-        log.info("Объект успешно обновлён [{}]", facility);
+        log.info("Объект {} успешно обновлён. Ключ {}", facility, token);
         return new ApiSuccessResponse(HttpStatus.OK, "Объект успешно сохранён");
     }
 
