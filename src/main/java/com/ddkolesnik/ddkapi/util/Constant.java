@@ -41,6 +41,8 @@ public class Constant {
 
   public static final String PATH_INVESTOR_CASH_UPDATE = "/update";
 
+  public static final String PATH_INVESTOR_CASH_DELETE = "/delete";
+
   // MESSAGES
   public static final String UNKNOWN_FACILITY = "Неизвестный объект";
 

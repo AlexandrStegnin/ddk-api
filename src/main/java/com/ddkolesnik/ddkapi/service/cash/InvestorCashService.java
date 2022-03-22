@@ -1,10 +1,15 @@
 package com.ddkolesnik.ddkapi.service.cash;
 
 import com.ddkolesnik.ddkapi.configuration.exception.ApiSuccessResponse;
+import com.ddkolesnik.ddkapi.dto.cash.DeleteCashDTO;
 import com.ddkolesnik.ddkapi.dto.cash.InvestorCashDTO;
 import com.ddkolesnik.ddkapi.model.cash.CashSource;
 import com.ddkolesnik.ddkapi.model.log.TransactionLog;
-import com.ddkolesnik.ddkapi.model.money.*;
+import com.ddkolesnik.ddkapi.model.money.AccountTransaction;
+import com.ddkolesnik.ddkapi.model.money.Facility;
+import com.ddkolesnik.ddkapi.model.money.Investor;
+import com.ddkolesnik.ddkapi.model.money.Money;
+import com.ddkolesnik.ddkapi.model.money.UnderFacility;
 import com.ddkolesnik.ddkapi.repository.money.MoneyRepository;
 import com.ddkolesnik.ddkapi.service.CashingService;
 import com.ddkolesnik.ddkapi.service.ResaleShareService;
@@ -17,6 +22,11 @@ import com.ddkolesnik.ddkapi.service.money.InvestorService;
 import com.ddkolesnik.ddkapi.service.money.UnderFacilityService;
 import com.ddkolesnik.ddkapi.util.AccountingCode;
 import com.ddkolesnik.ddkapi.util.Constant;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -25,12 +35,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Сервис для работы с проводками из 1С
@@ -76,7 +80,7 @@ public class InvestorCashService {
       return new ApiSuccessResponse(HttpStatus.PRECONDITION_FAILED, "Старая проводка, операция невозможна");
     }
     AccountingCode code = AccountingCode.fromCode(dto.getAccountingCode());
-    List<Money> monies = getByTransactionUUID(dto);
+    List<Money> monies = getByTransactionUUID(dto.getTransactionUUID());
     if (isMoneyToDelete(dto, code, monies)) {
       monies.forEach(this::delete);
       return new ApiSuccessResponse(HttpStatus.OK, SUCCESSFUL_SAVED);
@@ -105,8 +109,13 @@ public class InvestorCashService {
       transactionLogService.update(money);
       update(money, dto);
     }
-    log.info("Проводка успешно обновлена [{}]", dto);
+    log.info("Проводка успешно обновлена: {}", dto);
     return new ApiSuccessResponse(HttpStatus.OK, SUCCESSFUL_SAVED);
+  }
+
+  public void delete(DeleteCashDTO dto) {
+    var monies = getByTransactionUUID(dto.getTransactionUUID());
+    monies.forEach(this::delete);
   }
 
   private boolean isMoneyToDelete(InvestorCashDTO dto, AccountingCode code, List<Money> monies) {
@@ -294,8 +303,8 @@ public class InvestorCashService {
     return money.getInvestor().getLogin().replaceAll("\\D+", "");
   }
 
-  private List<Money> getByTransactionUUID(InvestorCashDTO dto) {
-    return moneyRepository.findByTransactionUUID(dto.getTransactionUUID());
+  private List<Money> getByTransactionUUID(String transactionUUID) {
+    return moneyRepository.findByTransactionUUID(transactionUUID);
   }
 
 }
