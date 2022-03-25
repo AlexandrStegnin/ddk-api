@@ -101,7 +101,7 @@ public class InvestorCashController {
       @Valid @RequestBody DeleteCashDTO dto) {
     investorCashService.delete(dto);
     log.info("Money was deleted {}", dto);
-    return new ApiSuccessResponse(HttpStatus.OK, "Данные успешно удалены");
+    return new ApiSuccessResponse(HttpStatus.OK, "Данные успешно сохранены");
   }
 
 }
