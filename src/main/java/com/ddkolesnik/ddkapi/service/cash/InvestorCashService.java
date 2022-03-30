@@ -3,6 +3,7 @@ package com.ddkolesnik.ddkapi.service.cash;
 import com.ddkolesnik.ddkapi.configuration.exception.ApiSuccessResponse;
 import com.ddkolesnik.ddkapi.dto.cash.DeleteCashDTO;
 import com.ddkolesnik.ddkapi.dto.cash.InvestorCashDTO;
+import com.ddkolesnik.ddkapi.mapper.InvestorCashMapper;
 import com.ddkolesnik.ddkapi.model.cash.CashSource;
 import com.ddkolesnik.ddkapi.model.log.TransactionLog;
 import com.ddkolesnik.ddkapi.model.money.AccountTransaction;
@@ -59,6 +60,7 @@ public class InvestorCashService {
   TransactionLogService transactionLogService;
   UnderFacilityService underFacilityService;
   AccountTransactionService accountTransactionService;
+  InvestorCashMapper investorCashMapper;
   ResaleShareService resaleShareService;
   CashingService cashingService;
   MoneyMapper moneyMapper;
@@ -126,22 +128,15 @@ public class InvestorCashService {
   }
 
   private void deleteResaleShare(DeleteCashDTO dto) {
-    InvestorCashDTO cashDTO = buildCashDTO(dto);
+    InvestorCashDTO cashDTO = investorCashMapper.toCashDTO(dto);
     log.info("Deleting resale share");
     resaleShareService.resaleShare(cashDTO);
   }
 
   private void deleteCashing(DeleteCashDTO dto) {
-    InvestorCashDTO cashDTO = buildCashDTO(dto);
+    InvestorCashDTO cashDTO = investorCashMapper.toCashDTO(dto);
     log.info("Deleting cashing");
     cashingService.cashing(cashDTO);
-  }
-
-  private InvestorCashDTO buildCashDTO(DeleteCashDTO dto) {
-    return InvestorCashDTO.builder()
-        .delete(true)
-        .transactionUUID(dto.getTransactionUUID())
-        .build();
   }
 
   private boolean isMoneyToDelete(InvestorCashDTO dto, AccountingCode code, List<Money> monies) {
