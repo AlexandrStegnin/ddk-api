@@ -1,5 +1,7 @@
 package com.ddkolesnik.ddkapi.service;
 
+import static com.ddkolesnik.ddkapi.util.Constant.INVESTOR_PREFIX;
+
 import com.ddkolesnik.ddkapi.configuration.exception.ApiException;
 import com.ddkolesnik.ddkapi.dto.cash.InvestorCashDTO;
 import com.ddkolesnik.ddkapi.model.app.Account;
@@ -16,6 +18,12 @@ import com.ddkolesnik.ddkapi.service.cash.CashSourceService;
 import com.ddkolesnik.ddkapi.service.money.AccountTransactionService;
 import com.ddkolesnik.ddkapi.service.money.InvestorService;
 import com.ddkolesnik.ddkapi.util.OwnerType;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,15 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import static com.ddkolesnik.ddkapi.util.Constant.INVESTOR_PREFIX;
 
 /**
  * @author Alexandr Stegnin
@@ -64,9 +63,6 @@ public class ResaleShareService {
 
   private void deleteResale(InvestorCashDTO dto) {
     List<Money> monies = getByTransactionUUID(dto);
-    if (monies.isEmpty()) {
-      throw new ApiException("Не найдена сумма для удаления", HttpStatus.NOT_FOUND);
-    }
     for (Money money : monies) {
       deleteAccountTransactions(money);
       Long sourceMoneyId = releaseRelatedMonies(money);
