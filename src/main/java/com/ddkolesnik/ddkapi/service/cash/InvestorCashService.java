@@ -114,8 +114,34 @@ public class InvestorCashService {
   }
 
   public void delete(DeleteCashDTO dto) {
+    deleteMonies(dto);
+    deleteResaleShare(dto);
+    deleteCashing(dto);
+  }
+
+  private void deleteMonies(DeleteCashDTO dto) {
     var monies = getByTransactionUUID(dto.getTransactionUUID());
+    log.info("Deleting monies");
     monies.forEach(this::delete);
+  }
+
+  private void deleteResaleShare(DeleteCashDTO dto) {
+    InvestorCashDTO cashDTO = buildCashDTO(dto);
+    log.info("Deleting resale share");
+    resaleShareService.resaleShare(cashDTO);
+  }
+
+  private void deleteCashing(DeleteCashDTO dto) {
+    InvestorCashDTO cashDTO = buildCashDTO(dto);
+    log.info("Deleting cashing");
+    cashingService.cashing(cashDTO);
+  }
+
+  private InvestorCashDTO buildCashDTO(DeleteCashDTO dto) {
+    return InvestorCashDTO.builder()
+        .delete(true)
+        .transactionUUID(dto.getTransactionUUID())
+        .build();
   }
 
   private boolean isMoneyToDelete(InvestorCashDTO dto, AccountingCode code, List<Money> monies) {

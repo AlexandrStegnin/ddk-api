@@ -82,6 +82,7 @@ public class InvestorCashController {
       @Parameter(description = "Проводки из 1С",
           array = @ArraySchema(schema = @Schema(implementation = InvestorCashDTO.class)))
       @Valid @RequestBody List<InvestorCashDTO> dtoList) {
+    log.info("Update investor cash list: {}", dtoList);
     return investorCashService.update(dtoList);
   }
 

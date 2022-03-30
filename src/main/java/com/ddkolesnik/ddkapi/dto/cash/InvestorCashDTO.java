@@ -2,7 +2,10 @@ package com.ddkolesnik.ddkapi.dto.cash;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotBlank;
@@ -15,8 +18,10 @@ import java.time.LocalDate;
  *
  * @author Alexandr Stegnin
  */
-
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(name = "InvestorCash", description = "Информация о вложениях инвестора из 1С")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class InvestorCashDTO {
